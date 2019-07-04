@@ -21,8 +21,8 @@ params.cpus = 4
 params.mem = "8GB"
 
 // choose the Method (hybrid or long with short polishing)
-params.method = ''
-if (params.method != 'metaflye' && params.assembler != 'metaspades') {
+params.assembler = ''
+if (params.assembler != 'metaflye' && params.assembler != 'metaspades') {
         exit 1, "--method: ${params.method}. \
         Should be 'metaflye'or 'metaspades'"
 }
@@ -60,7 +60,7 @@ process assembly {
         set val(name), file(illumina), file(nanopore), file('assembly.fasta') into {qc_assembly, mapping_assembly, polishing_assembly }
 
     script:
-    if(params.method == 'metaspades')
+    if(params.assembler == 'metaspades')
         """
         spades.py -1 ${illumina[0]} -2 ${illumina[1]}  --meta --nanopore ${nanopore} -o spades_output -t ${task.cpus} -m ${task.mem}
         mv spades_output/contigs.fasta  assembly.fasta
