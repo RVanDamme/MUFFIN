@@ -20,14 +20,14 @@ params.mem = "8GB"
 params.filter = FALSE
 params.qual = FALSE
 
-if (params.filter == '' & params.qual == '')
-    readsFileList_ch = readFileList_illumina.join(readFileList_nanopore)
-else if (params.filter == '' & params.qual == TRUE)
+if (params.filter == '' & params.qual == ''){
+    readsFileList_ch = readFileList_illumina.join(readFileList_nanopore)}
+else if (params.filter == '' & params.qual == TRUE){
     readsFileList_qual = readFileList_illumina.join(readFileList_nanopore)
-else if (params.filter == TRUE & params.qual == '')
-    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)
-else if (params.filter == TRUE & params.qual == TRUE)
-    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)
+else if (params.filter == TRUE & params.qual == ''){
+    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)}
+else if (params.filter == TRUE & params.qual == TRUE){
+    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)}
 
 
 // choose the Method (hybrid or long with short polishing)
@@ -108,7 +108,7 @@ process assembly {
 
 }  
 
-if (params.assembler == 'metaflye')
+if (params.assembler == 'metaflye'){
     process polishing {
         input:
             set val(name), file(illumina), file(nanopore), file(assembly) from polishing_assembly
@@ -137,7 +137,7 @@ if (params.assembler == 'metaflye')
 
             """
     }
-
+}
 // process assembly_qc {
 //     input:
 //         if (params.polish == "")
