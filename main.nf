@@ -13,12 +13,22 @@ readFileList_nanopore = Channel
                 .ifEmpty { error "Cannot find any Nanopore reads in the directory: ${params.reads} \n Delfault is ./nanopore" }
 
 
-readFileList_ch = readFileList_illumina.join(readFileList_nanopore)
-
 params.polish = ''
 params.output = ''
 params.cpus = 4
 params.mem = "8GB"
+params.filter = FALSE
+params.qual = FALSE
+
+if (params.filter == '' & params.qual == '')
+    readsFileList_ch = readFileList_illumina.join(readFileList_nanopore)
+else if (params.filter == '' & params.qual == TRUE)
+    readsFileList_qual = readFileList_illumina.join(readFileList_nanopore)
+else if (params.filter == TRUE & params.qual == '')
+    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)
+else if (params.filter == TRUE & params.qual == TRUE)
+    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)
+
 
 // choose the Method (hybrid or long with short polishing)
 params.assembler = ''
@@ -35,20 +45,42 @@ if (params.polish == '') {
 }
 
 //IF WE FILTER 
-// if (params.filter == '') {}
+// if (params.filter == True) {}
 //     process filter_reads {
 //         input:
-//         set val(name), file(illumina), file(nanopore) from readsFileList_ch
+//         set val(name), file(illumina), file(nanopore) from readsFileList_filter
 
 //         output:
-//         set val(name), file("${name}_filtered_1.fasta"), file("${name}_filtered_2.fasta"), file("${name}_filtered_nanopore.fasta") into {reads_assembly}
-
+//         if (params.qual == '')
+//              set val(name), file("${name}_filtered_1.fasta"), file("${name}_filtered_2.fasta"), file("${name}_filtered_nanopore.fasta") into {readsFileList_qual}
+//         if (params.qual == TRUE)
+//              set val(name), file("${name}_filtered_1.fasta"), file("${name}_filtered_2.fasta"), file("${name}_filtered_nanopore.fasta") into {readsFileList_ch}
 //         script:
 //             """
 //             NEED TO LOOK FOR IT
+//              map using bbmap or bowtie and only keep the unmap
+//              use blast and only keep the non hit
 //             """
 //     }
 
+//IF WE Qual FILTER 
+// if (params.qual == TRUE) {}
+//     process filter_reads {
+//         input:
+//         set val(name), file(illumina), file(nanopore) from readsFileList_qual
+
+//         output:
+//         set val(name), file("${name}_filtered_1.fasta"), file("${name}_filtered_2.fasta"), file("${name}_filtered_nanopore.fasta") into {readsFileList_ch}
+//   BIG ISSUES THE ILLUMINA ARE  A TUPLE AND USE AS A TUPLE EVERYWHERE SO NEED TO PUT THEM AS A TUPLE HERE ALSO
+//    MAYBE USING file("${name}_filtered_1.fasta","${name}_filtered_2.fasta") will WORK need to test it
+//         script:
+//             """
+//             NEED TO LOOK FOR IT
+//                for nanopore use FiltLong
+//                for illumina use fastp?
+
+//             """
+//     }
 
 
 
@@ -98,25 +130,26 @@ if (params.assembler == 'metaflye')
             """
         else if (params.polish == 'both')
             """
-            medaka_consensus -i ${nanopore} -d ${assembly} -o consensus -t ${task.cpus}
-            mv consensus/consensus.fasta medaka_consensus.fasta
-            minimap2 -ax map-ont medaka_consensus.fasta ${nanopore} > ready_to_polish.sam
-            racon ${nanopore} ready_polish.sam medaka_consensus.fasta -t ${task.cpus} > assembly_polished.fasta
+            minimap2 -ax map-ont ${assembly} ${nanopore} > ready_to_polish.sam
+            racon ${nanopore} ready_polish.sam ${assembly} -t ${task.cpus} > assembly_racon.fasta
+            medaka_consensus -i ${nanopore} -d assembly_racon.fasta -o consensus -t ${task.cpus}
+            mv consensus/consensus.fasta polished_consensus.fasta
+
             """
     }
 
-process assembly_qc {
-    input:
-        if (params.polish == "")
-            set val(name), file(illumina), file(nanopore), file(assembly) from qc_assembly      
-        else 
-            set val(name), file(illumina), file(nanopore), file(assembly) from qc_polished
-    script:
-    """
-    python metaquast.py ${assembly} 
+// process assembly_qc {
+//     input:
+//         if (params.polish == "")
+//             set val(name), file(illumina), file(nanopore), file(assembly) from qc_assembly      
+//         else 
+//             set val(name), file(illumina), file(nanopore), file(assembly) from qc_polished
+//     script:
+//     """
+//     python metaquast.py ${assembly} 
 
-    """
-}
+//     """
+// }
 
 process assembly_mapping {
     echo true
