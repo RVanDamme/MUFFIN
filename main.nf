@@ -1,95 +1,70 @@
 #!/usr/bin/env nextflow
 
-params.illumina = "./illumina"
-params.reads_illumina = "${params.illumina}*_R{1,2}.fastq"
-readFileList_illumina = Channel
-                .fromFilePairs(params.reads_illumina)
-                .ifEmpty { error "Cannot find any Illumina reads in the directory: ${params.reads} \n Delfault is ./illumina" }
-params.nanopore ='./nanopore'
-params.reads_nanopore = "${params.nanopore}*.fastq"
-readFileList_nanopore = Channel
-                .fromPath(params.reads_nanopore)
-                .map {file -> tuple(file.baseName, file) }
-                .ifEmpty { error "Cannot find any Nanopore reads in the directory: ${params.reads} \n Delfault is ./nanopore" }
+// TODO IMPLEMENT OUTPUT; FILTER ADN QC IF WANTED
+//-with-dag file.html
 
-
-params.polish = ''
-params.output = ''
-params.cpus = 4
-params.mem = "8GB"
-params.filter = FALSE
-params.qual = FALSE
-
-if (params.filter == '' & params.qual == ''){
-    readsFileList_ch = readFileList_illumina.join(readFileList_nanopore)}
-else if (params.filter == '' & params.qual == TRUE){
-    readsFileList_qual = readFileList_illumina.join(readFileList_nanopore)
-else if (params.filter == TRUE & params.qual == ''){
-    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)}
-else if (params.filter == TRUE & params.qual == TRUE){
-    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)}
-
-
-// choose the Method (hybrid or long with short polishing)
 params.assembler = ''
-if (params.assembler != 'metaflye' && params.assembler != 'metaspades') {
-        exit 1, "--method: ${params.method}. \
-        Should be 'metaflye'or 'metaspades'"
+params.polish = false
+params.output = './'
+// params.cpus = 4
+// params.mem = "8GB"
+// params.filter = FALSE
+// params.qual = FALSE
+
+if (params.assembler!='metaflye' && params.assembler!='metaspades') {
+    exit 1, "--assembler: ${params.method}. Should be 'metaflye' or 'metaspades'"
 }
-// need --output
-if (params.output == '') {
-    exit 1, "--output is a required parameter"
-}
-if (params.polish == '') {
-    println("No polishing; If you want polishing chose either 'medaka' 'racon' or 'both' in --polish")
+
+if (params.assembler=='metaspades' && params.polish!=false) {
+    exit 1, "Do not specify '--polish' if you use '--assembler metaspades'"
 }
 
-//IF WE FILTER 
-// if (params.filter == True) {}
-//     process filter_reads {
-//         input:
-//         set val(name), file(illumina), file(nanopore) from readsFileList_filter
+if (params.assembler=='metaflye' && params.polish==false) {
+    println "No polishing step, if you want one use --polish"
+}
 
-//         output:
-//         if (params.qual == '')
-//              set val(name), file("${name}_filtered_1.fasta"), file("${name}_filtered_2.fasta"), file("${name}_filtered_nanopore.fasta") into {readsFileList_qual}
-//         if (params.qual == TRUE)
-//              set val(name), file("${name}_filtered_1.fasta"), file("${name}_filtered_2.fasta"), file("${name}_filtered_nanopore.fasta") into {readsFileList_ch}
-//         script:
-//             """
-//             NEED TO LOOK FOR IT
-//              map using bbmap or bowtie and only keep the unmap
-//              use blast and only keep the non hit
-//             """
-//     }
+if (params.assembler=='metaflye' && params.polish==true) {
+    exit 1, "If you want to polish please specify the method with:\n --polish racon\n --polish medaka\n --polish both"
+}
 
-//IF WE Qual FILTER 
-// if (params.qual == TRUE) {}
-//     process filter_reads {
-//         input:
-//         set val(name), file(illumina), file(nanopore) from readsFileList_qual
+if (params.polish!=true && params.polish!=false && params.polish!='medaka' && params.polish!='racon' && params.polish!='both'){
+    exit 1, "If you want to polish please specify the method with one of this:\n --polish racon\n --polish medaka\n --polish both"
+}
 
-//         output:
-//         set val(name), file("${name}_filtered_1.fasta"), file("${name}_filtered_2.fasta"), file("${name}_filtered_nanopore.fasta") into {readsFileList_ch}
-//   BIG ISSUES THE ILLUMINA ARE  A TUPLE AND USE AS A TUPLE EVERYWHERE SO NEED TO PUT THEM AS A TUPLE HERE ALSO
-//    MAYBE USING file("${name}_filtered_1.fasta","${name}_filtered_2.fasta") will WORK need to test it
-//         script:
-//             """
-//             NEED TO LOOK FOR IT
-//                for nanopore use FiltLong
-//                for illumina use fastp?
 
-//             """
-//     }
+params.filter = false
+params.qual = false
+params.illumina = "./data/tmft"
+params.reads_illumina = "${params.illumina}*_R{1,2}.{fastq,fastq.gz}"
+readFileList_illumina = Channel.fromFilePairs(params.reads_illumina).ifEmpty { error "Cannot find any Illumina reads in the directory: ${params.reads} \n Delfault is ./illumina" }
+params.nanopore ='./nanopore'
+//params.reads_nanopore = "${params.nanopore}*.fastq"
+params.reads_nanopore= "/d/DATA_NANOPORE/sandbox/tmft.fastq"
+readFileList_nanopore = Channel.fromPath(params.reads_nanopore).map {file -> tuple(file.baseName, file) }.ifEmpty { error "Cannot find any Nanopore reads in the directory: ${params.reads} \n Delfault is ./nanopore" }
 
 
 
-process assembly {
-    echo true
+
+if (params.filter == false & params.qual == false){
+    readsFileList2_ch = readFileList_illumina.join(readFileList_nanopore)}
+else if (params.filter == '' & params.qual == true){
+    readsFileList_qual = readFileList_illumina.join(readFileList_nanopore)}
+else if (params.filter == true & params.qual == ''){
+    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)}
+else if (params.filter == true & params.qual == true){
+    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)}
+
+
+readsFileList2_ch.into {readsFileList_ch; test}
+test.subscribe{println "got: ${it}"}
+
+
+process assembly_p {
+
     input:
         set val(name), file(illumina), file(nanopore) from readsFileList_ch  
     output:
-        set val(name), file(illumina), file(nanopore), file('assembly.fasta') into {qc_assembly, mapping_assembly, polishing_assembly }
+        set val(name), file(illumina), file(nanopore), file('assembly.fasta') into assembly_out2
 
     script:
     if(params.assembler == 'metaspades')
@@ -108,19 +83,29 @@ process assembly {
 
 }  
 
-if (params.assembler == 'metaflye'){
-    process polishing {
-        input:
-            set val(name), file(illumina), file(nanopore), file(assembly) from polishing_assembly
 
+
+assembly_out2.into{assembly_out; test2}
+test2.subscribe{println "banana: ${it}"}
+
+if (!params.polish){assembly_out.set{mapping_ready}}
+else {
+    process polishing {
+        when:
+        params.assembler == 'metaflye'
+
+        input:
+            set val(name), file(illumina), file(nanopore), file(assembly) from assembly_out
+        
         output:
-            set val(name), file(illumina), file(nanopore), file('assembly_polished.fasta') into {qc_polished, mapping_polished}
+            set val(name), file(illumina), file(nanopore), file('assembly_polished.fasta') into mapping_ready
 
         script:
         if (params.polish == 'medaka')
             """
             medaka_consensus -i ${nanopore} -d ${assembly} -o consensus -t ${task.cpus}
             mv consensus/consensus.fasta medaka_consensus.fasta
+
             """
         else if (params.polish == 'racon')
             """
@@ -138,45 +123,30 @@ if (params.assembler == 'metaflye'){
             """
     }
 }
-// process assembly_qc {
-//     input:
-//         if (params.polish == "")
-//             set val(name), file(illumina), file(nanopore), file(assembly) from qc_assembly      
-//         else 
-//             set val(name), file(illumina), file(nanopore), file(assembly) from qc_polished
-//     script:
-//     """
-//     python metaquast.py ${assembly} 
 
-//     """
-// }
+//mapping_ready.subscribe{println "skip well done ${it}"}
 
 process assembly_mapping {
-    echo true
     input:
-        if (params.polish == "")
-            set val(name), file(illumina), file(nanopore), files(assembly) from mapping_assembly
-        else
-            set val(name), file(illumina), file(nanopore), files(assembly) from mapping_polished
+        set val(name), file(illumina), file(nanopore), file(assembly) from mapping_ready
+
     output:
-        set val(name), file(illumina), file(nanopore), files(assembly), files("mapping_illumina.sam"), files("mapping_nanopore.sam") into binning_assembly
+        set val(name), file(illumina), file(nanopore), file(assembly), file("mapping_illumina.sam"), file("mapping_nanopore.sam") into binning_assembly
 
     script:
         """
         minimap2 -ax map-ont ${assembly} ${nanopore} > mapping_nanopore.sam
-        
         bwa index -p illumina -a bwtsw ${assembly}
-        bwa mem illumina ${illumina} -t ${task.cpus} > mapping_illumina.sam
-
+        bwa mem illumina ${illumina} -t ${task.cpus} > mapping_illumina.samm
+        
         """
 }
 
-
+//binning_assembly.subscribe{println "mapping done ${it}"}
 
 process binning {
-    echo true
     input:
-    set val(name), file(illumina), file(nanopore), files(assembly), files(mapping_illumina), files(mapping_nanopore) from binning_assembly   
+    set val(name), file(illumina), file(nanopore), file(assembly), file(mapping_illumina), file(mapping_nanopore) from binning_assembly   
         
     output:
         
@@ -187,4 +157,3 @@ process binning {
 
     """ // NEED TO FIND HOW TO ADD MAPPING AND IF RELEVANT
 }
-
