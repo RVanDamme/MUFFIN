@@ -128,6 +128,15 @@ else {
             mv consensus/consensus.fasta polished_consensus.fasta
 
             """
+        else if (params.polish == 'pilon')
+            """
+            minimap2 -ax map-ont ${assembly} ${nanopore} > mapping_nanopore.sam
+            samtools view -bS mapping_nanopore.sam > mapping_nanopore.bam
+            bwa index -p illumina -a bwtsw ${assembly}
+            bwa mem illumina ${illumina} -t ${task.cpus} > mapping_illumina.sam 
+            samtools view -bS mapping_illumina.sam > mapping_illumina.bam
+            pilon --genome ${assembly} --frags mapping_illumina.bam --unpaired mapping_nanopore.bam --output assembly_polished
+            """
     }
 }
 
@@ -144,7 +153,7 @@ process assembly_mapping {
         """
         minimap2 -ax map-ont ${assembly} ${nanopore} > mapping_nanopore.sam
         bwa index -p illumina -a bwtsw ${assembly}
-        bwa mem illumina ${illumina} -t ${task.cpus} > mapping_illumina.samm
+        bwa mem illumina ${illumina} -t ${task.cpus} > mapping_illumina.sam
         
         """
 }
