@@ -1,175 +1,346 @@
 #!/usr/bin/env nextflow
+nextflow.preview.dsl=2
 
-// TODO IMPLEMENT OUTPUT; FILTER ADN QC IF WANTED
-//-with-dag file.html
+// if param.mode==retrieval {whole step one script}
+// if param.mode==analysis {whole bin analysis and genome analysis}
+// TODO publish of file in output (need to deicide what to keep)
 
-params.assembler = ''
-params.polish = "skip"
-params.output = './'
-//params.cpus = 4
-//params.mem = "16GB"
-params.genome = ""
 
-// params.filter = FALSE
-// params.qual = FALSE
+//*****************************************
+// Input, check(command) and stdout (param and such)
+//*****************************************
+
+// fool proof checks
+if (params.help) { exit 0, helpMSG() }
 
 if (params.assembler!='metaflye' && params.assembler!='metaspades') {
-    exit 1, "--assembler: ${params.method}. Should be 'metaflye' or 'metaspades'"
-}
+    exit 1, "--assembler: ${params.method}. Should be 'metaflye' or 'metaspades'"}
 
-if (params.assembler=='metaspades' && params.polish!="skip") {
-    exit 1, "Do not specify '--polish' if you use '--assembler metaspades'"
-}
+// stdout early usage (print header + default or modified param)
 
-if (params.assembler=='metaflye' && params.genome==""){
-    exit 1, "please specify an estimate genome size using --genome and value (e.g. 5m or 2.6g) \n the genome size is required but metaspades is not very sensitive to it"
-}
+// DATA INPUT (ONT and ILLUMINA)
 
-if (params.assembler=='metaflye' && params.polish=="skip") {
-    println "No polishing step, if you want one use --polish"
-}
-
-if (params.assembler=='metaflye' && params.polish==true) {
-    exit 1, "If you want to polish please specify the method with:\n --polish racon\n --polish medaka\n --polish both"
-}
-
-if (params.polish!="skip" && params.polish!='medaka' && params.polish!='racon' && params.polish!='both'){
-    exit 1, "If you want to polish please specify the method with one of this:\n --polish racon\n --polish medaka\n --polish both"
-}
-
-
-params.filter = false
-params.qual = false
-params.illumina = "./data/tmft"
 params.reads_illumina = "${params.illumina}*_R{1,2}.{fastq,fastq.gz}"
-readFileList_illumina = Channel.fromFilePairs(params.reads_illumina).ifEmpty { error "Cannot find any Illumina reads in the directory: ${params.illumina} \n Delfault is ./illumina" }
-params.nanopore ='./nanopore'
-//params.reads_nanopore = "${params.nanopore}*.fastq"
-params.reads_nanopore= "${params.nanopore}*.{fastq,fastq.gz}"
-readFileList_nanopore = Channel.fromPath(params.reads_nanopore).map {file -> tuple(file.baseName, file) }.ifEmpty { error "Cannot find any Nanopore reads in the directory: ${params.nanopore} \n Delfault is ./nanopore" }
+illumina_input_ch = Channel.fromFilePairs(params.reads_illumina).ifEmpty { error "Cannot find any Illumina reads in the directory: ${params.illumina} \n Delfault is ./illumina" }
 
-readFileList_nanopore.into {readFileList_nanopore; test}
-test.subscribe{println "got: ${it}"}
+params.reads_ont= "${params.ont}*.{fastq,fastq.gz}"
+ont_input_ch = Channel.fromPath(params.reads_ont).map {file -> tuple(file.baseName, file) }.ifEmpty { error "Cannot find any Nanopore reads in the directory: ${params.nanopore} \n Delfault is ./nanopore" }
 
 
-if (params.filter == false & params.qual == false){
-    readsFileList2_ch = readFileList_illumina.join(readFileList_nanopore)}
-else if (params.filter == '' & params.qual == true){
-    readsFileList_qual = readFileList_illumina.join(readFileList_nanopore)}
-else if (params.filter == true & params.qual == ''){
-    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)}
-else if (params.filter == true & params.qual == true){
-    readsFileList_filter = readFileList_illumina.join(readFileList_nanopore)}
+// Help Message
+def helpMSG() {
+    log.info """
+    *********Metagenomic Assembly pipeline using nextFlow for Illumina and Nanopore reads*********
 
+    Mafin is composed of 2 part the retrieval of potential genome and the analysis of said genomes
 
-readsFileList2_ch.into {readsFileList_ch; test}
-test.subscribe{println "got: ${it}"}
+        Usage example for retrieval:
+    nextflow run mafin --retrieve --ont /path/to/ont_dir --illumina /path/to/illumina_dir --metaspades -profile conda
+    or 
+    nextflow run mafin --retrieve --ont /path/to/ont_dir --illumina /path/to/illumina_dir --metaflye -profile conda
 
+        Input:
+    --ont                       path to the directory containing the nanopore read file (fastq)
+    -- illumina                 path to the directory containing the illumina read file (fastq)
 
-process assembly_p {
+        Output (default output is bin only):
+    --output                    path to the output directory (default: ./results)
+    --contigs                   output the assembly contigs file (fasta)
+    --bam                       output the bam sorted files of the reads aligned to the contigs
 
-    input:
-        set val(name), file(illumina), file(nanopore) from readsFileList_ch  
-    output:
-        set val(name), file(illumina), file(nanopore), file('assembly.fasta') into assembly_out2
+        Parameter:
+    --cores                     max cores for local use [default: $params.cores]
+    --memory                    80% of available RAM in GB for --metamaps [default: $params.memory]
+    
+        Options:
+    --checkm_db                 path to an already INSTALLED checkm database (not the tar file)
+    --checkm_tar_db             path to the tar checkm database (it will extract it in the dir)
+    --sourmash                  path to an already installed sourmash database
+    --skip_ill_qc               skip quality control of illumina files
+    --skip_ont_qc               skip quality control of nanopore file
+    --short_qc                  minimum size of the reads to be kept (default: 2000 )
+    --filtlong                  use filtlong to improve the quality furthermore (default: false)
+    --polish_iteration          number of iteration of the polish step (advanced)
+    --polish_threshold          threshold to reach to stop the iteration of the polish step (advanced)
+    --skip_metabat2             skip the binning using metabat2 (advanced)
+    --skip_maxbin2              skip the binning using maxbin2 (advanced)
+    --skip_concoct              skip the binning using concoct (advanced)
 
-    script:
-    if(params.assembler == 'metaspades')
-        """
-        spades.py -1 ${illumina[0]} -2 ${illumina[1]}  --meta --nanopore ${nanopore} -o spades_output -t ${task.cpus} -m ${task.memory}
-        mv spades_output/contigs.fasta  assembly.fasta
+        Nextflow options:
+    -profile                    change the profile of nextflow (currently available conda)
+    -with-report rep.html       cpu / ram usage (may cause errors)
+    -with-dag chart.html        generates a flowchart for the process tree
+    -with-timeline time.html    timeline (may cause errors)
+    """
+}
+/***********************
+* Whole process using MODULES
+************************/
 
-        """
-    else if(params.assembler == 'metaflye')
-        """
-        flye --nano-corr ${nanopore} -o flye_output -t ${task.cpus} --plasmids --meta
-        mv flye_output/assembly.fasta assembly.fasta
+//******************************
+// Databases check or retrieval
+//******************************
 
-        """
-        //NEED TO ADD THE POLISHING STEP (one round Medaka then Pilon or racon)
+// sourmash_db
+if (param.assembler=="metaflye") { 
+    if (params.sour_db) { database_sourmash = file(params.sour_db) }
 
-}  
-
-
-
-assembly_out2.into{assembly_out; test2}
-test2.subscribe{println "banana: ${it}"}
-
-if (params.polish=="skip"){assembly_out.set{mapping_ready}}
-else {
-    process polishing {
-        when:
-        params.assembler == 'metaflye'
-
-        input:
-            set val(name), file(illumina), file(nanopore), file(assembly) from assembly_out
-        
-        output:
-            set val(name), file(illumina), file(nanopore), file('assembly_polished.fasta') into mapping_ready
-
-        script:
-        if (params.polish == 'medaka')
-            """
-            medaka_consensus -i ${nanopore} -d ${assembly} -o consensus -t ${task.cpus}
-            mv consensus/consensus.fasta medaka_consensus.fasta
-
-            """
-        else if (params.polish == 'racon')
-            """
-            minimap2 -ax map-ont ${assembly} ${nanopore} > ready_polish.sam
-            racon ${nanopore} ready_polish.sam ${assembly}
-
-            """
-        else if (params.polish == 'both')
-            """
-            minimap2 -ax map-ont ${assembly} ${nanopore} > ready_to_polish.sam
-            racon ${nanopore} ready_polish.sam ${assembly} -t ${task.cpus} > assembly_racon.fasta
-            medaka_consensus -i ${nanopore} -d assembly_racon.fasta -o consensus -t ${task.cpus}
-            mv consensus/consensus.fasta polished_consensus.fasta
-
-            """
-        else if (params.polish == 'pilon')
-            """
-            minimap2 -ax map-ont ${assembly} ${nanopore} > mapping_nanopore.sam
-            samtools view -bS mapping_nanopore.sam > mapping_nanopore.bam
-            bwa index -p illumina -a bwtsw ${assembly}
-            bwa mem illumina ${illumina} -t ${task.cpus} > mapping_illumina.sam 
-            samtools view -bS mapping_illumina.sam > mapping_illumina.bam
-            pilon --genome ${assembly} --frags mapping_illumina.bam --unpaired mapping_nanopore.bam --output assembly_polished
-            """
+    else {
+        include 'modules/sourmashgetdatabase'
+        sourmash_download_db() 
+        database_sourmash = sourmash_download_db.out 
     }
 }
 
-//mapping_ready.subscribe{println "skip well done ${it}"}
-
-process assembly_mapping {
-    input:
-        set val(name), file(illumina), file(nanopore), file(assembly) from mapping_ready
-
-    output:
-        set val(name), file(illumina), file(nanopore), file(assembly), file("mapping_illumina.sam"), file("mapping_nanopore.sam") into binning_assembly
-
-    script:
-        """
-        minimap2 -ax map-ont ${assembly} ${nanopore} > mapping_nanopore.sam
-        bwa index -p illumina -a bwtsw ${assembly}
-        bwa mem illumina ${illumina} -t ${task.cpus} > mapping_illumina.sam
-        
-        """
+// checkm_db
+if (params.checkm_db) {
+    include 'modules/checkmsetupDB'
+    checkm_setup_db(params.checkm_db, val(true))
 }
 
-//binning_assembly.subscribe{println "mapping done ${it}"}
-
-process binning {
-    input:
-    set val(name), file(illumina), file(nanopore), file(assembly), file(mapping_illumina), file(mapping_nanopore) from binning_assembly   
-        
-    output:
-        
-
-    script:
-    """
-    metabat2  -o output_bin -t ${task.cpus} --unbinned --seed 133742 -i ${assembly} ${mapping_illumina} ${mapping_nanopore}
-
-    """ // NEED TO FIND HOW TO ADD MAPPING AND IF RELEVANT
+else if (params.checkm_tar_db) {
+    include 'modules/checkmsetupDB'
+    checkm_setup_db(params.checkm_db, val(false))
 }
+
+else {
+    include 'modules/checkmgetdatabases'
+    include 'modules/checkmsetupDB'
+    checkm_setup_db(checkm_download_db(), val(false))
+}
+
+
+if (skip_ont_qc==true) {}
+else if (skip_ont_qc==false){
+    include discard_short from 'modules/ont_qc'
+    split_ont_ch = ont_input_ch.splitFastq(by:100000, file:true)
+    discard_short(split_ont_ch)
+    if (filtlong==true){
+        include filtlong from 'modules/ont_qc'
+        filtlong(discard_short.out)
+        merging_ch = filtlong.out.groupTuple()
+    }
+    else {
+        merging_ch = discard_short.out.groupTuple()
+    }
+    include merge from 'modules/ont_qc'
+    merge(merging_ch)
+    ont_input_ch = merge.out
+
+}
+
+
+// QC check Illumina
+
+if (skip_ill_qc==true) {}
+
+else if (skip_ill_qc==false){
+    include 'modules/fastp'  
+    fastp(illumina_input_ch)
+    illumina_input_ch = fastp.out
+}
+
+//**********
+// Assembly 
+//**********
+
+// Meta-SPADES
+
+if (param.assembler=="metaspades") {
+    include 'modules/spades'
+    spades_ch= illumina_input_ch.join(ont_input_ch)
+    spades(spades_ch)
+    assembly_ch = spades.out
+}
+
+
+// Meta-FLYE
+
+if (param.assembler=="metaflye") {
+    include 'modules/flye'
+    include 'modules/pilon'
+    include 'modules/mapper' // determine if it's ONT, ILL or both to map for pilon
+    // FLYE + Pilon 
+    pilon(minimap2(flye(ont_input_ch), ont_input_ch), flye.out, params.polish_iteration, params.polish_threshold) // don't remember which reads to map
+    assembly_ch = pilon.out
+}
+
+//*********
+// Mapping
+//*********
+
+// ONT mapping
+
+{
+    include 'modules/minimap2'
+    minimap2_ch = assembly_ch.join(ont_input_ch)
+    minimap2(minimap2_ch)
+    ont_bam_ch = minimap2.out
+}
+
+// Illumina mapping
+
+{
+    include 'modules/bwa'
+    bwa_ch = assembly_ch.join(illumina_input_ch)
+    bwa(bwa_ch)
+    illumina_bam_ch = bwa.out
+}
+
+//***************************************************
+// Binning
+//***************************************************
+
+// metabat2 + checkm  OR metabat2 and check of it separately?
+
+if (skip_metabat2==true) {}
+
+else {
+    include 'modules/metabat2'
+    metabat2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
+    metabat2(metabat2_ch)
+    metabat2_out = metabat2.out
+}
+
+// Maxbin2 OR CheckM Maxbin2
+
+if (skip_maxbin2==true) {}
+
+else {
+    include 'modules/maxbin2'
+    maxbin2_ch = assembly_ch.join(ont_input_ch).join(illumina_input_ch)
+    maxbin2(maxbin2_ch)
+    maxbin2_out = maxbin2.out
+}
+
+// Concoct OR CheckM Concoct
+
+if (skip_concoct==true) {}
+
+else {
+    include 'modules/concoct'
+    concoct_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
+    concoct(concoct_ch)
+    concoct_out = concoct.out
+}
+
+// Bin refine
+
+if (skip_metabat2==true) {
+    if (  skip_maxbin2==true || skip_concoct==true) {}
+    else {
+        include refine2 from 'modules/metawrap'
+        refine2_ch = maxbin2_out.join(concoct_out)
+        refine2(refine2_ch)
+        final_bin_ch = refine2.out
+    }
+}
+
+else if (skip_maxbin2==true) {
+    if (  skip_metabat2==true || skip_concoct==true) {}
+    else {
+        include refine2 from 'modules/metawrap_refine_bin'
+        refine2_ch = metabat2_out.join(concoct_out)
+        refine2(refine2_ch)
+        final_bin_ch = refine2.out
+    }
+}
+
+else if (skip_concoct==true) {
+    if (  skip_metabat2==true || skip_maxbin2==true) {}
+    else {
+        include refine2 from 'modules/metawrap_refine_bin'
+        refine2_ch = metabat2_out.join(maxbin2_out)
+        refine2(refine2_ch)
+        final_bin_ch = refine2.out
+    }
+}
+
+else {
+    include refine3 from 'modules/metawrap_refine_bin'
+    refine3_ch = metabat2_out.join(maxbin2_out).join(concoct_out)
+    refine3(refine3_ch)
+    final_bin_ch = refine3.out
+}
+
+//**************
+//Retrieve reads for each bin and assemble them
+//**************
+
+// retrieve the ids of each bin contigs
+{
+    include contig_list from 'modules/list_ids'
+    contig_list(final_bin_ch)
+    extract_reads_ch = contig_list.out.transpose()
+}
+ 
+// bam align the reads to ALL OF THE CONTIGS 
+{
+    include 'modules/cat_all_bins'
+    include 'modules/bwa'
+    include 'modules/minimap2'
+    
+    cat_all_bins(final_bin_ch)
+    fasta_all_bin = cat_all_bins.out.cat_bins
+    bwa_all_bin = fasta_all_bin.join(illumina_input_ch)
+    ill_map_all_bin = bwa(bwa_all_bin)    
+    minimap2_all_bin = fasta_all_bin.join(ont_input_ch)
+    ont_map_all_bin = minimap2(minimap2_all_bin)
+}
+// retrieve the reads aligned to the contigs + run unicycler
+{
+    include reads_retrieval from 'module/list_ids'
+    include 'modules/unicycler_reassemble_from_bin'
+    retrieve_reads_ch = extract_reads_ch.join(ill_map_all_bin).join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
+    unicycler(reads_retrieval(retrieve_reads_ch))
+    
+
+}
+
+//can do either ont Illumina separated or not ups to me (separater is better)
+
+//unicycler
+
+
+
+
+
+
+
+
+// gather all contigs in each bin in one fasta file + map the reads (ill+ont) to it
+// {
+//     include 'modules/cat_all_bins'
+//     include 'modules/bwa'
+//     include 'modules/minimap2'
+    
+//     cat_all_bins(final_bin_ch)
+//     fasta_all_bin = cat_all_bins.out.cat_bins
+//     ch_indepedent_bin = cat_all_bins.out.independent_bin
+//     bwa_all_bin = fasta_all_bin.join(illumina_input_ch)
+//     ill_map_all_bin = bwa(bwa_all_bin)
+//     minimap2_all_bin = fasta_all_bin.join(ont_input_ch)
+//     ont_map_all_bin = minimap2(minimap2_all_bin)
+// }
+
+
+// // reads retrieval
+// {
+//     include retrieve_ont_reads from 'modules/retrieve_reads_from_bin'
+//     retrieve_ont_reads(final_bin_ch, ont_input_ch)
+// }
+// {
+//     include retrieve_ill_reads from 'modules/retrieve_reads_from_bin'
+//     retrieve_ill_reads(final_bin_ch, illumina_input_ch )
+// }
+// retrieve_reads = retrieve_ill_reads.out.join(retrieve_ont_reads.out)
+//reassemble 
+{
+    include 'modules/unicycler_reassemble_from_bin'
+    unicycler(retrieve_reads)
+}
+
+
+//******
+// Done
+//******
