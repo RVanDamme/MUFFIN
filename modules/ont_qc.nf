@@ -26,6 +26,8 @@ process filtlong {
 }
 
 process merge {
+    label 'ubuntu'
+    publishDir "${params.output}/tmp/${name}_ont_qc/", mode: 'copy', pattern: "${name}.fastq"
     input:
     set val(name) , file(filtered)
     output:

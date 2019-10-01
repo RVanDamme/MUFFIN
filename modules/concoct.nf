@@ -1,5 +1,7 @@
 process concoct {
     label 'concoct'
+    label 'ubuntu'
+    publishDir "${params.output}/tmp/${name}_concoct/", mode: 'copy', pattern: "bins_dir/concoct_bin/fasta_bins/*"
     input:
     set val(name), file(assembly), file(ont_bam), file(illumina_bam)
     output:
@@ -11,7 +13,7 @@ process concoct {
     concoct --composition_file contigs_10K.fa --coverage_file coverage_table.tsv -b bins_dir/concoct_out
     merge_cutup_clustering.py bins_dir/concoct_out/clustering_gt1000.csv > bins_dir/concoct_out/clustering_merged.csv
     mkdir bins_dir/concoct_out/fasta_bins
-    extract_fasta_bins.py ${assembly} bins_dir/concoct_out/clustering_merged.csv --output_path bins_dir/concoct_out/fasta_bins
+    extract_fasta_bins.py ${assembly} bins_dir/concoct_out/clustering_merged.csv --output_path bins_dir/concoct_bin/fasta_bins
     """
 
 }

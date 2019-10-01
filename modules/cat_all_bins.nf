@@ -1,5 +1,5 @@
 process cat_all_bins {
-    //label 'ubuntu'
+    label 'ubuntu'
     input:
     set val(name), file(bins)
     output:

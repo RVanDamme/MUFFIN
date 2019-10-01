@@ -1,6 +1,7 @@
 process flye {
     label 'flye'
-    publishDir "${params.output}/${name}_assembly/", mode: 'copy', pattern: "assembly.fasta"
+    label 'ubuntu'
+    publishDir "${params.output}/tmp/${name}_assembly/", mode: 'copy', pattern: "assembly.fasta"
     input:
     set val(name), file(ont), file(genome_size)
     output:

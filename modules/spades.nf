@@ -1,6 +1,6 @@
 process spades {
     label 'spades'
-    publishDir "${params.output}/${name}_assembly/", mode: 'copy', pattern: "assembly.fasta"
+    publishDir "${params.output}/tmp/${name}_assembly/", mode: 'copy', pattern: "assembly.fasta"
     input:
     set val(name), file(illumina), file(ont)
     output:

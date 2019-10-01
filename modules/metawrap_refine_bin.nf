@@ -1,7 +1,6 @@
 process refine2 {
     label 'metawrap'
-    label 'checkm'
-    publishDir "${params.output}/${name}_refined_bins/", mode: 'copy', pattern: "refined_bins/*"
+    publishDir "${params.output}/tmp/${name}_refined_bins/", mode: 'copy', pattern: "refined_bins/*"
     input:
     set val(name1), file(bins1), file(bins2)
     output:
@@ -14,8 +13,7 @@ process refine2 {
 
 process refine3 {
     label 'metawrap'
-    label 'checkm'
-    publishDir "${params.output}/${name}_refined_bins/", mode: 'copy', pattern: "refined_bins/*"
+    publishDir "${params.output}/tmp/${name}_refined_bins/", mode: 'copy', pattern: "refined_bins/*"
     input:
     set val(name1), file(bins1), file(bins2), file(bins3)
     output:

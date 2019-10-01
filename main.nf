@@ -43,13 +43,21 @@ def helpMSG() {
     --ont                       path to the directory containing the nanopore read file (fastq)
     -- illumina                 path to the directory containing the illumina read file (fastq)
 
-        Output (default output is bin only):
-    --output                    path to the output directory (default: ./results)
-    --contigs                   output the assembly contigs file (fasta)
-    --bam                       output the bam sorted files of the reads aligned to the contigs
+        Output (default output is reassemblies from each bins):
+    --output                    path to the output directory (default: $params.output)
+    --assembly                  output the original assembly contigs file (default: false)
+    --out_qc                    output the reads file after qc (default: false)
+    --out_metabat               output the bins produce by metabat2 (default: false)
+    --out_concoct               output the bins produce by concoct (default: false)
+    --out_maxbin                output the bins produce by meaxbin2 (default: false)
+    --out_metawrap              output the bins produce by metawrap refining (default: false)
+    --out_bin_reads             output fastq files containing the reads map to each bin (default: false)
+
+
+    
 
         Parameter:
-    --cores                     max cores for local use [default: $params.cores]
+    --cpus                      max cores for local use [default: $params.cpus]
     --memory                    80% of available RAM in GB for --metamaps [default: $params.memory]
     
         Options:
@@ -58,7 +66,7 @@ def helpMSG() {
     --sourmash                  path to an already installed sourmash database
     --skip_ill_qc               skip quality control of illumina files
     --skip_ont_qc               skip quality control of nanopore file
-    --short_qc                  minimum size of the reads to be kept (default: 2000 )
+    --short_qc                  minimum size of the reads to be kept (default: $params.short_qc )
     --filtlong                  use filtlong to improve the quality furthermore (default: false)
     --polish_iteration          number of iteration of the polish step (advanced)
     --polish_threshold          threshold to reach to stop the iteration of the polish step (advanced)
@@ -229,7 +237,7 @@ else {
 if (skip_metabat2==true) {
     if (  skip_maxbin2==true || skip_concoct==true) {}
     else {
-        include refine2 from 'modules/metawrap'
+        include refine2 from 'modules/metawrap_refine_bin'
         refine2_ch = maxbin2_out.join(concoct_out)
         refine2(refine2_ch)
         final_bin_ch = refine2.out
@@ -297,48 +305,55 @@ else {
 
 }
 
-//can do either ont Illumina separated or not ups to me (separater is better)
+//***********************
+// output requested files
+//***********************
+process output {
+    input:
+    set val(name) from ont_input_ch
+    shell:
+    """
+    if [${params.assembly} == true]
+    then
+    mv ${params.output}/tmp/${name}_assembly/  ${params.output}/${name}_assembly/
+    fi
 
-//unicycler
+    if [${out_qc} == true]    
+    then
+    mv ${params.output}/tmp/${name}_ont_qc/  ${params.output}/${name}_ont_qc/
+    mv ${params.output}/tmp/${name}_illumina_qc/  ${params.output}/${name}_illumina_qc/
+    fi
 
+    if [${out_metabat} == true]
+        then
+    mv ${params.output}/tmp/${name}_metabat2/  ${params.output}/${name}_metabat2/
+    fi
 
+    if [${out_concoct} == true]
+        then
+    mv ${params.output}/tmp/${name}_concoct/  ${params.output}/${name}_concoct/
+    fi
 
+    if [${out_maxbin} == true]
+        then
+    mv ${params.output}/tmp/${name}_maxbin2/  ${params.output}/${name}_maxbin2/
+    fi
 
+    if [${out_metawrap} == true]
+        then
+    mv ${params.output}/tmp/${name}_refined_bins/  ${params.output}/${name}_metawrap/
+    fi
 
+    if [${out_bin_reads} == true]
+        then
+    mv ${params.output}/tmp/${name}_bins_reads/  ${params.output}/${name}_bins_reads/
+    fi
 
-
-
-// gather all contigs in each bin in one fasta file + map the reads (ill+ont) to it
-// {
-//     include 'modules/cat_all_bins'
-//     include 'modules/bwa'
-//     include 'modules/minimap2'
-    
-//     cat_all_bins(final_bin_ch)
-//     fasta_all_bin = cat_all_bins.out.cat_bins
-//     ch_indepedent_bin = cat_all_bins.out.independent_bin
-//     bwa_all_bin = fasta_all_bin.join(illumina_input_ch)
-//     ill_map_all_bin = bwa(bwa_all_bin)
-//     minimap2_all_bin = fasta_all_bin.join(ont_input_ch)
-//     ont_map_all_bin = minimap2(minimap2_all_bin)
-// }
-
-
-// // reads retrieval
-// {
-//     include retrieve_ont_reads from 'modules/retrieve_reads_from_bin'
-//     retrieve_ont_reads(final_bin_ch, ont_input_ch)
-// }
-// {
-//     include retrieve_ill_reads from 'modules/retrieve_reads_from_bin'
-//     retrieve_ill_reads(final_bin_ch, illumina_input_ch )
-// }
-// retrieve_reads = retrieve_ill_reads.out.join(retrieve_ont_reads.out)
-//reassemble 
-{
-    include 'modules/unicycler_reassemble_from_bin'
-    unicycler(retrieve_reads)
+    rm -r ${params.output}/tmp/*
+    """
 }
+
+
 
 
 //******
