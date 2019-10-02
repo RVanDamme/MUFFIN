@@ -1,7 +1,7 @@
 process sourmash_download_db {
-        //if (workflow.profile == 'gcloud') { publishDir 'gs://databases-nextflow/databases/sourmash', mode: 'copy', pattern: "genbank-k31.lca.json" }
-        //else 
-        { storeDir 'nextflow-autodownload-databases/sourmash' }  
+        if (workflow.profile == 'gcloud') { publishDir 'gs://databases-nextflow/databases/sourmash', mode: 'copy', pattern: "genbank-k31.lca.json" }
+        else { storeDir 'nextflow-autodownload-databases/sourmash' }  
+        //this condition is here only for gcloud usage 
         label 'ubuntu' 
       output:
         file("genbank-k31.lca.json")

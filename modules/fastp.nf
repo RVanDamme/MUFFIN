@@ -1,6 +1,6 @@
 process fastp {
     label 'fastp'
-    publishDir "${params.output}/tmp/${name}_illumina_qc/", mode: 'copy', pattern: "${name}_R?_clean.fastq"
+    if (params.out_qc == true ) { publishDir "${params.output}/${name}_illumina_qc/", mode: 'copy', pattern: "${name}_R?_clean.fastq"}
     input:
     set val(name), file(illumina)
 

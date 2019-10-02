@@ -17,7 +17,7 @@ process contig_list {
 process reads_retrieval {
     label 'ubuntu'
     label 'seqtk'
-    publishDir "${params.output}/tmp/${name}_bins_reads/", mode: 'copy', pattern: "\$bin*.fastq"
+    if (params.out_bin_reads == true ) {publishDir "${params.output}/${name}_bins_reads/", mode: 'copy', pattern: "\$bin*.fastq"}
     input:
     set val(name),file(contig_list), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
     output:

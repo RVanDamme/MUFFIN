@@ -1,6 +1,6 @@
 process maxbin2 {
     label 'maxbin2'
-    publishDir "${params.output}/tmp/${name}_maxbin2/", mode: 'copy', pattern: "bins_dir/maxbin_bin/*"
+    if (params.out_maxbin == true ) { publishDir "${params.output}/${name}_maxbin2/", mode: 'copy', pattern: "bins_dir/maxbin_bin/*" }
     input:
     set val(name), file(assembly), file(ont), file(illumina)
     output:

@@ -305,57 +305,6 @@ else {
 
 }
 
-//***********************
-// output requested files
-//***********************
-process output {
-    input:
-    set val(name) from ont_input_ch
-    shell:
-    """
-    if [${params.assembly} == true]
-    then
-    mv ${params.output}/tmp/${name}_assembly/  ${params.output}/${name}_assembly/
-    fi
-
-    if [${out_qc} == true]    
-    then
-    mv ${params.output}/tmp/${name}_ont_qc/  ${params.output}/${name}_ont_qc/
-    mv ${params.output}/tmp/${name}_illumina_qc/  ${params.output}/${name}_illumina_qc/
-    fi
-
-    if [${out_metabat} == true]
-        then
-    mv ${params.output}/tmp/${name}_metabat2/  ${params.output}/${name}_metabat2/
-    fi
-
-    if [${out_concoct} == true]
-        then
-    mv ${params.output}/tmp/${name}_concoct/  ${params.output}/${name}_concoct/
-    fi
-
-    if [${out_maxbin} == true]
-        then
-    mv ${params.output}/tmp/${name}_maxbin2/  ${params.output}/${name}_maxbin2/
-    fi
-
-    if [${out_metawrap} == true]
-        then
-    mv ${params.output}/tmp/${name}_refined_bins/  ${params.output}/${name}_metawrap/
-    fi
-
-    if [${out_bin_reads} == true]
-        then
-    mv ${params.output}/tmp/${name}_bins_reads/  ${params.output}/${name}_bins_reads/
-    fi
-
-    rm -r ${params.output}/tmp/*
-    """
-}
-
-
-
-
 //******
 // Done
 //******

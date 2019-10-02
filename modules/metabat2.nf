@@ -1,6 +1,6 @@
 process metabat2 {
     label 'metabat2'
-    publishDir "${params.output}/tmp/${name}_metabat2/", mode: 'copy', pattern: "bins_dir/metabat_bin/*"
+    if (params.out_metabat == true ) { publishDir "${params.output}/${name}_metabat2/", mode: 'copy', pattern: "bins_dir/metabat_bin/*" }
     input:
     set val(name), file(assembly), file(ont_bam), file(illumina_bam)
     output:

@@ -1,6 +1,7 @@
 process minimap2 {
     label 'minimap2'
-    publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
+    //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
+    //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
     set val(name), file(assembly), file(ont)
     output:

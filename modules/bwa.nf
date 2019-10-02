@@ -1,6 +1,7 @@
 process bwa {
     label 'bwa'
-    publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "illumina.bam"
+    //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "illumina.bam"  
+    //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
     set val(name), file(assembly), file(illumina)
     output:

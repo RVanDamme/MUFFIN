@@ -12,3 +12,5 @@ process checkm {
     checkm bin_qa_plot -x fa ${bins}"_checkm" ${bins} ${bins}"_checkm_plot"
     """
 }
+// checkm module is not use in the script at the moment but it is used in metawrap
+// this module can be added for an additional check by the user just call it in the main script and input a channel outputted from a binning step

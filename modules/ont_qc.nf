@@ -25,9 +25,10 @@ process filtlong {
     """
 }
 
+
 process merge {
     label 'ubuntu'
-    publishDir "${params.output}/tmp/${name}_ont_qc/", mode: 'copy', pattern: "${name}.fastq"
+    if (params.out_qc == true ) { publishDir "${params.output}/${name}_ont_qc/", mode: 'copy', pattern: "${name}.fastq" }
     input:
     set val(name) , file(filtered)
     output:
@@ -36,5 +37,4 @@ process merge {
     """
     cat *.fastq > ${name}.fastq
     """
-
 }

@@ -1,7 +1,7 @@
 process concoct {
     label 'concoct'
     label 'ubuntu'
-    publishDir "${params.output}/tmp/${name}_concoct/", mode: 'copy', pattern: "bins_dir/concoct_bin/fasta_bins/*"
+    if (params.out_concoct == true) {publishDir "${params.output}/${name}_concoct/", mode: 'copy', pattern: "bins_dir/concoct_bin/fasta_bins/*"}
     input:
     set val(name), file(assembly), file(ont_bam), file(illumina_bam)
     output:
