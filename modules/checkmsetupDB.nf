@@ -1,4 +1,4 @@
-process checkm_download_db {
+process checkm_setup_db {
         label 'checkm'
         label 'ubuntu' 
     input:

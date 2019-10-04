@@ -8,7 +8,7 @@ process spades {
     
     script:
     """
-    spades.py -1 ${illumina[0]} -2 ${illumina[1]}  --meta --nanopore ${ont} -o spades_output -t ${task.cpus} -m ${task.memory}
+    spades.py -1 ${illumina[0]} -2 ${illumina[1]}  --meta --nanopore ${ont} -o spades_output -t ${task.cpus}
     mv spades_output/contigs.fasta  assembly.fasta
     """
 }

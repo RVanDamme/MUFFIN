@@ -9,7 +9,7 @@ process contig_list {
     mkdir ids
     for bin in \$(ls -d !{refined_bins}/bin*);
         do
-        cat \$bin/*.{fasta;fa} | grep -o -E "^>\w+" | tr -d "@" > "ids/"\$bin".contigs.list" ;
+        cat \$bin/*.{fasta;fa} | grep -o -E "^>\\w+" | tr -d "@" > "ids/"\$bin".contigs.list" ;
         done ;
     """
 }
