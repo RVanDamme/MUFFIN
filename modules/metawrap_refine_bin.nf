@@ -36,7 +36,7 @@ process refine3 {
     echo \$path_db
     echo -e "\$path_db" | checkm data setRoot
     echo "checkm done"
-    metawrap bin_refinement -t !{task.cpus} -m \$mem -o refined_bins -A !{bins1} -B !{bins2} -C !{bins3}
+    metawrap bin_refinement -o refined_bins -A !{bins2} -B !{bins3} -C !{bins1} -t !{task.cpus} -m \$mem 
 
     """
 }

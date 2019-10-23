@@ -37,7 +37,7 @@ extra_ont_ch=Channel.fromPath(params.extra_ont).splitCsv().map { row ->
 }
 
 // extra ill reads
-if (params.extra_ont != false) {
+if (params.extra_ill != false) {
 extra_ill_ch=Channel.fromPath(params.extra_ill).splitCsv().map { row ->
             def path = file("${row[0]}")
             return path

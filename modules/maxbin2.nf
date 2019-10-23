@@ -5,10 +5,10 @@ process maxbin2 {
     set val(name), file(assembly), file(ont), file(illumina)
     output:
     set val(name), file("maxbin_bin/")
-    script:
+    shell:
     """
-    run_MaxBin.pl -contig ${assembly}  -reads ${illumina[0]} -reads2 ${illumina[1]} -reads3 ${ont}  -out maxbin2 -thread ${task.cpus}
+    run_MaxBin.pl -contig !{assembly}  -reads !{illumina[0]} -reads2 !{illumina[1]} -reads3 !{ont}  -out maxbin2 -thread !{task.cpus}
     mkdir maxbin_bin
-    mv maxbin2.*.fa maxbin_bin/
+    mv maxbin2.*.fasta maxbin_bin/
     """
 }  // add -prob_threshold 0.5 -markerset 40 ??

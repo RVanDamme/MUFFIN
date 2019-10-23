@@ -7,7 +7,7 @@ process metabat2 {
     set val(name), file("bins_dir")
     script:
     """
-    metabat -i ${assembly} ${ont_bam} ${illumina_bam} -o bins_dir/metabat_bin -t ${task.cpus}
+    metabat -i ${assembly} ${ont_bam} ${illumina_bam} -o bins_dir/metabat_bins -t ${task.cpus}
     """
 }
 
