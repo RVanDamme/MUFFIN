@@ -28,6 +28,22 @@ illumina_input_ch = Channel
 // reads_ont= "${params.ont}*.fastq.gz"
 ont_input_ch = Channel.fromPath("${params.ont}*.fastq.gz",checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
 
+// extra ont reads
+if (params.extra_ont != false) {
+extra_ont_ch=Channel.fromPath(params.extra_ont).splitCsv().map { row ->
+            def path = file("${row[0]}")
+            return path
+        }
+}
+
+// extra ill reads
+if (params.extra_ont != false) {
+extra_ill_ch=Channel.fromPath(params.extra_ill).splitCsv().map { row ->
+            def path = file("${row[0]}")
+            return path
+        }
+}
+
 /*
 // Help Message
 def helpMSG() {
@@ -53,7 +69,8 @@ def helpMSG() {
     --out_concoct               output the bins produce by concoct (default: false)
     --out_maxbin                output the bins produce by meaxbin2 (default: false)
     --out_metawrap              output the bins produce by metawrap refining (default: false)
-    --out_bin_reads             output fastq files containing the reads map to each bin (default: false)
+    --out_bin_reads             output fastq files containing the reads mapped to each bin (default: false)
+    --out_unmapped              output sorted bam files containing the unmmaped reads of illumina and nanopore (default:false)
 
 
     
@@ -70,8 +87,12 @@ def helpMSG() {
     --skip_ont_qc               skip quality control of nanopore file
     --short_qc                  minimum size of the reads to be kept (default: $params.short_qc )
     --filtlong                  use filtlong to improve the quality furthermore (default: false)
-    --polish_iteration          number of iteration of the polish step (advanced)
-    --polish_threshold          threshold to reach to stop the iteration of the polish step (advanced)
+    --model                     the model medaka will use (default: r941_min_high)
+    --polish_iteration          number of iteration of pilon in the polish step (advanced)
+    --extra_ill                 a list of additional ill sample file (with full path with a * instead of _R1,2.fastq) to use for the binning in Metabat2 and concoct
+    --extra_ont                 a list of additional ont sample file (with full path) to use for the binning in Metabat2 and concoct
+    --SRA_ill                   a list of additional ill sample from SRA accession number to use for the binning in Metabat2 and concoct
+    --SRA_ont                   a list of additional ont sample from SRA accession number to use for the binning in Metabat2 and concoct
     --skip_metabat2             skip the binning using metabat2 (advanced)
     --skip_maxbin2              skip the binning using maxbin2 (advanced)
     --skip_concoct              skip the binning using concoct (advanced)
@@ -109,12 +130,14 @@ if (params.checkm_db) {
     include 'modules/checkmsetupDB'
     untar = true
     checkm_setup_db(params.checkm_db, untar)
+    checkm_db_path = checkm_setup_db.out
 }
 
 else if (params.checkm_tar_db) {
     include 'modules/checkmsetupDB'
     untar = false
     checkm_setup_db(params.checkm_db, untar)
+    checkm_db_path = checkm_setup_db.out
 }
 
 else {
@@ -122,8 +145,8 @@ else {
     include 'modules/checkmgetdatabases'
     untar = false
     checkm_setup_db(checkm_download_db(), untar)
+    checkm_db_path = checkm_setup_db.out
 }
-
 
 if (params.skip_ont_qc == true) {}
 else if (params.skip_ont_qc==false){
@@ -172,11 +195,20 @@ if (params.assembler=="metaspades") {
 // Meta-FLYE
 
 if (params.assembler=="metaflye") {
+    include 'modules/sourmash'
     include 'modules/flye' params(assembly : params.assembly, output : params.output)
-    include 'modules/pilon' params(assembly : params.assembly, output : params.output)
-    include minimap2 as minimap_polish from'modules/minimap2' // determine if it's ONT, ILL or both to map for pilon
+    include minimap_polish from'modules/minimap2'
+    include racon from 'modules/polish'
+    include medaka from 'modules/polish' params(model : params.model)
+    include pilon from 'modules/polish' params(assembly : params.assembly, output : params.output)
     // FLYE + Pilon 
-    pilon(minimap2_polish(flye(ont_input_ch), ont_input_ch), flye.out, params.polish_iteration, params.polish_threshold) // don't remember which reads to map
+    flye(sourmash(ont_input_ch,database_sourmash))
+    flye_to_map = flye.out.join(ont_input_ch)
+    minimap_polish(flye_to_map)
+    map_to_racon = ont_input_ch.join(flye.out).join(minimap_polish.out)
+    medaka(racon(map_to_racon))
+    medaka_to_pilon = medaka.out.join(ont_input_ch)
+    pilon(medaka_to_pilon, params.polish_iteration)
     assembly_ch = pilon.out
 }
 
@@ -191,6 +223,14 @@ if (params.assembler=="metaflye") {
     minimap2(minimap2_ch)
     ont_bam_ch = minimap2.out
 
+// Illumina mapping of extra files
+
+if (params.extra_ont != false) {
+    include extra_minimap2 from 'modules/minimap2'
+    minimap_extra = assembly_ch.join(extra_ont_ch)
+    extra_minimap2(minimap_extra)
+    ont_extra_bam = extra_minimap2.out.collect()
+}
 
 // Illumina mapping
 
@@ -199,6 +239,24 @@ if (params.assembler=="metaflye") {
     bwa(bwa_ch)
     illumina_bam_ch = bwa.out
 
+// Illumina mapping of extra files
+
+if (params.extra_ill != false) {
+    include extra_bwa from 'modules/bwa'
+    bwa_extra = assembly_ch.join(extra_ill_ch)
+    extra_bwa(bwa_extra)
+    illumina_extra_bam = extra_bwa.out.collect()
+}
+
+if (params.extra_ont != false && params.extra_ill != false ) {
+    extra_bam = illumina_extra_bam.concat(ont_extra_bam)
+}
+else if (params.extra_ont != false) {
+    extra_bam = ont_extra_bam
+}
+else if (params.extra_ill != false) {
+    extra_bam = illumina_extra_bam
+}
 //***************************************************
 // Binning
 //***************************************************
@@ -208,10 +266,18 @@ if (params.assembler=="metaflye") {
 if (params.skip_metabat2==true) {}
 
 else {
-    include 'modules/metabat2' params(out_metabat : params.out_metabat, output : params.output)
-    metabat2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
-    metabat2(metabat2_ch)
-    metabat2_out = metabat2.out
+    if (params.extra_ont != false || params.extra_ill != false ) {
+        include metabat2_extra from 'modules/metabat2' params(out_metabat : params.out_metabat, output : params.output)
+        metabat2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
+        metabat2_extra(metabat2_ch, extra_bam)
+        metabat2_out = metabat2_extra.out
+    }
+    else {    
+        include metabat2 from 'modules/metabat2' params(out_metabat : params.out_metabat, output : params.output)
+        metabat2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
+        metabat2(metabat2_ch)
+        metabat2_out = metabat2.out
+    }
 }
 
 // Maxbin2 OR CheckM Maxbin2
@@ -230,10 +296,18 @@ else {
 if (params.skip_concoct==true) {}
 
 else {
-    include 'modules/concoct' params(out_concoct : params.out_concoct, output : params.output)
-    concoct_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
-    concoct(concoct_ch)
-    concoct_out = concoct.out
+    if (params.extra_ont != false || params.extra_ill != false ) {
+        include concoct_extra from 'modules/concoct' params(out_concoct : params.out_concoct, output : params.output)
+        concoct_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
+        concoct_extra(concoct_ch, extra_bam)
+        concoct_out = concoct_extra.out
+    }
+    else {
+        include concoct from 'modules/concoct' params(out_concoct : params.out_concoct, output : params.output)
+        concoct_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
+        concoct(concoct_ch)
+        concoct_out = concoct.out
+    }
 }
 
 // Bin refine
@@ -243,7 +317,7 @@ if (params.skip_metabat2==true) {
     else {
         include refine2 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
         refine2_ch = maxbin2_out.join(concoct_out)
-        refine2(refine2_ch)
+        refine2(refine2_ch, checkm_db_path)
         final_bin_ch = refine2.out
     }
 }
@@ -253,7 +327,7 @@ else if (params.skip_maxbin2==true) {
     else {
         include refine2 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
         refine2_ch = metabat2_out.join(concoct_out)
-        refine2(refine2_ch)
+        refine2(refine2_ch, checkm_db_path)
         final_bin_ch = refine2.out
     }
 }
@@ -263,7 +337,7 @@ else if (params.skip_concoct==true) {
     else {
         include refine2 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
         refine2_ch = metabat2_out.join(maxbin2_out)
-        refine2(refine2_ch)
+        refine2(refine2_ch, checkm_db_path)
         final_bin_ch = refine2.out
     }
 }
@@ -271,7 +345,7 @@ else if (params.skip_concoct==true) {
 else {
     include refine3 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
     refine3_ch = metabat2_out.join(maxbin2_out).join(concoct_out)
-    refine3(refine3_ch)
+    refine3(refine3_ch, checkm_db_path)
     final_bin_ch = refine3.out
 }
 
@@ -281,7 +355,7 @@ else {
 
 // retrieve the ids of each bin contigs
 
-    include contig_list from 'modules/list_ids'
+    include 'modules/list_ids'
     contig_list(final_bin_ch)
     extract_reads_ch = contig_list.out.transpose()
 
@@ -298,13 +372,21 @@ else {
     minimap2_all_bin = fasta_all_bin.join(ont_input_ch)
     ont_map_all_bin = minimap2_bin(minimap2_all_bin)
 
-// retrieve the reads aligned to the contigs + run unicycler
+// retrieve the reads aligned to the contigs + run unicycler + polish with pilon for 2 round
 
-    include reads_retrieval from 'modules/list_ids'params(out_bin_reads: params.out_bin_reads, output : params.output)
+    include 'modules/seqtk_retrieve_reads'params(out_bin_reads: params.out_bin_reads, output : params.output, out_unmapped : params.out_unmapped)
     include 'modules/unicycler_reassemble_from_bin' params(output : params.output)
-    retrieve_reads_ch = extract_reads_ch.join(ill_map_all_bin).join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
+    include pilon_final from 'modules/polish' params( output : params.output)
+    retrieve_reads_ch = extract_reads_ch.join(ill_map_all_bin).join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch).join(fasta_all_bin)
     unicycler(reads_retrieval(retrieve_reads_ch))
-    
+    to_polish_assemblies_ch = unicycler.out
+    pilon_final(to_polish_assemblies_ch, params.polish_iteration)
+    final_assemblies_ch=pilon_final.out.collect()
+//checkm of the final assemblies
+
+    include 'modules/checkm'
+    checkm(final_assemblies_ch)
+
 //******
 // Done
 //******
