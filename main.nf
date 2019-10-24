@@ -154,7 +154,7 @@ else if (params.skip_ont_qc==false){
     split_ont_ch = ont_input_ch.splitFastq(by:100000, file:true)
     discard_short(split_ont_ch)
     if (params.filtlong==true){
-        include filtlong from 'modules/ont_qc'
+        include filtlong from 'modules/ont_qc' params(short_qc : params.short_qc)
         filtlong(discard_short.out)
         merging_ch = filtlong.out.groupTuple()
     }
