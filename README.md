@@ -139,8 +139,8 @@ nextflow run MAFIN/main.nf --output results --assembler metaspades  --illumina f
     --polish_iteration          number of iteration of pilon in the polish step (advanced)
     --extra_ill                 a list of additional ill sample file (with full path with a * instead of _R1,2.fastq) to use for the binning in Metabat2 and concoct
     --extra_ont                 a list of additional ont sample file (with full path) to use for the binning in Metabat2 and concoct
-    --SRA_ill                   a list of additional ill sample from SRA accession number to use for the binning in Metabat2 and concoct
-    --SRA_ont                   a list of additional ont sample from SRA accession number to use for the binning in Metabat2 and concoct
+    TBD --SRA_ill                   a list of additional ill sample from SRA accession number to use for the binning in Metabat2 and concoct
+    TBD --SRA_ont                   a list of additional ont sample from SRA accession number to use for the binning in Metabat2 and concoct
     --skip_metabat2             skip the binning using metabat2 (advanced)
     --skip_maxbin2              skip the binning using maxbin2 (advanced)
     --skip_concoct              skip the binning using concoct (advanced)
