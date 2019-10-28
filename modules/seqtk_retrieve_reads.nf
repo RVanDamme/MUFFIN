@@ -1,5 +1,4 @@
 process reads_retrieval {
-    label 'ubuntu'
     label 'seqtk'
     if (params.out_bin_reads == true ) {publishDir "${params.output}/${name}_bins_reads/", mode: 'copy', pattern: "\$bin*.fastq"}
     if (params.out_unmapped == true ) {publishDir "${params.output}/${name}_unmapped_bam/", mode: 'copy', pattern: "*unmapped_*.fastq"}
@@ -14,7 +13,7 @@ process reads_retrieval {
     list=\$(cat !{contig_list} | tr "\n" " " ) 
     
     ## illumina mapped reads retrieval
-    samtools index !{ill_bam}
+    samtools index -@ !{task.cpus} !{ill_bam}
     samtools view -bh !{ill_bam} \$list > illumina_contigs.bam  
     samtools view -F4 illumina_contigs.bam > illumina_mapped_contigs.sam
     cut -f1 illumina_mapped_contigs.sam | sort | uniq > \$bin"_illumina_mapped.list"
@@ -28,7 +27,7 @@ process reads_retrieval {
     seqtk subseq !{ill_reads[1]} illumina_unmapped.list > unmapped_ILL_R2.fastq
 
     ## ONT mapped reads retrieval
-    samtools index !{ont_bam}
+    samtools index -@ !{task.cpus} !{ont_bam}
     samtools view -bh !{ont_bam} \$list > ont_contigs.bam  
     samtools view -F4 ont_contigs.bam > ont_mapped_contigs.sam
     cut -f1 ont_mapped_contigs.sam | sort | uniq > \$bin"_ont_mapped.list"

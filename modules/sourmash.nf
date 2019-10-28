@@ -1,6 +1,5 @@
 process sourmash {
     label 'sourmash'
-    label 'ubuntu'
     input:
     set val(name), file(ont)
     file(database)

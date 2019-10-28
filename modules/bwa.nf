@@ -8,10 +8,10 @@ process bwa {
     set val(name) , file("illumina_sorted.bam")
     script:
     """
-    bwa index -p illumina -a bwtsw ${assembly}
+    bwa index -@ ${task.cpus} -p illumina -a bwtsw ${assembly}
     bwa mem illumina ${illumina[0]} ${illumina[1]} -t ${task.cpus} > illumina.sam
     samtools view -bS illumina.sam > illumina.bam
-    samtools sort -o illumina_sorted.bam illumina.bam
+    samtools sort -@ ${task.cpus} -o illumina_sorted.bam illumina.bam
     """
 }
 
@@ -25,10 +25,10 @@ process extra_bwa {
     set val(name) , file("*_sorted.bam")
     script:
     """
-    bwa index -p illumina -a bwtsw ${assembly}
+    bwa index -@ ${task.cpus} -p illumina -a bwtsw ${assembly}
     bwa mem illumina ${illumina} -t ${task.cpus} > illumina.sam
     samtools view -bS illumina.sam > illumina.bam
-    samtools sort -o ${illumina[0]}_sorted.bam illumina.bam
+    samtools sort -@ ${task.cpus} -o ${illumina[0]}_sorted.bam illumina.bam
     """
 }
 
@@ -42,9 +42,9 @@ process bwa_bin {
     set val(name) , file("illumina_sorted.bam")
     script:
     """
-    bwa index -p illumina -a bwtsw ${assembly}
+    bwa index -@ ${task.cpus} -p illumina -a bwtsw ${assembly}
     bwa mem illumina ${illumina[0]} ${illumina[1]} -t ${task.cpus} > illumina.sam
     samtools view -bS illumina.sam > illumina.bam
-    samtools sort -o illumina_sorted.bam illumina.bam
+    samtools sort -@ ${task.cpus} -o illumina_sorted.bam illumina.bam
     """
 }

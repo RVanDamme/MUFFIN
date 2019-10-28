@@ -1,7 +1,5 @@
 process concoct {
     label 'concoct'
-    label 'ubuntu'
-    label 'samtools'
     if (params.out_concoct == true) {publishDir "${params.output}/${name}_concoct/", mode: 'copy', pattern: "concoct_bin/fasta_bins/*"}
     input:
     set val(name), file(assembly), file(ont_bam), file(illumina_bam)
@@ -11,8 +9,8 @@ process concoct {
     """
     mkdir concoct_out
     cut_up_fasta.py ${assembly} -c 10000 -o 0 --merge_last -b contigs_10K.bed > contigs_10K.fa
-    samtools index ${ont_bam}
-    samtools index ${illumina_bam}
+    samtools index -@ ${task.cpus} ${ont_bam}
+    samtools index -@ ${task.cpus} ${illumina_bam}
     concoct_coverage_table.py contigs_10K.bed *.bam > coverage_table.tsv
     concoct --composition_file contigs_10K.fa --coverage_file coverage_table.tsv -b concoct_out --thread ${task.cpus}
     merge_cutup_clustering.py concoct_out/clustering_gt1000.csv > concoct_out/clustering_merged.csv
@@ -25,8 +23,6 @@ process concoct {
 
 process concoct_extra {
     label 'concoct'
-    label 'ubuntu'
-    label 'samtools'
     if (params.out_concoct == true) {publishDir "${params.output}/${name}_concoct/", mode: 'copy', pattern: "concoct_bin/fasta_bins/*"}
     input:
     set val(name), file(assembly), file(ont_bam), file(illumina_bam)
@@ -37,9 +33,9 @@ process concoct_extra {
     """
     mkdir concoct_out
     cut_up_fasta.py ${assembly} -c 10000 -o 0 --merge_last -b contigs_10K.bed > contigs_10K.fa
-    samtools index ${ont_bam}
-    samtools index ${illumina_bam}
-    ls ${extra_bam} | wargs -n1 -P5 samtools index
+    samtools index -@ ${task.cpus} ${ont_bam}
+    samtools index -@ ${task.cpus} ${illumina_bam}
+    ls ${extra_bam} | xargs -n1 -P5 samtools index  -@ ${task.cpus}
     concoct_coverage_table.py contigs_10K.bed *.bam > coverage_table.tsv
     concoct --composition_file contigs_10K.fa --coverage_file coverage_table.tsv -b concoct_out --thread ${task.cpus}
     merge_cutup_clustering.py concoct_out/clustering_gt1000.csv > concoct_out/clustering_merged.csv

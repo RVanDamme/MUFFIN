@@ -20,8 +20,6 @@ process refine2 {
 
 process refine3 {
     //label 'metawrap'
-    label 'ubuntu'
-    //label 'metawrap'
     conda '/home/renaud/miniconda3/envs/metawrap-env'
     if (params.out_metawrap == true ) { publishDir "${params.output}/${name}_refined_bins/", mode: 'copy', pattern: "refined_bins/*" }
     input:
