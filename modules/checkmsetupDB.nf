@@ -19,7 +19,7 @@ process checkm_setup_db {
                     mkdir \$path_db/db/;
                     tar -xvf !{db} -C \$path_db/db/;
                     checkm data setRoot \$path_db/db;   
-                    echo \$path_db/db/not_working > path_db.txt;
+                    echo \$path_db/db > path_db.txt;
         fi
         """
     }

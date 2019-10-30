@@ -8,7 +8,7 @@ process checkm {
     script:
     """
     mkdir bins
-    mv *_polished.fasta bins/
+    mv *_final.fasta bins/
     checkm lineage_wf -t ${task.cpus} -x fasta bins bins_checkm
     checkm qa bins_checkm/lineage.ms bins_checkm
     checkm bin_qa_plot -x fasta bins_checkm bins bins_checkm_plot

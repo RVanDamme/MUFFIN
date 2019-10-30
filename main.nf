@@ -110,9 +110,9 @@ def helpMSG() {
 
 // Loading modules
 
-//******************************
-// Databases check or retrieval
-//******************************
+//**********************************
+// Databases and metawrap obtention
+//**********************************
 
 // sourmash_db
 if (params.assembler=="metaflye") { 
@@ -148,6 +148,9 @@ else {
     checkm_db_path = checkm_setup_db.out
 }
 
+//************
+// QC OF READS
+//************
 if (params.skip_ont_qc == true) {}
 else if (params.skip_ont_qc==false){
     include discard_short from 'modules/ont_qc' params(short_qc : params.short_qc)
@@ -374,14 +377,15 @@ else {
 
 // retrieve the reads aligned to the contigs + run unicycler + polish with pilon for 2 round
 
-    include 'modules/seqtk_retrieve_reads'params(out_bin_reads: params.out_bin_reads, output : params.output, out_unmapped : params.out_unmapped)
+    include reads_retrieval from 'modules/seqtk_retrieve_reads'params(out_bin_reads: params.out_bin_reads, output : params.output)
+    include unmapped_retrieve from 'modules/seqtk_retrieve_reads'params(output : params.output)
     include 'modules/unicycler_reassemble_from_bin' params(output : params.output)
     include pilon_final from 'modules/polish' params( output : params.output)
-    retrieve_reads_ch = extract_reads_ch.join(ill_map_all_bin).join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch).join(fasta_all_bin)
+    retrieve_unmapped_ch = ill_map_all_bin.join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
+    if (params.out_unmapped == true) {unmapped_retrieve(retrieve_unmapped_ch)}
+    retrieve_reads_ch = extract_reads_ch.join(ill_map_all_bin).join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
     unicycler(reads_retrieval(retrieve_reads_ch))
-    to_polish_assemblies_ch = unicycler.out
-    pilon_final(to_polish_assemblies_ch, params.polish_iteration)
-    final_assemblies_ch=pilon_final.out.collect()
+    final_assemblies_ch=unicycler.out.collect()
 //checkm of the final assemblies
 
     include 'modules/checkm'

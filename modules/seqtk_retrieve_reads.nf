@@ -1,9 +1,8 @@
 process reads_retrieval {
     label 'seqtk'
     if (params.out_bin_reads == true ) {publishDir "${params.output}/${name}_bins_reads/", mode: 'copy', pattern: "\$bin*.fastq"}
-    if (params.out_unmapped == true ) {publishDir "${params.output}/${name}_unmapped_bam/", mode: 'copy', pattern: "*unmapped_*.fastq"}
     input:
-    set val(name), file(contig_list), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads), file(assembly)
+    set val(name), file(contig_list), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
     output:
     set val(name), file(contig_list), file("*_illumina_R{1,2}.fastq"), file("*_ont.fastq")
     shell:
@@ -20,12 +19,6 @@ process reads_retrieval {
     seqtk subseq !{ill_reads[0]} \$bin"_illumina_mapped.list" > \$bin"_illumina_R1.fastq"
     seqtk subseq !{ill_reads[1]} \$bin"_illumina_mapped.list" > \$bin"_illumina_R2.fastq"
 
-    ## illumina unmapped reads retrieval
-    samtools view -f4 !{ill_bam} > illumina_unmapped_contigs.sam
-    cut -f1 illumina_unmapped_contigs.sam | sort | uniq > illumina_unmapped.list
-    seqtk subseq !{ill_reads[0]} illumina_unmapped.list > unmapped_ILL_R1.fastq
-    seqtk subseq !{ill_reads[1]} illumina_unmapped.list > unmapped_ILL_R2.fastq
-
     ## ONT mapped reads retrieval
     samtools index -@ !{task.cpus} !{ont_bam}
     samtools view -bh !{ont_bam} \$list > ont_contigs.bam  
@@ -33,12 +26,30 @@ process reads_retrieval {
     cut -f1 ont_mapped_contigs.sam | sort | uniq > \$bin"_ont_mapped.list"
     seqtk subseq !{ont_reads} \$bin"_ont_mapped.list" > \$bin"_ont.fastq"
 
+    """
+}
+
+// TODO PUT THE UNMAPPING AS A STAND ALONE STEP RETRIEVEING ALL UNMAPPED AS ONE FILE
+
+// notes that contigs.bam is the bam file of the reads aligned to the list of contigs used
+// notes that mapped.contigs.bam is the mapped reads to the contigs
+
+process unmapped_retrieve {
+    label 'seqtk'
+    publishDir "${params.output}/${name}_unmapped_bam/", mode: 'copy', pattern: "*unmapped_*.fastq"
+    input:
+    set val(name), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
+    shell:
+    """
+    ## illumina unmapped reads retrieval
+    samtools view -f4 !{ill_bam} > illumina_unmapped_contigs.sam
+    cut -f1 illumina_unmapped_contigs.sam | sort | uniq > illumina_unmapped.list
+    seqtk subseq !{ill_reads[0]} illumina_unmapped.list > unmapped_ILL_R1.fastq
+    seqtk subseq !{ill_reads[1]} illumina_unmapped.list > unmapped_ILL_R2.fastq
+
     ## ONT unmapped reads retrieval
     samtools view -f4 !{ont_bam} > ont_unmapped_contigs.sam
     cut -f1 ont_unmapped_contigs.sam | sort | uniq > ont_unmapped.list
     seqtk subseq !{ont_reads} ont_unmapped.list > unmapped_ONT.fastq
     """
 }
-
-// notes that contigs.bam is the bam file of the reads aligned to the list of contigs used
-// notes that mapped.contigs.bam is the mapped reads to the contigs
