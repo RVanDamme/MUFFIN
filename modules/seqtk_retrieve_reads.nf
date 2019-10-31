@@ -4,11 +4,11 @@ process reads_retrieval {
     input:
     set val(name), file(contig_list), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
     output:
-    set val(name), file(contig_list), file("*_illumina_R{1,2}.fastq"), file("*_ont.fastq")
+    set val(name), val(file(file(file(contig_list).baseName).baseName).baseName), file("*_illumina_R{1,2}.fastq"), file("*_ont.fastq")
     shell:
     // first I extract the reads that NEED TO REDO IT WITH FRESH MIND (include BWA.nf)
     """
-    bin=\$(basename !{contig_list})
+    bin=\$(basename -s .fa.contigs.list !{contig_list})
     list=\$(cat !{contig_list} | tr "\n" " " ) 
     
     ## illumina mapped reads retrieval
