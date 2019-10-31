@@ -1,7 +1,7 @@
 process contig_list {
     label 'ubuntu'
     input:
-    set val(name), val(bins)
+    set val(name), file(bins)
     output:
     set val(name), file("ids/*.list")
     shell:\
