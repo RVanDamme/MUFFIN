@@ -1,6 +1,6 @@
 process concoct {
     label 'concoct'
-    if (params.out_concoct == true) {publishDir "${params.output}/${name}_concoct/", mode: 'copy', pattern: "concoct_bin/fasta_bins/*"}
+    publishDir "${params.output}/${name}/concoct_bins/", mode: 'copy', pattern: "fasta_bins"
     input:
     set val(name), file(assembly), file(ont_bam), file(illumina_bam)
     output:
@@ -23,7 +23,7 @@ process concoct {
 
 process concoct_extra {
     label 'concoct'
-    if (params.out_concoct == true) {publishDir "${params.output}/${name}_concoct/", mode: 'copy', pattern: "fasta_bins/*"}
+    publishDir "${params.output}/${name}/concoct_bins/", mode: 'copy', pattern: "fasta_bins"
     input:
     set val(name), file(assembly), file(ont_bam), file(illumina_bam)
     file(extra_bam)

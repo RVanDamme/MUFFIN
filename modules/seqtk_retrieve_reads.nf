@@ -1,6 +1,6 @@
 process reads_retrieval {
     label 'seqtk'
-    if (params.out_bin_reads == true ) {publishDir "${params.output}/${name}_bins_reads/", mode: 'copy', pattern: "\$bin*.fastq"}
+    publishDir "${params.output}/${name}/reads_mapped_to_metawrap_bins/", mode: 'copy', pattern: "*.fastq"
     input:
     set val(name), file(contig_list), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
     output:
@@ -27,6 +27,7 @@ process reads_retrieval {
     seqtk subseq !{ont_reads} \$bin"_ont_mapped.list" > \$bin"_ont.fastq"
 
     """
+
 }
 
 // TODO PUT THE UNMAPPING AS A STAND ALONE STEP RETRIEVEING ALL UNMAPPED AS ONE FILE
@@ -36,9 +37,11 @@ process reads_retrieval {
 
 process unmapped_retrieve {
     label 'seqtk'
-    publishDir "${params.output}/${name}_unmapped_bam/", mode: 'copy', pattern: "*unmapped_*.fastq"
+    publishDir "${params.output}/${name}/reads_unmapped_to_metawrap_bins/", mode: 'copy', pattern: "*unmapped_*.fastq"
     input:
     set val(name), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
+    output:
+    file("unmapped_*.fastq")
     shell:
     """
     ## illumina unmapped reads retrieval
@@ -52,4 +55,5 @@ process unmapped_retrieve {
     cut -f1 ont_unmapped_contigs.sam | sort | uniq > ont_unmapped.list
     seqtk subseq !{ont_reads} ont_unmapped.list > unmapped_ONT.fastq
     """
+
 }

@@ -9,7 +9,13 @@ nextflow.preview.dsl=2
 //*****************************************
 // Input, check(command) and stdout (params and such)
 //*****************************************
-
+// if (params.out_all == true) {
+//     params.assembly = true
+//     params.out_qc = true
+//     params.out_metawrap = true
+//     params.out_bin_reads = true
+//     params.out_unmapped = true
+//     }
 // fool proof checks
 if (params.help) { exit 0, helpMSG() }
 
@@ -63,14 +69,15 @@ def helpMSG() {
 
         Output (default output is reassemblies from each bins):
     --output                    path to the output directory (default: $params.output)
-    --assembly                  output the original assembly contigs file (default: false)
-    --out_qc                    output the reads file after qc (default: false)
-    --out_metabat               output the bins produce by metabat2 (default: false)
-    --out_concoct               output the bins produce by concoct (default: false)
-    --out_maxbin                output the bins produce by meaxbin2 (default: false)
-    --out_metawrap              output the bins produce by metawrap refining (default: false)
-    --out_bin_reads             output fastq files containing the reads mapped to each bin (default: false)
-    --out_unmapped              output sorted bam files containing the unmmaped reads of illumina and nanopore (default:false)
+        Outputed files:
+    assembly                    the original assembly contigs file 
+    qc                          the reads file after qc
+    metabat                     the bins produce by metabat2
+    concoct                     the bins produce by concoct
+    maxbin                      the bins produce by meaxbin2
+    metawrap                    the bins produce by metawrap refining
+    mapped bin reads            the fastq files containing the reads mapped to each metawrap bin
+    unmapped bin reads          the fastq files containing the unmmaped reads of illumina and nanopore
 
 
     
@@ -321,7 +328,7 @@ if (params.skip_metabat2==true) {
         include refine2 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
         refine2_ch = maxbin2_out.join(concoct_out)
         refine2(refine2_ch, checkm_db_path)
-        final_bin_ch = refine2.out
+        final_bin_ch = refine2.out[0]
     }
 }
 
@@ -331,7 +338,7 @@ else if (params.skip_maxbin2==true) {
         include refine2 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
         refine2_ch = metabat2_out.join(concoct_out)
         refine2(refine2_ch, checkm_db_path)
-        final_bin_ch = refine2.out
+        final_bin_ch = refine2.out[0]
     }
 }
 
@@ -341,7 +348,7 @@ else if (params.skip_concoct==true) {
         include refine2 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
         refine2_ch = metabat2_out.join(maxbin2_out)
         refine2(refine2_ch, checkm_db_path)
-        final_bin_ch = refine2.out
+        final_bin_ch = refine2.out[0]
     }
 }
 
@@ -349,7 +356,7 @@ else {
     include refine3 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
     refine3_ch = metabat2_out.join(maxbin2_out).join(concoct_out)
     refine3(refine3_ch, checkm_db_path)
-    final_bin_ch = refine3.out
+    final_bin_ch = refine3.out[0]
 }
 
 //**************
@@ -360,7 +367,7 @@ else {
 
     include 'modules/list_ids'
     contig_list(final_bin_ch)
-    extract_reads_ch = contig_list.out.transpose()
+    extract_reads_ch = contig_list.out.transpose().view()
 
  
 // bam align the reads to ALL OF THE CONTIGS 
@@ -378,17 +385,17 @@ else {
 // retrieve the reads aligned to the contigs + run unicycler + polish with pilon for 2 round
 
     include reads_retrieval from 'modules/seqtk_retrieve_reads'params(out_bin_reads: params.out_bin_reads, output : params.output)
-    include unmapped_retrieve from 'modules/seqtk_retrieve_reads'params(output : params.output)
+    include unmapped_retrieve from 'modules/seqtk_retrieve_reads'params(out_unmapped: params.out_unmapped, output : params.output)
     include 'modules/unicycler_reassemble_from_bin' params(output : params.output)
-    include pilon_final from 'modules/polish' params( output : params.output)
     retrieve_unmapped_ch = ill_map_all_bin.join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
     if (params.out_unmapped == true) {unmapped_retrieve(retrieve_unmapped_ch)}
     retrieve_reads_ch = extract_reads_ch.join(ill_map_all_bin).join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
-    unicycler(reads_retrieval(retrieve_reads_ch))
-    final_assemblies_ch=unicycler.out.collect()
+    reads_retrieval(retrieve_reads_ch).view()
+    unicycler(reads_retrieval.out)
+    final_assemblies_ch=unicycler.out[0].collect()
 //checkm of the final assemblies
 
-    include 'modules/checkm'
+    include 'modules/checkm'params(output : params.output)
     checkm(final_assemblies_ch)
 
 //******
