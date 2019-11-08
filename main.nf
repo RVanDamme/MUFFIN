@@ -367,7 +367,7 @@ else {
 
     include 'modules/list_ids'
     contig_list(final_bin_ch)
-    extract_reads_ch = contig_list.out.transpose().view()
+    extract_reads_ch = contig_list.out.view()
 
  
 // bam align the reads to ALL OF THE CONTIGS 
@@ -389,7 +389,7 @@ else {
     include 'modules/unicycler_reassemble_from_bin' params(output : params.output)
     retrieve_unmapped_ch = ill_map_all_bin.join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
     if (params.out_unmapped == true) {unmapped_retrieve(retrieve_unmapped_ch)}
-    retrieve_reads_ch = extract_reads_ch.join(ill_map_all_bin).join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
+    retrieve_reads_ch = extract_reads_ch.join(ill_map_all_bin).join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch).transpose()
     reads_retrieval(retrieve_reads_ch).view()
     unicycler(reads_retrieval.out)
     final_assemblies_ch=unicycler.out[0].collect()
