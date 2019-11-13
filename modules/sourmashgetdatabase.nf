@@ -4,10 +4,9 @@ process sourmash_download_db {
         //this condition is here only for gcloud usage 
         label 'ubuntu' 
       output:
-        file("genbank-k31.lca.json")
+        file("gtdb_r89_k31_scaled10k.sbt.json"), file(".sbt.gtdb_r89_k31_scaled10k")
       script:
-        """
-        wget https://osf.io/4f8n3/download -O genbank-k31.lca.json.gz
-        gunzip genbank-k31.lca.json.gz
+        """wget https://ndownloader.figshare.com/files/18666761?private_link=f7f668a136b56e04a48d -O gtdb_r89_k31_scaled10k.tar.gz
+        tar -xzf gtdb_r89_k31_scaled10k.tar.gz
         """
     }

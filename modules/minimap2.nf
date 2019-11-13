@@ -11,6 +11,7 @@ process minimap2 {
     minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
     samtools view -bS ont.sam > ont.bam
     samtools sort -@ ${task.cpus} -o ont_sorted.bam ont.bam
+    rm ont.*
     """
 }
 
@@ -41,6 +42,7 @@ process extra_minimap2 {
     minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
     samtools view -bS ont.sam > ont.bam
     samtools sort -@ ${task.cpus} -o ${ont}_sorted.bam ont.bam
+    rm ont.*
     """
 }
 
@@ -58,5 +60,6 @@ process minimap2_bin {
     minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
     samtools view -bS ont.sam > ont.bam
     samtools sort -o ont_sorted.bam ont.bam
+    rm ont.*
     """
 }

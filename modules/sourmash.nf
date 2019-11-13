@@ -1,16 +1,19 @@
 process sourmash {
-    label 'sourmash'
+    label 'sourmash' 
     input:
     set val(name), file(ont)
-    file(database)
+    file(json), file(sbt_files)
     output:
     set val(name), file(ont), file('genome_size.txt')
     shell:
     """
     sourmash compute -p !{task.cpus} --scaled 10000 -k 31 !{ont} -o !{name}.sig 
-    sourmash lca gather  !{name}.sig !{database} --ignore-abundance -o metagenomic-composition.txt
+    sourmash gather  !{name}.sig !{json} --ignore-abundance -o metagenomic-composition.txt
     sum_ont=\$(cat metagenomic-composition.txt | cut -d ',' -f 1 | paste -sd+ | bc)
     total_m_ont=\$(bc -l <<< "scale=2 ; \$sum_ont /10^6")
-    echo \$total_m_ont"M" >genome_size.txt
+    if (( \$(echo "\$total_m_ont < 100" |bc -l) ));
+        then echo "100M" >genome_size.txt;
+        else echo \$total_m_ont"M" >genome_size.txt;
+    fi
     """
 }

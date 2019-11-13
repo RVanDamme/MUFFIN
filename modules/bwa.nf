@@ -12,6 +12,7 @@ process bwa {
     bwa mem illumina ${illumina[0]} ${illumina[1]} -t ${task.cpus} > illumina.sam
     samtools view -bS illumina.sam > illumina.bam
     samtools sort -@ ${task.cpus} -o illumina_sorted.bam illumina.bam
+    rm illumina.*
     """
 }
 
@@ -29,6 +30,7 @@ process extra_bwa {
     bwa mem illumina ${illumina} -t ${task.cpus} > illumina.sam
     samtools view -bS illumina.sam > illumina.bam
     samtools sort -@ ${task.cpus} -o ${illumina[0]}_sorted.bam illumina.bam
+    rm illumina.*
     """
 }
 
@@ -46,5 +48,6 @@ process bwa_bin {
     bwa mem illumina ${illumina[0]} ${illumina[1]} -t ${task.cpus} > illumina.sam
     samtools view -bS illumina.sam > illumina.bam
     samtools sort -@ ${task.cpus} -o illumina_sorted.bam illumina.bam
+    rm illumina.*
     """
 }
