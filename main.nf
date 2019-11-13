@@ -356,11 +356,7 @@ else {
     include refine3 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
     refine3_ch = metabat2_out.join(maxbin2_out).join(concoct_out)
     refine3(refine3_ch, checkm_db_path)
-<<<<<<< Updated upstream
-    final_bin_ch = refine3.out
-=======
     final_bin_dir_ch = refine3.out[0]
->>>>>>> Stashed changes
 }
 
 //**************
@@ -371,11 +367,7 @@ else {
 
     include 'modules/list_ids'
     contig_list(final_bin_ch)
-<<<<<<< Updated upstream
-    extract_reads_ch = contig_list.out.transpose()
-=======
     extract_reads_ch = contig_list.out.view()
->>>>>>> Stashed changes
 
  
 // bam align the reads to ALL OF THE CONTIGS 
@@ -398,16 +390,10 @@ else {
     include pilon_final from 'modules/polish' params( output : params.output)
     retrieve_unmapped_ch = ill_map_all_bin.join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
     if (params.out_unmapped == true) {unmapped_retrieve(retrieve_unmapped_ch)}
-<<<<<<< Updated upstream
-    retrieve_reads_ch = extract_reads_ch.join(ill_map_all_bin).join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
-    unicycler(reads_retrieval(retrieve_reads_ch))
-    final_assemblies_ch=unicycler.out.collect()
-=======
     retrieve_reads_ch = extract_reads_ch.transpose().combine(ill_map_all_bin, by:0).combine( ont_map_all_bin, by:0).combine(illumina_input_ch, by:0).combine(ont_input_ch, by:0)
     reads_retrieval(retrieve_reads_ch).view()
     unicycler(reads_retrieval.out)
     final_assemblies_ch=unicycler.out[0].collect()
->>>>>>> Stashed changes
 //checkm of the final assemblies
 
     include 'modules/checkm'

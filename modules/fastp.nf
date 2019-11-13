@@ -11,9 +11,6 @@ process fastp {
     """
     fastp -i ${illumina[0]} -I ${illumina[1]} -o ${name}_R1_clean.fastq -O ${name}_R2_clean.fastq
     """
-<<<<<<< Updated upstream
-
-=======
 }
 
 process fastp_rna {
@@ -27,5 +24,4 @@ process fastp_rna {
     """
     fastp -i ${illumina[0]} -I ${illumina[1]} -o ${name}_R1_clean.fastq -O ${name}_R2_clean.fastq
     """
->>>>>>> Stashed changes
 }

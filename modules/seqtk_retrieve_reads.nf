@@ -8,13 +8,8 @@ process reads_retrieval {
     shell:
     // first I extract the reads that NEED TO REDO IT WITH FRESH MIND (include BWA.nf)
     """
-<<<<<<< Updated upstream
-    bin=\$(basename !{contig_list})
-    list=\$(cat !{contig_list} | tr "\n" " " ) 
-=======
     bin=\$(basename -s .fa.contigs.list !{contig_list})
     list=\$(cat !{contig_list} | tr "\\n" " " ) 
->>>>>>> Stashed changes
     
     ## illumina mapped reads retrieval
     samtools index -@ !{task.cpus} !{ill_bam}
@@ -49,11 +44,8 @@ process unmapped_retrieve {
     publishDir "${params.output}/${name}_unmapped_bam/", mode: 'copy', pattern: "*unmapped_*.fastq"
     input:
     set val(name), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
-<<<<<<< Updated upstream
-=======
     output:
     file("unmapped_*.fastq") optionnal true
->>>>>>> Stashed changes
     shell:
     """
     ## illumina unmapped reads retrieval
