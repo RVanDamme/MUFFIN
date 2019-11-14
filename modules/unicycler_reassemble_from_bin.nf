@@ -7,7 +7,7 @@ process unicycler {
     set val(name),val(contig_list), file(illumina), file(ont)    
     output:
     set val(name), file("*_final.fasta") optionnal true
-    file("*_final.gfa")
+    file("*_final.gfa") optionnal true
     shell:
     """
     unicycler -1 ${illumina[0]} -2 ${illumina[1]} -l ${ont} -o output -t ${task.cpus} --keep 0 --no_pilon
