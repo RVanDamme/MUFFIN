@@ -2,10 +2,11 @@ process unicycler {
     label 'unicycler'
     publishDir "${params.output}/${name}/unicycler_assembly/", mode: 'copy', pattern: "*_final.fasta"
     publishDir "${params.output}/${name}/unicycler_assembly/", mode: 'copy', pattern: "*_final.gfa"
+    errorStrategy { task.exitStatus in 1 ? 'finish' }
     input:
     set val(name),val(contig_list), file(illumina), file(ont)    
     output:
-    set val(name), file("*_final.fasta")
+    set val(name), file("*_final.fasta") optionnal true
     file("*_final.gfa")
     shell:
     """
