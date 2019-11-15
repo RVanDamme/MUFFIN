@@ -1,9 +1,9 @@
 process unicycler {
     label 'unicycler'
+    errorStrategy { task.exitStatus = 1 ? 'retry' : 'terminate' }
+    maxRetries 2
     publishDir "${params.output}/${name}/unicycler_assembly/", mode: 'copy', pattern: "*_final.fasta"
     publishDir "${params.output}/${name}/unicycler_assembly/", mode: 'copy', pattern: "*_final.gfa"
-    errorStrategy { task.exitStatus = 1 ? 'retry' : 'terminate' }
-    maxRetries 3
     input:
     set val(name),val(contig_list), file(illumina), file(ont)    
     output:
@@ -20,21 +20,14 @@ process unicycler {
     if (task.attempt == 2)
     """
     mkdir spades_tmp
-    unicycler -1 ${illumina[0]} -2 ${illumina[1]} -l ${ont} -o output -t ${task.cpus} --keep 0 --no_pilon --spades_tmp_dir spades_tmp --max_kmer_frac 0.85
+    unicycler -1 ${illumina[0]} -2 ${illumina[1]} -l ${ont} -o output -t ${task.cpus} --keep 0 --no_pilon --spades_tmp_dir spades_tmp --max_kmer_frac 0.80
     mv output/assembly.fasta ${bin_name}".fa"
     mv output/assembly.gfa ${bin_name}".gfa"
     """
     if (task.attempt == 3)
     """
     mkdir spades_tmp
-    unicycler -1 ${illumina[0]} -2 ${illumina[1]} -l ${ont} -o output -t ${task.cpus} --keep 0 --no_pilon --spades_tmp_dir spades_tmp --max_kmer_frac 0.70
-    mv output/assembly.fasta ${bin_name}".fa"
-    mv output/assembly.gfa ${bin_name}".gfa"
-    """
-    if (task.attempt == 4)
-    """
-    mkdir spades_tmp
-    unicycler -1 ${illumina[0]} -2 ${illumina[1]} -l ${ont} -o output -t ${task.cpus} --keep 0 --no_pilon --spades_tmp_dir spades_tmp --max_kmer_frac 0.50
+    unicycler -1 ${illumina[0]} -2 ${illumina[1]} -l ${ont} -o output -t ${task.cpus} --keep 0 --no_pilon --spades_tmp_dir spades_tmp --max_kmer_frac 0.60
     mv output/assembly.fasta ${bin_name}".fa"
     mv output/assembly.gfa ${bin_name}".gfa"
     """
