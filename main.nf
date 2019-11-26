@@ -44,7 +44,7 @@ extra_ill_ch=Channel.fromPath(params.extra_ill).splitCsv().map { row ->
         }
 }
 
-/*
+
 // Help Message
 def helpMSG() {
     log.info """
@@ -121,15 +121,14 @@ def helpMSG() {
 //**********************************
 
 // sourmash_db
-if (params.assembler=="metaflye") { 
-    if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
+if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
 
-    else {
-        include 'modules/sourmashgetdatabase'
-        sourmash_download_db() 
-        database_sourmash = sourmash_download_db.out 
+else {
+    include 'modules/sourmashgetdatabase'
+    sourmash_download_db() 
+    database_sourmash = sourmash_download_db.out 
     }
-}
+
 
 // checkm_db
 if (params.checkm_db) {
@@ -205,14 +204,14 @@ if (params.assembler=="metaspades") {
 // Meta-FLYE
 
 if (params.assembler=="metaflye") {
-    include 'modules/sourmash'
+    include sourmash_genome_size from 'modules/sourmash'
     include 'modules/flye' params(assembly : params.assembly, output : params.output)
     include minimap_polish from'modules/minimap2'
     include racon from 'modules/polish'
     include medaka from 'modules/polish' params(model : params.model)
     include pilon from 'modules/polish' params(assembly : params.assembly, output : params.output)
     // FLYE + Pilon 
-    flye(sourmash(ont_input_ch,database_sourmash))
+    flye(sourmash_genome_size(ont_input_ch,database_sourmash))
     flye_to_map = flye.out.join(ont_input_ch)
     minimap_polish(flye_to_map)
     map_to_racon = ont_input_ch.join(flye.out).join(minimap_polish.out)
@@ -362,15 +361,15 @@ else {
 //**************
 //Retrieve reads for each bin and assemble them
 //**************
-
-// retrieve the ids of each bin contigs
+if (params.reassembly) {
+        // retrieve the ids of each bin contigs
 
     include 'modules/list_ids'
     contig_list(final_bin_ch)
     extract_reads_ch = contig_list.out.view()
 
  
-// bam align the reads to ALL OF THE CONTIGS 
+    // bam align the reads to ALL OF THE CONTIGS 
 
     include 'modules/cat_all_bins'
     include bwa_bin from 'modules/bwa'  
@@ -382,7 +381,7 @@ else {
     minimap2_all_bin = fasta_all_bin.join(ont_input_ch)
     ont_map_all_bin = minimap2_bin(minimap2_all_bin)
 
-// retrieve the reads aligned to the contigs + run unicycler + polish with pilon for 2 round
+    // retrieve the reads aligned to the contigs + run unicycler + polish with pilon for 2 round
 
     include reads_retrieval from 'modules/seqtk_retrieve_reads'params(out_bin_reads: params.out_bin_reads, output : params.output)
     include unmapped_retrieve from 'modules/seqtk_retrieve_reads'params(output : params.output)
@@ -393,24 +392,51 @@ else {
     retrieve_reads_ch = extract_reads_ch.transpose().combine(ill_map_all_bin, by:0).combine( ont_map_all_bin, by:0).combine(illumina_input_ch, by:0).combine(ont_input_ch, by:0)
     reads_retrieval(retrieve_reads_ch).view()
     unicycler(reads_retrieval.out)
-    final_assemblies_ch=unicycler.out[0].collect()
-//checkm of the final assemblies
 
-    include 'modules/checkm'
-    checkm(final_assemblies_ch)
-
+    collected_final_bins_ch=unicycler.out[0].collect()
+    final_bins_ch=unicycler.out[0]
+}
+else {
+    collected_final_bins_ch=final_bin_dir_ch
+}
 //******
 // Done
 //******
 
 
 
-//*******************************************************************************
-// STEP 2 Taxonomy; annotation; kegg pathways (and maybe go-term) + use or RNAseq
-//*******************************************************************************
+//*************************************************
+// STEP 2 classify taxa
+//*************************************************
 
+//**************
+// File handling
+//**************
 
+//bins (list with id (run id not bin) coma path/to/file)
+if (params.bin_classify) { 
+    classify_ch = Channel
+        .fromPath( params.bin_classify, checkIfExists: true )
+        .splitCsv()
+        .map { row -> ["${row[0]}","${row[1]}", file("${row[2]}", checkIfExists: true)]  }
+        .view()
+        }
 
+else {classify_ch=final_bins_ch}
+
+//*************************
+// Bins classify workflow
+//*************************
+
+//checkm of the final assemblies
+
+    include 'modules/checkm'
+    checkm(classify_ch)
+
+//sourmash classification using gtdb database
+
+    include sourmash_bins from 'modules/sourmash'
+    sourmash_bins(classify_ch,database_sourmash)
 
 
 
@@ -429,13 +455,14 @@ if (params.rna) {rna_input_ch = Channel
 }
 
 //bins (list with id (run id not bin) coma path/to/file)
-if (params.list_bins) {bins_input_ch = Channel
-        .fromPath( params.list_bins, checkIfExists: true )
+if (params.bin_annotate) {
+    bins_input_ch = Channel
+        .fromPath( params.bin_annotate, checkIfExists: true )
         .splitCsv()
-        .map { row -> ["${row[0]}", file("${row[1]}", checkIfExists: true)]  }
-        .view() }
-
-else if () {bins_input_ch = unicycler.out[0] }
+        .map { row -> ["${row[0]}","${row[1]}", file("${row[2]}", checkIfExists: true)]  }
+        .view() 
+        }
+else {bins_input_ch = final_bins_ch }
 
 
 
@@ -444,45 +471,56 @@ else if () {bins_input_ch = unicycler.out[0] }
 //************************
 
 if (params.rna) {
-    if (params.dammmit_db) {dammit_db=params.dammmit_db}
+    if (params.dammit_db) {dammit_db=Channel
+        .fromPath( params.dammit_db, checkIfExists: true )}
     else {
-        include 'modules/dammit_get_databases'
+        include 'modules/dammit_get_databases' params (busco_db : params.busco_db)
         dammit_download_db()
         dammit_db = dammit_download_db.out
     }
 }
 
-if (params.eggnog_db) {eggnog_db=params.eggnog_db}
+if (params.eggnog_db) {eggnog_db=Channel
+        .fromPath( params.eggnog_db, checkIfExists: true )}
 else {
     include 'modules/eggnog_get_databases'
     eggnog_download_db()
     eggnog_db = eggnog_download_db.out
     }
-
 //*************************
 // Bins annotation workflow
 //*************************
 
-include 'modules/eggnog'
-eggnog(,eggnog_db)
+    include 'modules/eggnog'
+    eggnog(bins_input_ch,eggnog_db)
+    bin_annotated_ch=eggnog.out
 
 //************************
 // RNA annotation workflow
 //************************
 
 // QC
-include fastp_rna from 'modules/fastp'
-    fastp(rna_input_ch)
-    rna_input_ch = fastp.out
+    include fastp_rna from 'modules/fastp'
+    fastp_rna(rna_input_ch)
+    rna_input_ch = fastp_rna.out
 
 // De novo transcript
-include from 'modules/trinity_and_salmon'
-    de_novo_transcript_and_quant(rna_input_ch)
-    transcript_ch=de_novo_transcript_and_quant.out[0]
-    quant_of_transcrip_ch=de_novo_transcript_and_quant.out[1]
+    include de_novo_transcript from 'modules/trinity_and_salmon'
+    de_novo_transcript(rna_input_ch)
+    transcript_ch=de_novo_transcript.out
 // annotation of the transcript
-
-include from 'modules/dammit' params(output : params.output, dammmit_user_db : params.dammmit_user_db )
+    include 'modules/dammit' params( dammit_user_db : params.dammit_user_db, busco_db: params.busco_db )
     dammit(transcript_ch,dammit_db)
     rna_annotation_ch = dammit.out
-    
+// quantification of the annotated transcript
+    include quantification from 'modules/trinity_and_salmon'
+    quantification(rna_input_ch,rna_annotation_ch)
+    quant_of_transcrip_ch=quantification.out
+
+
+//******************************************************
+// Parsing bin annot and RNA out into nice graphical out
+//******************************************************
+
+
+// Share pathway to put and HTML file with

@@ -1,9 +1,9 @@
 process fasta_check { 
         label 'ubuntu'
       input:
-        val(sample), val(bin_id), file(file)
+       set val(sample), val(bin_id), file(file)
       output:
-        val(name), val(bin_id), file("${bin_id}.fa")
+       set val(name), val(bin_id), file("${bin_id}.fa")
       shell:
         """
        case "${file}" in

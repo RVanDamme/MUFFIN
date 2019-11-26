@@ -4,10 +4,10 @@ process eggnog_download_db {
         storeDir 'nextflow-autodownload-databases/eggnog' 
         label 'eggnog' 
       output:
-        file("eggnogdb")
+        file("eggnog-db")
       script:
         """
         mkdir eggnog-db
-        download_eggnog_data.py --data-dir eggnog-db -y
+        download_eggnog_data.py --data_dir eggnog-db -y
         """
     }
