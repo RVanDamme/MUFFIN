@@ -20,11 +20,12 @@ process sourmash_genome_size {
 
 process sourmash_bins {
     label 'sourmash' 
+    publishDir "${params.output}/${name}/sourmash/${bin_id}/", mode: 'copy', pattern: "*.txt"
     input:
     set val(name), val(bin_id), file(bins)
     file(json)
     output:
-    set val(name), val(bin_id), file(bins), file('*.txt')
+    file('*.txt')
     shell:
     """
     sourmash compute -p !{task.cpus} --scaled 10000 -k 31 !{bins} -o !{bins}.sig

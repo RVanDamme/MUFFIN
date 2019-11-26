@@ -62,10 +62,10 @@ else {
 
 //checkm of the final assemblies
 
-    include 'modules/checkm'
+    include 'modules/checkm'params(output : params.output)
     checkm(classify_ch)
 
 //sourmash classification using gtdb database
 
-    include sourmash_bins from 'modules/sourmash'
+    include sourmash_bins from 'modules/sourmash'params(output : params.output)
     sourmash_bins(classify_ch,database_sourmash)

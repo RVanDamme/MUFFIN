@@ -1,10 +1,12 @@
 process eggnog { 
         label 'eggnog' 
+        publishDir "${params.output}/${name}/checkm_bins/${bin_id}/", mode: 'copy', pattern: "*.tsv"
       input:
-        set val(sample), val(bin_id), file(bin)
+        set val(name), val(bin_id), file(bin)
         file(db)
       output:
-        set val(sample), val(bin_id), file("*.annotations.tsv")
+        set val(name), val(bin_id), file("*.annotations.tsv")
+        file("*.seed_orthologs.tsv")
       shell:
         """
         emapper.py --data_dir ${db} -d bact -o ${bin_id}  -m diamond -i ${bin} --cpu ${task.cpus} --go_evidence non-electronic  --target_orthologs all --translate

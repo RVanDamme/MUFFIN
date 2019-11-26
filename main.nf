@@ -430,12 +430,12 @@ else {classify_ch=final_bins_ch}
 
 //checkm of the final assemblies
 
-    include 'modules/checkm'
+    include 'modules/checkm'params(output : params.output)
     checkm(classify_ch)
 
 //sourmash classification using gtdb database
 
-    include sourmash_bins from 'modules/sourmash'
+    include sourmash_bins from 'modules/sourmash'params(output : params.output)
     sourmash_bins(classify_ch,database_sourmash)
 
 
@@ -491,29 +491,29 @@ else {
 // Bins annotation workflow
 //*************************
 
-    include 'modules/eggnog'
+    include 'modules/eggnog'params(output : params.output)
     eggnog(bins_input_ch,eggnog_db)
-    bin_annotated_ch=eggnog.out
+    bin_annotated_ch=eggnog.out[0]
 
 //************************
 // RNA annotation workflow
 //************************
 
 // QC
-    include fastp_rna from 'modules/fastp'
+    include fastp_rna from 'modules/fastp'params(output : params.output)
     fastp_rna(rna_input_ch)
     rna_input_ch = fastp_rna.out
 
 // De novo transcript
-    include de_novo_transcript from 'modules/trinity_and_salmon'
+    include de_novo_transcript from 'modules/trinity_and_salmon'params(output : params.output)
     de_novo_transcript(rna_input_ch)
     transcript_ch=de_novo_transcript.out
 // annotation of the transcript
-    include 'modules/dammit' params( dammit_user_db : params.dammit_user_db, busco_db: params.busco_db )
+    include 'modules/dammit' params( dammit_user_db : params.dammit_user_db, busco_db: params.busco_db, output: params.output )
     dammit(transcript_ch,dammit_db)
     rna_annotation_ch = dammit.out
 // quantification of the annotated transcript
-    include quantification from 'modules/trinity_and_salmon'
+    include quantification from 'modules/trinity_and_salmon'params(output : params.output)
     quantification(rna_input_ch,rna_annotation_ch)
     quant_of_transcrip_ch=quantification.out
 

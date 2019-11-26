@@ -1,5 +1,6 @@
 process dammit { 
         label 'dammit' 
+        publishDir "${params.output}/${name}/dammit/", mode: 'copy', pattern: "*.dammit.*"
       input:
         set val(name), file(transcript)
         file(db)

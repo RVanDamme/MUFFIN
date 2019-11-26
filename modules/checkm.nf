@@ -1,11 +1,15 @@
 process checkm {
     maxForks 1
     label 'checkm'
-    publishDir "${params.output}/${name}_checkm_bins/", mode: 'copy', pattern: "*"
+    publishDir "${params.output}/${name}/checkm_bins/${bin_id}/", mode: 'copy', pattern: "summary.txt"
+    publishDir "${params.output}/${name}/checkm_bins/${bin_id}/", mode: 'copy', pattern: "*_checkm"
+    publishDir "${params.output}/${name}/checkm_bins/${bin_id}/", mode: 'copy', pattern: "*_checkm_plot"
     input:
     set val(name), val(bin_id), file(bins_assemblies)
     output:
-    //TBD
+    file("summarry.txt")
+    file("${bin_id}_checkm")
+    file("${bin_id}_checkm_plot")
     script:
     """
     mkdir ${bin_id}_bin
