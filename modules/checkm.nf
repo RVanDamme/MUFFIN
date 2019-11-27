@@ -7,7 +7,7 @@ process checkm {
     input:
     set val(name), val(bin_id), file(bins_assemblies)
     output:
-    file("summarry.txt")
+    file("summary.txt")
     file("${bin_id}_checkm")
     file("${bin_id}_checkm_plot")
     script:
