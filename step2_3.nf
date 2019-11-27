@@ -123,7 +123,8 @@ else {
 //*************************
 
     include 'modules/eggnog'params(output : params.output)
-    eggnog(classify_ch,eggnog_db)
+    eggnog_ch= classify_ch.combine(eggnog_db)
+    eggnog(eggnog_ch)
     bin_annotated_ch=eggnog.out[0]
 
 //************************

@@ -2,8 +2,7 @@ process eggnog {
         label 'eggnog' 
         publishDir "${params.output}/${name}/checkm_bins/${bin_id}/", mode: 'copy', pattern: "*.tsv"
       input:
-        set val(name), val(bin_id), file(bin)
-        file(db)
+        set val(name), val(bin_id), file(bin), file(db)
       output:
         set val(name), val(bin_id), file("*.annotations.tsv")
         file("*.seed_orthologs.tsv")
