@@ -8,6 +8,6 @@ process dammit_download_db {
       script:
         """
         mkdir dammit-db
-        dammit databases --install --n_threads 1 --busco-group ${params.busco_db} --database_dir dammit-db
+        dammit databases --install --n_threads 1 --busco-group ${params.busco_db} --database-dir dammit-db
         """
     }

@@ -53,38 +53,36 @@ else {
 // Bins annotation workflow
 //*************************
 
-    include 'modules/eggnog'params(output : params.output)
-    eggnog_ch= bins_input_ch.combine(eggnog_db)
-    eggnog(eggnog_ch)
-    bin_annotated_ch=eggnog.out[0].collect().view()
-    bin_annot_ch=eggnog.out[0].view()
+    include eggnog_bin 'modules/eggnog'params(output : params.output)
+    eggnog_bin_ch= bins_input_ch.combine(eggnog_db)
+    eggnog_bin(eggnog_bin_ch)
+    bin_annotated_ch=eggnog_bin.out[0].collect().view()
+    bin_annot_ch=eggnog_bin.out[0].view()
 
 //************************
 // RNA annotation workflow
 //************************
 
-// // QC
-//     include fastp_rna from 'modules/fastp'params(output : params.output)
-//     fastp_rna(rna_input_ch)
-//     rna_input_ch = fastp_rna.out
+// QC
+    include fastp_rna from 'modules/fastp'params(output : params.output)
+    fastp_rna(rna_input_ch)
+    rna_input_ch = fastp_rna.out
 
-// // De novo transcript
-//     include de_novo_transcript from 'modules/trinity_and_salmon'params(output : params.output)
-//     de_novo_transcript(rna_input_ch)
-//     transcript_ch=de_novo_transcript.out
-// // annotation of the transcript
-//     include 'modules/dammit' params( dammit_user_db : params.dammit_user_db, busco_db: params.busco_db, output: params.output )
-//     dammit(transcript_ch,dammit_db)
-//     rna_annotation_ch = dammit.out
-// // quantification of the annotated transcript
-//     include quantification from 'modules/trinity_and_salmon'params(output : params.output)
-//     quantification(rna_input_ch,rna_annotation_ch)
-//     quant_of_transcrip_ch=quantification.out
+// De novo transcript
+    include de_novo_transcript_and_quant from 'modules/trinity_and_salmon'params(output : params.output)
+    de_novo_transcript_and_quant(rna_input_ch)
+    transcript_ch=de_novo_transcript_and_quant.out
+// annotations of transcript
+    include eggnog_rna 'modules/eggnog'params(output : params.output)
+    eggnog_rna_ch= transcript_ch.combine(eggnog_db)
+    eggnog_rna(eggnog_rna_ch)
+    rna_annot_ch=eggnog_rna.out[0].view()
 
 
 //******************************************************
 // Parsing bin annot and RNA out into nice graphical out
 //******************************************************
-
+// include from 'modules/parser'params(output: params.output)
+// parser(rna_annot_ch,bin_annotated_ch)
 
 // Share pathway to put and HTML file with
