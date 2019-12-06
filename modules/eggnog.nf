@@ -20,7 +20,7 @@ process eggnog_rna {
       input:
         set val(name), val(transcript), file(quant), file(db)
       output:
-        set val(name), val(bin_id), file("*.annotations.tsv"), file(quant)
+        set val(name), file("*.annotations.tsv"), file(quant)
         file("*.seed_orthologs.tsv")
       shell:
         """
