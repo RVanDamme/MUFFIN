@@ -140,8 +140,7 @@ else {
 //******************************************************
 // Parsing bin annot and RNA out into nice graphical out
 //******************************************************
-
-    include from 'modules/parser'params(output: params.output)
+    include parser from 'modules/parser'params(output: params.output)
     parser(rna_annot_ch,bin_annotated_ch)
 
 // Share pathway to put and HTML file with

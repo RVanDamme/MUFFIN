@@ -1,5 +1,5 @@
 process parser {
-    label 'parser'
+    label 'pankegg'
     publishDir "${params.output}/${name}/final_result", mode: 'copy', pattern: "*.html"
     publishDir "${params.output}/${name}/final_result", mode: 'copy', pattern: "*.csv"
     input:
@@ -8,8 +8,16 @@ process parser {
     output:
         file("results/*.html") 
         file("results/*.csv") 
-    shell:
+    script:
         """
-        python -m ${annotation_parser} -r ${rna_annot} -l ${quant} -b ${bins_annot} -o results
+        #!/usr/bin/python
+
+        import PANKEGG
+        import PANKEGG.parser
+        from PANKEGG.parser import *
+        import sys
+        sys.argv = [sys.argv[0], '-b', '${bin_annot}' , '-l' ,'${quant}', '-o', 'result', '-r', '${rna_annot}']
+        main()
+
         """
     }
