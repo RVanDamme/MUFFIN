@@ -7,7 +7,8 @@ import sys
 import shutil
 import logging
 import argparse
-from urllib.error import HTTPError #used to request the name of the pathways and genes
+from urllib.error import HTTPError 
+# used to request the name of the pathways and genes
 from urllib.request import urlopen
 from collections import defaultdict
 
