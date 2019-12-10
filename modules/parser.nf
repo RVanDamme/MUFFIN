@@ -10,7 +10,7 @@ process parser {
         file("results/*.csv") 
     script:
         """
-        parser.py -b ${bin_annot} -l ${quant} -o result -r ${rna_annot}
+        pankegg.py -b ${bins_annot} -l ${quant} -o result -r ${rna_annot}
         """
     }
 
