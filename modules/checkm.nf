@@ -1,23 +1,25 @@
 process checkm {
     maxForks 1
     label 'checkm'
-    publishDir "${params.output}/${name}/checkm_bins/${bin_id}/", mode: 'copy', pattern: "summary.txt"
-    publishDir "${params.output}/${name}/checkm_bins/${bin_id}/", mode: 'copy', pattern: "*_checkm"
-    publishDir "${params.output}/${name}/checkm_bins/${bin_id}/", mode: 'copy', pattern: "*_checkm_plot"
+    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "summary.txt"
+    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "taxonomy.txt"
+    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "*_checkm"
+    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "*_checkm_plot"
     input:
     set val(name), val(bin_id), file(bins_assemblies)
     output:
     file("summary.txt")
-    file("${bin_id}_checkm")
-    file("${bin_id}_checkm_plot")
+    file("${name}_checkm")
+    file("${name}_checkm_plot")
     script:
     """
-    mkdir ${bin_id}_bin
-    mv *.fa ${bin_id}_bin/
-    checkm lineage_wf -t ${task.cpus} -x fa ${bin_id}_bin ${bin_id}_checkm > summary.txt
-    checkm qa ${bin_id}_checkm/lineage.ms ${bin_id}_checkm
-    checkm bin_qa_plot -x fa ${bin_id}_checkm ${bin_id}_bin ${bin_id}_checkm_plot
-    """
+    mkdir temporary
+    mkdir ${name}_bin
+    mv *.fa ${name}_bin/
+    checkm lineage_wf --tmpdir temporary --pplacer_threads ${task.cpus} -t ${task.cpus} --reduced_tree -x fa ${name}_bin ${name}_checkm > summary.txt
+    checkm bin_qa_plot --image_type png -x fa ${name}_checkm ${name}_bin ${name}_checkm_plot
+    checkm tree_qa ${name}_checkm > taxonomy.txt
+     """
 }
 // checkm module is not use in the script at the moment but it is used in metawrap
 // this module can be added for an additional check by the user just call it in the main script and input a channel outputted from a binning step

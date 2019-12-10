@@ -6,8 +6,8 @@ process parser {
         set val(name), file(rna_annot), file(quant)
         set val(name), val(bin_id), file(bins_annot)
     output:
-        file("results/*.html") 
-        file("results/*.csv") 
+        file("result/*.html") 
+        file("result/*.csv") 
     script:
         """
         pankegg.py -b ${bins_annot} -l ${quant} -o result -r ${rna_annot}

@@ -431,7 +431,7 @@ else {classify_ch=final_bins_ch}
 //checkm of the final assemblies
 
     include 'modules/checkm'params(output : params.output)
-    checkm(classify_ch)
+    checkm(classify_ch.groupTuple(by:0))
 
 //sourmash classification using gtdb database
 
@@ -483,8 +483,7 @@ else {
     include eggnog_bin from 'modules/eggnog'params(output : params.output)
     eggnog_bin_ch= bins_input_ch.combine(eggnog_db)
     eggnog_bin(eggnog_bin_ch)
-    bin_annotated_ch=eggnog_bin.out[0].collect().view()
-    bin_annot_ch=eggnog_bin.out[0].view()
+    bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
 
 //************************
 // RNA annotation workflow
