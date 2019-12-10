@@ -16,7 +16,7 @@ process parser {
         import PANKEGG.parser
         from PANKEGG.parser import *
         import sys
-        sys.argv = [sys.argv[0], '-b', '${bin_annot}' , '-l' ,'${quant}', '-o', 'result', '-r', '${rna_annot}']
+        sys.argv = [sys.argv[0], '-b', '!{bin_annot}' , '-l' ,'!{quant}', '-o', 'result', '-r', '!{rna_annot}']
         main()
 
         """
