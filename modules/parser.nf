@@ -8,7 +8,7 @@ process parser {
         file("parser_result/*") 
     script:
         """
-        pankegg.py -b ${bins_annot} -l ${quant} -o parser_result -r ${rna_annot}
+        pankegg.py -b ${bins_annot} -r ${rna_annot} -l ${quant} -o parser_result 
         """
     }
 
