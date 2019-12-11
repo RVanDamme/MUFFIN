@@ -573,7 +573,7 @@ def parse(args):
     """
     logger = logging.getLogger(__name__)
     output = args.output
-    bins = args.bins[0].split()
+    bins = args.bins
     level = args.level
     rna = args.rna
     # try:
