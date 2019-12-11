@@ -301,7 +301,7 @@ def write_html_sample(dict_global_sample, output,
             <table class="tg">
                 <tr>
                     <th class="header">Pathways</th>
-                    <th class="header">Bins [<font color="red">number of gene</font>, <font color="green">number of expressed gene</font>]</th>
+                    <th class="header">Bins [<font color="#db6e00">number of gene</font>, <font color="green">number of expressed gene</font>]</th>
                 </tr>
     """)
 
@@ -315,7 +315,7 @@ def write_html_sample(dict_global_sample, output,
         set_activgene = set()
         try:
             for gene in dictrna[pathway]:
-                set_activgene.add(gene+"%9green,black/")
+                set_activgene.add(gene+"%09green,black/")
             list_html_active_gene = "".join(set_activgene)
         except KeyError:
             list_active_gene = ""
@@ -326,8 +326,8 @@ def write_html_sample(dict_global_sample, output,
                 set_gene.add(gene)
                 list_inactive_gene = [ inactiv for inactiv in list(
                     set_gene) if inactiv not in list(set_activgene)]
-        list_html_inactive_gene = [
-            inactiv+"%9red,black" for inactiv in list_inactive_gene]
+        list_html_inactive_gene = "".join([
+            inactiv+"%09orange,black/" for inactiv in list_inactive_gene])
         outfile.write(f"""
         <tr>
         <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/{list_html_inactive_gene}">{pathway_name}</a></td>
@@ -490,7 +490,7 @@ def write_html_bins(dict_global_bin, output,
                     <tr>
                         <th class="header">Pathways</th>
                         <th class="header"><font color="green">Expressed genes</font></th>
-                        <th class="header"><font color="red">Non expressed genes</font></th>
+                        <th class="header"><font color="#db6e00">Non expressed genes</font></th>
                     </tr>
         """)
 
@@ -506,7 +506,7 @@ def write_html_bins(dict_global_bin, output,
                 if dict_global_bin[bin_html][pathway][3] != "":
                     for gene in dict_global_bin[bin_html][pathway][3]:
                         set_active_gene.add(gene)
-                        set_html_active_gene.add(gene+"%9green,black/")
+                        set_html_active_gene.add(gene+"%09green,black/")
                 set_gene = set()
                 for gene in dict_global_bin[bin_html][pathway][1]:
                     set_gene.add(gene)
@@ -515,8 +515,8 @@ def write_html_bins(dict_global_bin, output,
                     list_active_gene = list(set_active_gene)
                     list_inactive_gene = [activ for activ in list(
                         set_gene) if activ not in list_active_gene]
-                    list_html_inactive_gene = [
-                    inactiv+"%9red,black" for inactiv in list_inactive_gene]
+                    list_html_inactive_gene = "".join([
+                    inactiv+"%09orange,black/" for inactiv in list_inactive_gene])
                 else:
                     list_html_gene = ""
                     list_active_gene = ""
