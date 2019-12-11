@@ -1,16 +1,14 @@
 process parser {
     label 'pankegg'
-    publishDir "${params.output}/${name}/final_result", mode: 'copy', pattern: "*.html"
-    publishDir "${params.output}/${name}/final_result", mode: 'copy', pattern: "*.csv"
+    publishDir "${params.output}/${name}/", mode: 'copy', pattern: "parser_result/*"
     input:
         set val(name), file(rna_annot), file(quant)
         set val(name), val(bin_id), file(bins_annot)
     output:
-        file("result/*.html") 
-        file("result/*.csv") 
+        file("parser_result/*") 
     script:
         """
-        pankegg.py -b ${bins_annot} -l ${quant} -o result -r ${rna_annot}
+        pankegg.py -b ${bins_annot} -l ${quant} -o parser_result -r ${rna_annot}
         """
     }
 
