@@ -438,6 +438,8 @@ else {classify_ch=final_bins_ch}
     include sourmash_bins from 'modules/sourmash'params(output : params.output)
     sourmash_bins(classify_ch,database_sourmash)
 
+    include sourmash_checkm_parser from 'modules/checkm_sourmash_parser'params(output: params.output)
+    sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect())
 
 
 //*************************************************

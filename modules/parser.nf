@@ -1,5 +1,5 @@
 process parser {
-    label 'pankegg'
+    label 'python38'
     publishDir "${params.output}/${name}/", mode: 'copy', pattern: "parser_result/*"
     input:
         set val(name), file(rna_annot), file(quant)
