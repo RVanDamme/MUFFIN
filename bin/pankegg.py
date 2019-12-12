@@ -213,10 +213,18 @@ def write_html_sample(dict_global_sample, output,
     <h1>Help</h1>
     <h2>
     <ul>
-        <li>The column "Pathways" is composed of name of each pathway present in the bins and are link to the kegg database figure</li>
+        <li>The columns "Pathways" are composed of name of each pathway present in the bins and are link to the kegg database figure</li>
+        <li>Pathway Full represent the pathway with the expressed and non expressed genes</li>
+        <li><font color="green">Pathway Expressed represent the pathway with the expressed genes</font></li>
+        <li><font color="#db6e00">Pathway Non expressed represent the pathway with the non expressed genes</font></li>
         <li>the column "Bins [number of gene, number of expressed gene]" is the list of the bins present in the pathway 
         with the number of genes from the bins present in the pathway and the number of genes present in the bins but also present in the RNA sample (expressed)</li>
-        <li>The Figures in the link represent the gene expressed by RNA in green, the gene present in the bins in orange and the genes absent from the samples in blue</li>
+        <li>The Figures in the links: <ul> 
+                <li>The gene expressed by RNA are in green</li>
+                <li>The gene present in the bins but that are not in the RNA are in orange</li>
+                <li>The genes absent from the samples are in blue</li></ul></li>
+        <li>When the link of the pathway is not loading or not showing anything, it means that there is too much gene to show on the figure.
+        Either try the link of another column or strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
     </ul>
     </h2>
     </div>
@@ -301,6 +309,8 @@ def write_html_sample(dict_global_sample, output,
             <table class="tg">
                 <tr>
                     <th class="header">Pathways</th>
+                    <th class="header"><font color="green">Pathways Expressed</font></th>
+                    <th class="header"><font color="#db6e00">Pathways Non Expressed</font></th>
                     <th class="header">Bins [<font color="#db6e00">number of gene</font>, <font color="green">number of expressed gene</font>]</th>
                 </tr>
     """)
@@ -334,7 +344,18 @@ def write_html_sample(dict_global_sample, output,
         <tr>
         <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/{list_html_inactive_gene}">{pathway_name}</a></td>
         <td class="pathway_gene">"""
+                      )        
+        outfile.write(f"""
+        <tr>
+        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}">{pathway_name}</a></td>
+        <td class="pathway_gene">"""
+                      )        
+        outfile.write(f"""
+        <tr>
+        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
+        <td class="pathway_gene">"""
                       )
+        
         for bins in dict_global_sample[pathway]:
             outfile.write(f"""{bins}[{dict_global_sample[pathway][bins][0]} 
                       ,{dict_global_sample[pathway][bins][2]}]; """)
@@ -401,10 +422,18 @@ def write_html_bins(dict_global_bin, output,
         <h1>Help</h1>
         <h2>
         <ul>
-            <li>The column "Pathways" is composed of name of each pathway present in the bins and are link to the kegg database figure</li>
+            <li>The columns "Pathways" are composed of name of each pathway present in the bins and are link to the kegg database figure</li>
+            <li>Pathway Full represent the pathway with the expressed and non expressed genes</li>
+            <li><font color="green">Pathway Expressed represent the pathway with the expressed genes</font></li>
+            <li><font color="#db6e00">Pathway Non expressed represent the pathway with the non expressed genes</font></li>
             <li>the column "Expressed genes" is the list of the genes of the pathway present in the RNA </li>
             <li>the column "Non expressed genes" is the list of the genes of the pathway present in the bin but are not present in the RNA</li>
-            <li>The Figures in the link represent the gene expressed by RNA in green, the gene present in the bins in orange and the genes absent from the samples in blue</li>
+            <li>The Figures in the links: <ul> 
+                <li>The gene expressed by RNA are in green</li>
+                <li>The gene present in the bins but that are not in the RNA are in orange</li>
+                <li>The genes absent from the samples are in blue</li></ul></li>
+            <li>When the link of the pathway is not loading or not showing anything, it means that there is too much gene to show on the figure.
+            Either try the link of another column or strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
         </ul>
         </h2>
         </div>
@@ -490,7 +519,9 @@ def write_html_bins(dict_global_bin, output,
             <div class="tg-wrap">
                 <table class="tg">
                     <tr>
-                        <th class="header">Pathways</th>
+                        <th class="header">Pathways Full</th>
+                        <th class="header"><font color="green">Pathways Expressed</font></th>
+                        <th class="header"><font color="#db6e00">Pathways Non Expressed</font></th>
                         <th class="header"><font color="green">Expressed genes</font></th>
                         <th class="header"><font color="#db6e00">Non expressed genes</font></th>
                     </tr>
@@ -531,6 +562,17 @@ def write_html_bins(dict_global_bin, output,
                 <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/{list_html_inactive_gene}">{pathway_name}</a></td>
                 <td class="pathway_gene">"""
                 )
+                outfile.write(f"""
+                <tr>
+                <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}">{pathway_name}</a></td>
+                <td class="pathway_gene">"""
+                )
+                outfile.write(f"""
+                <tr>
+                <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
+                <td class="pathway_gene">"""
+                )
+                
                 for gene in list_active_gene:
                     request_gene = 'http://rest.kegg.jp/get/'+gene
                     print(request_gene)
