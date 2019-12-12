@@ -9,8 +9,8 @@ process checkm {
     set val(name), val(bin_id), file(bins_assemblies)
     output:
     set val(name), file("summary.txt")
-    file("${name}_checkm")
-    file("${name}_checkm_plot")
+    set file("${name}_checkm"), file("${name}_checkm_plot"), file("taxonomy.txt")
+    
     script:
     """
     mkdir temporary

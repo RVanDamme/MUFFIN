@@ -209,6 +209,36 @@ def write_html_sample(dict_global_sample, output,
     )
     outfile.write(f"""
     <body>
+        <div id='summary'>
+        <h1>Help</h1>
+        <h2>
+        <ol>
+            <li>INDEX of the table
+            <ul>
+                <li>The columns "Pathways" are composed of name of each pathway present in the bins and link to a figure</li>
+                <li>Pathway Summary represent the pathway with both the expressed and non expressed genes</li>
+                <li><font color="green">Pathway Expressed</font> represent the pathway with the genes present in both RNAseq and the bin</li>
+                <li><font color="#db6e00">Pathway Non expressed</font> represent the pathway with the genes present in the bin but absent from the RNAseq</li>
+                <li><font color="firebrick">Pathway All Genes</font> represent the pathway with all the genes present in the bin</li>
+                <li>the column "Bins Composition" is the list of the bins with genes present in the pathway plus for each bin the number of genes from the bin present in the pathway and the number of genes present in the bins but also present in the RNAseq</li>
+            </ul></li>
+            <li> Figure detail
+            <ul>
+                <li>The Figures in the links: <ul> 
+                    <li>The gene expressed by RNA are in green</li>
+                    <li>The gene present in the bins but that are not in the RNA are in orange</li>
+                    <li>The genes absent from the samples are in blue</li></ul></li></ul></li>
+            <li>Troubleshooting
+            <ul>
+                <li>When the link of the pathway is not loading or not showing anything, it means that there is too much gene to show on the figure.
+            Either try the link of another column or strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
+                <li>In the figure you can have Green case that also contains orange.
+            If the case is composed of multiple genes and some are in RNA and some only in the bins the case will be highlighted in green even tough it should be green and orange</li>
+            </ul></li>
+        </ol>
+        </h2>
+        </div>
+    <body>
     <div id='summary'>
     <h1>Help</h1>
     <h2>
@@ -310,10 +340,18 @@ def write_html_sample(dict_global_sample, output,
         <div class="tg-wrap">
             <table class="tg">
                 <tr>
-                    <th class="header">Pathways</th>
+                    <th class="header">Pathways Summary</th>
                     <th class="header"><font color="green">Pathways Expressed</font></th>
                     <th class="header"><font color="#db6e00">Pathways Non Expressed</font></th>
-                    <th class="header">Bins [<font color="#db6e00">number of gene</font>, <font color="green">number of expressed gene</font>]</th>
+                    <th class="header"><font color="firebrick">Pathways All Genes</font></th>
+                    <th class="header">Bins Compositions</th>
+                </tr>
+                <tr>
+                    <th class="header">represent the genes of the BINS that are in RNAseq in green and the one absent from RNAseq in orange</th>
+                    <th class="header"><font color="green">represent only the genes of the bins that are in RNAseq in green</font></th>
+                    <th class="header"><font color="#db6e00">represent only the genes of the bins that are not in RNAseq in orange</font></th>
+                    <th class="header"><font color="firebrick">represent all the genes of the bins</font></th>
+                    <th class="header">Bins [<font color="#db6e00">number of gene in the bin</font>, <font color="green">number of genes in the bin present in RNAseq</font>]</th>
                 </tr>
     """)
 
@@ -345,6 +383,8 @@ def write_html_sample(dict_global_sample, output,
                 list_inactive_gene.append(inactiv)
         list_html_inactive_gene = "".join([
             inactiv+"%09orange,black/" for inactiv in list_inactive_gene])
+        list_html_all_gene = "".join([
+            gene+"%09red,black/" for gene in list(set_gene)])
         outfile.write(f"""
         <tr>
         <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}/{list_html_active_gene}">{pathway_name}</a></td>
@@ -358,6 +398,11 @@ def write_html_sample(dict_global_sample, output,
         outfile.write(f"""
 
         <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
+        """
+                      )
+        outfile.write(f"""
+
+        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_all_gene}">{pathway_name}</a></td>
         <td class="pathway_gene">"""
                       )
         
@@ -426,22 +471,31 @@ def write_html_bins(dict_global_bin, output,
         <div id='summary'>
         <h1>Help</h1>
         <h2>
-        <ul>
-            <li>The columns "Pathways" are composed of name of each pathway present in the bins and are link to the kegg database figure</li>
-            <li>Pathway Full represent the pathway with the expressed and non expressed genes</li>
-            <li><font color="green">Pathway Expressed represent the pathway with the expressed genes</font></li>
-            <li><font color="#db6e00">Pathway Non expressed represent the pathway with the non expressed genes</font></li>
-            <li>the column "Expressed genes" is the list of the genes of the pathway present in the RNA </li>
-            <li>the column "Non expressed genes" is the list of the genes of the pathway present in the bin but are not present in the RNA</li>
-            <li>The Figures in the links: <ul> 
-                <li>The gene expressed by RNA are in green</li>
-                <li>The gene present in the bins but that are not in the RNA are in orange</li>
-                <li>The genes absent from the samples are in blue</li></ul></li>
-            <li>When the link of the pathway is not loading or not showing anything, it means that there is too much gene to show on the figure.
+        <ol>
+            <li>INDEX of the table
+            <ul>
+                <li>The columns "Pathways" are composed of name of each pathway present in the bins and link to a figure</li>
+                <li>Pathway Summary represent the pathway with both the expressed and non expressed genes</li>
+                <li><font color="green">Pathway Expressed</font> represent the pathway with the genes present in both RNAseq and the bin</li>
+                <li><font color="#db6e00">Pathway Non expressed</font> represent the pathway with the genes present in the bin but absent from the RNAseq</li>
+                <li><font color="firebrick">Pathway All Genes</font> represent the pathway with all the genes present in the bin</li>
+                <li><font color="green">Expressed genes</font is the list of the genes of the pathway present in the RNAseq </li>
+                <li><font color="#db6e00">Non expressed genes</font> is the list of the genes of the pathway present in the bin but are absent of the RNAseq</li>
+            </ul></li>
+            <li> Figure detail
+            <ul>
+                <li>The Figures in the links: <ul> 
+                    <li>The gene expressed by RNA are in green</li>
+                    <li>The gene present in the bins but that are not in the RNA are in orange</li>
+                    <li>The genes absent from the samples are in blue</li></ul></li></ul></li>
+            <li>Troubleshooting
+            <ul>
+                <li>When the link of the pathway is not loading or not showing anything, it means that there is too much gene to show on the figure.
             Either try the link of another column or strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
-            <li>In the figure you can have Green case that also contains orange.
+                <li>In the figure you can have Green case that also contains orange.
             If the case is composed of multiple genes and some are in RNA and some only in the bins the case will be highlighted in green even tough it should be green and orange</li>
-        </ul>
+            </ul></li>
+        </ol>
         </h2>
         </div>
         """
@@ -526,11 +580,21 @@ def write_html_bins(dict_global_bin, output,
             <div class="tg-wrap">
                 <table class="tg">
                     <tr>
-                        <th class="header">Pathways Full</th>
+                        <th class="header">Pathways Summary</th>
                         <th class="header"><font color="green">Pathways Expressed</font></th>
                         <th class="header"><font color="#db6e00">Pathways Non Expressed</font></th>
-                        <th class="header"><font color="green">Expressed genes</font></th>
-                        <th class="header"><font color="#db6e00">Non expressed genes</font></th>
+                        <th class="header"><font color="#db6e00">Pathways All Genes</font></th>
+                        <th class="header"><font color="green">Expressed Genes</font></th>
+                        <th class="header"><font color="#db6e00">Non Expressed Genes</font></th>
+                    </tr>
+                    <tr>
+                        <th class="header">Represent the genes of the Bin that are in RNAseq in green and the one absent from RNAseq in orange</th>
+                        <th class="header">Represent only the genes of the bins that are in RNAseq in green</font></th>
+                        <th class="header">Represent only the genes of the bins that are not in RNAseq in orange</font></th>
+                        <th class="header">Represent all the genes of the bins</font></th>
+                        <th class="header">Genes of the bin present in RNAseq</th>
+                        <th class="header">Genes of the bin absent in RNAseq</th>
+
                     </tr>
         """)
 
@@ -550,6 +614,8 @@ def write_html_bins(dict_global_bin, output,
                 set_gene = set()
                 for gene in dict_global_bin[bin_html][pathway][1]:
                     set_gene.add(gene)
+                list_html_all_gene = "".join([
+                    gene+"%09red,black/" for gene in list(set_gene)])
                 list_inactive_gene=[]
                 if dict_global_bin[bin_html][pathway][3] != "":
                     list_html_active_gene = "".join(set_html_active_gene)
@@ -571,6 +637,10 @@ def write_html_bins(dict_global_bin, output,
                 )
                 outfile.write(f"""
                 <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}">{pathway_name}</a></td>
+                """
+                )
+                outfile.write(f"""
+                <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
                 """
                 )
                 outfile.write(f"""
