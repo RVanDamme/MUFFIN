@@ -325,8 +325,11 @@ def write_html_sample(dict_global_sample, output,
         set_activgene = set()
         try:
             for gene in dictrna[pathway]:
-                set_activgene.add(gene+"%09green,black/")
-            list_html_active_gene = "".join(set_activgene)
+                set_activgene.add(gene)
+            set_html_activgene= set()
+            for gene in set_activgene:
+                set_html_activgene.add(gene+"%09green,black/")
+            list_html_active_gene = "".join(set_html_activgene)
         except KeyError:
             list_active_gene = ""
         set_gene = set()
