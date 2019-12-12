@@ -1,4 +1,4 @@
-process checkm_sourmash_parser {
+process sourmash_checkm_parser {
     label 'python38'
     publishDir "${params.output}/${name}/step2_final_result/", mode: 'copy', pattern: "step2_summary.csv"
     input:
@@ -8,8 +8,8 @@ process checkm_sourmash_parser {
     file("step2_summary.csv")
     shell:
     """
-    grep -v "] INFO: " test | grep -v "\\-\\-\\-\\-\\-\\-\\-" | grep -v "Bin Id" | sed -e 's/^[ \\t]*//'|sed 's/[ \\t]*$//' |sed -r 's/ +/,/g'|sed '/^$/d' >checkm.csv
+    grep -v "] INFO: " !{checkm} | grep -v "\\-\\-\\-\\-\\-\\-\\-" | grep -v "Bin Id" | sed -e 's/^[ \\t]*//'|sed 's/[ \\t]*\$//' |sed -r 's/ +/,/g'|sed '/^\$/d' >checkm.csv
     for file in !{sourmash}; do tail -n 1 \$file | sed -e 's/.fa//' >>sourmash.csv; done
-    checkm_sourmash_parser.py -c checkm.tsv -s sourmash.csv
+    checkm_sourmash_parser.py -c checkm.csv -s sourmash.csv
     """
 }
