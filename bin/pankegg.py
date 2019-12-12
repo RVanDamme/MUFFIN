@@ -360,8 +360,8 @@ def write_html_sample(dict_global_sample, output,
                       )
         
         for bins in dict_global_sample[pathway]:
-            outfile.write(f"""{bins}[{dict_global_sample[pathway][bins][0]} 
-                      ,{dict_global_sample[pathway][bins][2]}]; """)
+            outfile.write(f"""{bins}[<font color="#db6e00">{dict_global_sample[pathway][bins][0]}</font> 
+                      ,<font color="green">{dict_global_sample[pathway][bins][2]}</font>]; """)
         # outfile.write("""</td>
         # <td class="modules">
         # """)
