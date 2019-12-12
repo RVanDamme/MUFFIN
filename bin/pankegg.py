@@ -324,8 +324,10 @@ def write_html_sample(dict_global_sample, output,
         for bins in dict_global_sample[pathway]:
             for gene in dict_global_sample[pathway][bins][1]:
                 set_gene.add(gene)
-                list_inactive_gene = [ inactiv for inactiv in list(
-                    set_gene) if inactiv not in list(set_activgene)]
+
+        for inactiv in list(set_gene):
+            if inactiv not in list(set_activgene):
+                list_inactive_gene.append(inactiv)
         list_html_inactive_gene = "".join([
             inactiv+"%09orange,black/" for inactiv in list_inactive_gene])
         outfile.write(f"""
@@ -510,15 +512,18 @@ def write_html_bins(dict_global_bin, output,
                 set_gene = set()
                 for gene in dict_global_bin[bin_html][pathway][1]:
                     set_gene.add(gene)
+                list_inactive_gene=[]
                 if dict_global_bin[bin_html][pathway][3] != "":
                     list_html_active_gene = "".join(set_html_active_gene)
                     list_active_gene = list(set_active_gene)
-                    list_inactive_gene = [activ for activ in list(
-                        set_gene) if activ not in list_active_gene]
+                    for elem in list(set_gene):
+                        if elem not in list_active_gene:
+                            list_inactive_gene.append(elem+"%09orange,black/")
                     list_html_inactive_gene = "".join([
-                    inactiv+"%09orange,black/" for inactiv in list_inactive_gene])
+                        inactiv for inactiv in list_inactive_gene])
                 else:
-                    list_html_gene = ""
+                    list_html_active_gene = ""
+                    list_html_inactive_gene = ""
                     list_active_gene = ""
                     list_inactive_gene = list(set_gene)
                 outfile.write(f"""
