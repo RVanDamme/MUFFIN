@@ -343,15 +343,15 @@ def write_html_sample(dict_global_sample, output,
         outfile.write(f"""
         <tr>
         <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/{list_html_inactive_gene}">{pathway_name}</a></td>
-        <td class="pathway_gene">"""
+        """
                       )        
         outfile.write(f"""
-        <tr>
+
         <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}">{pathway_name}</a></td>
-        <td class="pathway_gene">"""
+        """
                       )        
         outfile.write(f"""
-        <tr>
+
         <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
         <td class="pathway_gene">"""
                       )
@@ -560,15 +560,13 @@ def write_html_bins(dict_global_bin, output,
                 outfile.write(f"""
                 <tr>
                 <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/{list_html_inactive_gene}">{pathway_name}</a></td>
-                <td class="pathway_gene">"""
+                """
                 )
                 outfile.write(f"""
-                <tr>
                 <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}">{pathway_name}</a></td>
-                <td class="pathway_gene">"""
+                """
                 )
                 outfile.write(f"""
-                <tr>
                 <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
                 <td class="pathway_gene">"""
                 )
