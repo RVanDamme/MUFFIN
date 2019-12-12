@@ -225,6 +225,8 @@ def write_html_sample(dict_global_sample, output,
                 <li>The genes absent from the samples are in blue</li></ul></li>
         <li>When the link of the pathway is not loading or not showing anything, it means that there is too much gene to show on the figure.
         Either try the link of another column or strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
+        <li>In the figure you can have Green case that also contains orange.
+        If the case is composed of multiple genes and some are in RNA and some only in the bins the case will be highlighted in green even tough it should be green and orange</li>
     </ul>
     </h2>
     </div>
@@ -345,7 +347,7 @@ def write_html_sample(dict_global_sample, output,
             inactiv+"%09orange,black/" for inactiv in list_inactive_gene])
         outfile.write(f"""
         <tr>
-        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/{list_html_inactive_gene}">{pathway_name}</a></td>
+        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}/{list_html_active_gene}">{pathway_name}</a></td>
         """
                       )        
         outfile.write(f"""
@@ -360,8 +362,8 @@ def write_html_sample(dict_global_sample, output,
                       )
         
         for bins in dict_global_sample[pathway]:
-            outfile.write(f"""{bins}[<font color="#db6e00">{dict_global_sample[pathway][bins][0]}</font> 
-                      ,<font color="green">{dict_global_sample[pathway][bins][2]}</font>]; """)
+            outfile.write(f"""{bins}[ <font color="#db6e00"> {dict_global_sample[pathway][bins][0]}</font> 
+                      , <font color="green">{dict_global_sample[pathway][bins][2]}</font> ]; """)
         # outfile.write("""</td>
         # <td class="modules">
         # """)
@@ -437,6 +439,8 @@ def write_html_bins(dict_global_bin, output,
                 <li>The genes absent from the samples are in blue</li></ul></li>
             <li>When the link of the pathway is not loading or not showing anything, it means that there is too much gene to show on the figure.
             Either try the link of another column or strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
+            <li>In the figure you can have Green case that also contains orange.
+            If the case is composed of multiple genes and some are in RNA and some only in the bins the case will be highlighted in green even tough it should be green and orange</li>
         </ul>
         </h2>
         </div>
