@@ -34,7 +34,7 @@ def out_writing(dict_checkm_sourmash):
         out_writer.writerow(
             ['Bin Id', 'Marker lineage', 'UID', 'genomes', 'markers', 'marker sets',
              '0', '1', '2', '3', '4', '5+', 'Completeness', 'Contamination',
-              'Strain heterogeneity', 'status', 'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
+              'Strain heterogeneity', 'GTDB status', 'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
               )
         for bins in dict_checkm_sourmash:
             out_writer.writerow(dict_checkm_sourmash[bins])
