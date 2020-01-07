@@ -9,7 +9,8 @@ process reads_retrieval {
     // first I extract the reads that NEED TO REDO IT WITH FRESH MIND (include BWA.nf)
     """
     bin=\$(basename -s .fa.contigs.list !{contig_list})
-    list=\$(cat !{contig_list} | tr "\n" " " ) 
+    list=\$(cat !{contig_list} | tr "\\n" " " ) 
+
     
     ## illumina mapped reads retrieval
     samtools index -@ !{task.cpus} !{ill_bam}
@@ -26,6 +27,11 @@ process reads_retrieval {
     cut -f1 ont_mapped_contigs.sam | sort | uniq > \$bin"_ont_mapped.list"
     seqtk subseq !{ont_reads} \$bin"_ont_mapped.list" > \$bin"_ont.fastq"
 
+    rm illumina_contigs.bam
+    rm illumina_mapped_contigs.sam
+    rm ont_contigs.bam
+    rm ont_mapped_contigs.sam
+    rm *.bam.bai
     """
 
 }
@@ -41,7 +47,7 @@ process unmapped_retrieve {
     input:
     set val(name), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
     output:
-    file("unmapped_*.fastq")
+    file("unmapped_*.fastq") optionnal true
     shell:
     """
     ## illumina unmapped reads retrieval
@@ -54,6 +60,11 @@ process unmapped_retrieve {
     samtools view -f4 !{ont_bam} > ont_unmapped_contigs.sam
     cut -f1 ont_unmapped_contigs.sam | sort | uniq > ont_unmapped.list
     seqtk subseq !{ont_reads} ont_unmapped.list > unmapped_ONT.fastq
+
+    rm illumina_unmapped_contigs.sam
+    rm illumina_unmapped.list
+    rm ont_unmapped_contigs.sam
+    rm ont_unmapped.list
     """
 
 }

@@ -26,13 +26,13 @@ if (params.assembler!='metaflye' && params.assembler!='metaspades') {
 
 // DATA INPUT (ONT and ILLUMINA)
 illumina_input_ch = Channel
-        .fromFilePairs( "${params.illumina}*_R{1,2}.fastq.gz", checkIfExists: true)
+        .fromFilePairs( "${params.illumina}*_R{1,2}.fastq{,.gz}", checkIfExists: true)
         .view() 
 // reads_illumina = "${params.illumina}*_R{1,2}.fastq.gz"
 // illumina_input_ch = Channel.fromFilePairs(reads_illumina).ifEmpty { error "Cannot find any Illumina reads in the directory: ${params.illumina} \n Delfault is ./illumina \n ${reads_illumina}" }.view()
 
 // reads_ont= "${params.ont}*.fastq.gz"
-ont_input_ch = Channel.fromPath("${params.ont}*.fastq.gz",checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
+ont_input_ch = Channel.fromPath("${params.ont}*.fastq{,.gz}",checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
 
 // extra ont reads
 if (params.extra_ont != false) {
@@ -50,7 +50,7 @@ extra_ill_ch=Channel.fromPath(params.extra_ill).splitCsv().map { row ->
         }
 }
 
-/*
+
 // Help Message
 def helpMSG() {
     log.info """
@@ -64,8 +64,9 @@ def helpMSG() {
     nextflow run mafin --retrieve --ont /path/to/ont_dir --illumina /path/to/illumina_dir --metaflye -profile conda
 
         Input:
-    --ont                       path to the directory containing the nanopore read file (fastq)
-    -- illumina                 path to the directory containing the illumina read file (fastq)
+    --ont                       path to the directory containing the nanopore read file (fastq) (default: ./nanopore)
+    --illumina                 path to the directory containing the illumina read file (fastq) (default: ./illumina)
+    --rna                       path to the directory containing the illumina read file (fastq) (default: none)
 
         Output (default output is reassemblies from each bins):
     --output                    path to the output directory (default: $params.output)
@@ -85,11 +86,16 @@ def helpMSG() {
         Parameter:
     --cpus                      max cores for local use [default: $params.cpus]
     --memory                    80% of available RAM in GB for --metamaps [default: $params.memory]
-    
-        Options:
+
+        Databases:
     --checkm_db                 path to an already INSTALLED checkm database (not the tar file)
     --checkm_tar_db             path to the tar checkm database (it will extract it in the dir)
-    --sourmash                  path to an already installed sourmash database
+    --sourmash_db               path to an already installed sourmash database
+    --dammit_db                 path to an already installed dammit databases
+    --dammmit_user_db           path to a personnal protein database
+    --busco_db                  the busco database you want to use in dammit (default: metazoa)
+    
+        Options:
     --skip_ill_qc               skip quality control of illumina files
     --skip_ont_qc               skip quality control of nanopore file
     --short_qc                  minimum size of the reads to be kept (default: $params.short_qc )
@@ -122,15 +128,14 @@ def helpMSG() {
 //**********************************
 
 // sourmash_db
-if (params.assembler=="metaflye") { 
-    if (params.sour_db) { database_sourmash = file(params.sour_db) }
+if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
 
-    else {
-        include 'modules/sourmashgetdatabase'
-        sourmash_download_db() 
-        database_sourmash = sourmash_download_db.out 
+else {
+    include 'modules/sourmashgetdatabase'
+    sourmash_download_db() 
+    database_sourmash = sourmash_download_db.out 
     }
-}
+
 
 // checkm_db
 if (params.checkm_db) {
@@ -154,6 +159,7 @@ else {
     checkm_setup_db(checkm_download_db(), untar)
     checkm_db_path = checkm_setup_db.out
 }
+
 
 //************
 // QC OF READS
@@ -183,7 +189,7 @@ else if (params.skip_ont_qc==false){
 if (params.skip_ill_qc==true) {}
 
 else if (params.skip_ill_qc==false){
-    include 'modules/fastp' params(out_qc : params.out_qc, output : params.output)
+    include fastp from 'modules/fastp' params(out_qc : params.out_qc, output : params.output)
     fastp(illumina_input_ch)
     illumina_input_ch = fastp.out
 }
@@ -205,14 +211,14 @@ if (params.assembler=="metaspades") {
 // Meta-FLYE
 
 if (params.assembler=="metaflye") {
-    include 'modules/sourmash'
+    include sourmash_genome_size from 'modules/sourmash'
     include 'modules/flye' params(assembly : params.assembly, output : params.output)
     include minimap_polish from'modules/minimap2'
     include racon from 'modules/polish'
     include medaka from 'modules/polish' params(model : params.model)
     include pilon from 'modules/polish' params(assembly : params.assembly, output : params.output)
     // FLYE + Pilon 
-    flye(sourmash(ont_input_ch,database_sourmash))
+    flye(sourmash_genome_size(ont_input_ch,database_sourmash))
     flye_to_map = flye.out.join(ont_input_ch)
     minimap_polish(flye_to_map)
     map_to_racon = ont_input_ch.join(flye.out).join(minimap_polish.out)
@@ -356,21 +362,22 @@ else {
     include refine3 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
     refine3_ch = metabat2_out.join(maxbin2_out).join(concoct_out)
     refine3(refine3_ch, checkm_db_path)
-    final_bin_ch = refine3.out[0]
+    final_bin_dir_ch = refine3.out[0]
+
 }
 
 //**************
 //Retrieve reads for each bin and assemble them
 //**************
-
-// retrieve the ids of each bin contigs
+if (params.reassembly) {
+        // retrieve the ids of each bin contigs
 
     include 'modules/list_ids'
     contig_list(final_bin_ch)
     extract_reads_ch = contig_list.out.view()
 
  
-// bam align the reads to ALL OF THE CONTIGS 
+    // bam align the reads to ALL OF THE CONTIGS 
 
     include 'modules/cat_all_bins'
     include bwa_bin from 'modules/bwa'  
@@ -382,28 +389,146 @@ else {
     minimap2_all_bin = fasta_all_bin.join(ont_input_ch)
     ont_map_all_bin = minimap2_bin(minimap2_all_bin)
 
-// retrieve the reads aligned to the contigs + run unicycler + polish with pilon for 2 round
+    // retrieve the reads aligned to the contigs + run unicycler + polish with pilon for 2 round
 
     include reads_retrieval from 'modules/seqtk_retrieve_reads'params(out_bin_reads: params.out_bin_reads, output : params.output)
     include unmapped_retrieve from 'modules/seqtk_retrieve_reads'params(out_unmapped: params.out_unmapped, output : params.output)
     include 'modules/unicycler_reassemble_from_bin' params(output : params.output)
     retrieve_unmapped_ch = ill_map_all_bin.join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
     if (params.out_unmapped == true) {unmapped_retrieve(retrieve_unmapped_ch)}
-    retrieve_reads_ch = extract_reads_ch.join(ill_map_all_bin).join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch).transpose()
+    retrieve_reads_ch = extract_reads_ch.transpose().combine(ill_map_all_bin, by:0).combine( ont_map_all_bin, by:0).combine(illumina_input_ch, by:0).combine(ont_input_ch, by:0)
     reads_retrieval(retrieve_reads_ch).view()
     unicycler(reads_retrieval.out)
-    final_assemblies_ch=unicycler.out[0].collect()
-//checkm of the final assemblies
 
-    include 'modules/checkm'params(output : params.output)
-    checkm(final_assemblies_ch)
-
+    collected_final_bins_ch=unicycler.out[0].collect()
+    final_bins_ch=unicycler.out[0]
+}
+else {
+    collected_final_bins_ch=final_bin_dir_ch
+}
 //******
 // Done
 //******
 
 
 
-//*******************************************************************************
-// STEP 2 Taxonomy; annotation; kegg pathways (and maybe go-term) + use or RNAseq
-//*******************************************************************************
+
+//*************************************************
+// STEP 2 classify taxa
+//*************************************************
+
+//**************
+// File handling
+//**************
+
+//bins (list with id (run id not bin) coma path/to/file)
+if (params.bin_classify) { 
+    classify_ch = Channel
+        .fromPath( params.bin_classify, checkIfExists: true )
+        .splitCsv()
+        .map { row -> ["${row[0]}","${row[1]}", file("${row[2]}", checkIfExists: true)]  }
+        .view()
+        }
+
+else {classify_ch=final_bins_ch}
+
+//*************************
+// Bins classify workflow
+//*************************
+
+//checkm of the final assemblies
+
+    include 'modules/checkm'params(output : params.output)
+    checkm(classify_ch.groupTuple(by:0))
+
+//sourmash classification using gtdb database
+
+    include sourmash_bins from 'modules/sourmash'params(output : params.output)
+    sourmash_bins(classify_ch,database_sourmash)
+
+    include sourmash_checkm_parser from 'modules/checkm_sourmash_parser'params(output: params.output)
+    sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect())
+
+
+//*************************************************
+// STEP 3 annotation; kegg pathways + use or RNAseq
+//*************************************************
+
+//**************
+// File handling
+//**************
+
+//RNAseq
+if (params.rna) {rna_input_ch = Channel
+        .fromFilePairs( "${params.rna}*_R{1,2}.fastq{,.gz}", checkIfExists: true)
+        .view()
+}
+
+//bins (list with id (run id not bin) coma path/to/file)
+if (params.bin_annotate) {
+    bins_input_ch = Channel
+        .fromPath( params.bin_annotate, checkIfExists: true )
+        .splitCsv()
+        .map { row -> ["${row[0]}","${row[1]}", file("${row[2]}", checkIfExists: true)]  }
+        .view() 
+        }
+else {bins_input_ch = final_bins_ch }
+
+
+
+//************************
+// Databases Dll and setup
+//************************
+if (params.eggnog_db) {eggnog_db=Channel
+        .fromPath( params.eggnog_db, checkIfExists: true )}
+else {
+    include 'modules/eggnog_get_databases'
+    eggnog_download_db()
+    eggnog_db = eggnog_download_db.out
+    }
+//*************************
+// Bins annotation workflow
+//*************************
+
+    include eggnog_bin from 'modules/eggnog'params(output : params.output)
+    eggnog_bin_ch= bins_input_ch.combine(eggnog_db)
+    eggnog_bin(eggnog_bin_ch)
+    bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
+
+//************************
+// RNA annotation workflow
+//************************
+
+// QC
+    include fastp_rna from 'modules/fastp'params(output : params.output)
+    fastp_rna(rna_input_ch)
+    rna_input_ch = fastp_rna.out
+
+// De novo transcript
+    include de_novo_transcript_and_quant from 'modules/trinity_and_salmon'params(output : params.output)
+    de_novo_transcript_and_quant(rna_input_ch)
+    transcript_ch=de_novo_transcript_and_quant.out
+// annotations of transcript
+    include eggnog_rna from 'modules/eggnog'params(output : params.output)
+    eggnog_rna_ch= transcript_ch.combine(eggnog_db)
+    eggnog_rna(eggnog_rna_ch)
+    rna_annot_ch=eggnog_rna.out[0].view()
+
+
+//******************************************************
+// Parsing bin annot and RNA out into nice graphical out
+//******************************************************
+
+if (params.rna)  {
+    include parser_bin_RNA from 'modules/parser'params(output: params.output)
+    parser_bin_RNA(rna_annot_ch,bin_annotated_ch)
+  }
+else {
+    include parser_bin from 'modules/parser'params(output: params.output)
+    parser_bin(bin_annotated_ch)
+}
+// Share pathway to put and HTML file with
+
+//***********
+// MAFIN DONE
+//***********
