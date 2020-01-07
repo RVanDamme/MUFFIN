@@ -511,9 +511,14 @@ else {
 // Parsing bin annot and RNA out into nice graphical out
 //******************************************************
 
-    include from 'modules/parser'params(output: params.output)
-    parser(rna_annot_ch,bin_annotated_ch)
-
+if (params.rna)  {
+    include parser_bin_RNA from 'modules/parser'params(output: params.output)
+    parser_bin_RNA(rna_annot_ch,bin_annotated_ch)
+  }
+else {
+    include parser_bin from 'modules/parser'params(output: params.output)
+    parser_bin(bin_annotated_ch)
+}
 // Share pathway to put and HTML file with
 
 //***********

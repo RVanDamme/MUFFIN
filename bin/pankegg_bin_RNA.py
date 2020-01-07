@@ -122,14 +122,15 @@ def bin_parse(bins,
                                                 else:
                                                     dictactiv[pathway].append(
                                                         gene)
-                                for module_number in row[10].split(','):
-                                    if module_number != '':
-                                        if not pathway in dictmodules:
-                                            dictmodules[pathway] = [
-                                                module_number]
-                                        else:
-                                            dictmodules[pathway].append(
-                                                module_number)
+                                # WE DONT USE THE MODULES SO NO NEED TO RUN THAT
+                                # for module_number in row[10].split(','):
+                                #     if module_number != '':
+                                #         if not pathway in dictmodules:
+                                #             dictmodules[pathway] = [
+                                #                 module_number]
+                                #         else:
+                                #             dictmodules[pathway].append(
+                                #                 module_number)
 
                             elif pathway == "":
                                 pass
@@ -145,27 +146,28 @@ def bin_parse(bins,
                 number_activ = len(dictactiv[pathw])
             except KeyError:
                 number_activ = 0
-            try:
-                if number_activ != 0:
-                    dict_global_sample[pathw][bin_name] = [
-                        number_ko, dictko[pathw], number_activ, dictactiv[pathw], dictmodules[pathw]]
-                    dict_global_bin[bin_name][pathw] = [
-                        number_ko, dictko[pathw], number_activ, dictactiv[pathw], dictmodules[pathw]]
-                else:
-                    dict_global_sample[pathw][bin_name] = [
-                        number_ko, dictko[pathw], number_activ, "", dictmodules[pathw]]
-                    dict_global_bin[bin_name][pathw] = [
-                        number_ko, dictko[pathw], number_activ, "", dictmodules[pathw]]
-            except KeyError:
-                if number_activ != 0:
-                    dict_global_sample[pathw][bin_name] = [
+            # NO MODULES SO NO NEED
+            # try:
+            #     if number_activ != 0:
+            #         dict_global_sample[pathw][bin_name] = [
+            #             number_ko, dictko[pathw], number_activ, dictactiv[pathw], dictmodules[pathw]]
+            #         dict_global_bin[bin_name][pathw] = [
+            #             number_ko, dictko[pathw], number_activ, dictactiv[pathw], dictmodules[pathw]]
+            #     else:
+            #         dict_global_sample[pathw][bin_name] = [
+            #             number_ko, dictko[pathw], number_activ, "", dictmodules[pathw]]
+            #         dict_global_bin[bin_name][pathw] = [
+            #             number_ko, dictko[pathw], number_activ, "", dictmodules[pathw]]
+            # except KeyError:
+            if number_activ != 0:
+                dict_global_sample[pathw][bin_name] = [
                         number_ko, dictko[pathw], number_activ, dictactiv[pathw], ""]
-                    dict_global_bin[bin_name][pathw] = [
+                dict_global_bin[bin_name][pathw] = [
                         number_ko, dictko[pathw], number_activ, dictactiv[pathw], ""]
-                else:
-                    dict_global_sample[pathw][bin_name] = [
+            else:
+                dict_global_sample[pathw][bin_name] = [
                         number_ko, dictko[pathw], number_activ, "", ""]
-                    dict_global_bin[bin_name][pathw] = [
+                dict_global_bin[bin_name][pathw] = [
                         number_ko, dictko[pathw], number_activ, "", ""]
     globalpathwaylist = list(set(pathwaylist))
     return dict_global_sample, dict_global_bin, globalpathwaylist, binnamelist
@@ -387,6 +389,7 @@ def write_html_sample(dict_global_sample, output,
         for bins in dict_global_sample[pathway]:
             outfile.write(f"""{bins}[ <font color="#db6e00"> {dict_global_sample[pathway][bins][0]}</font> 
                       , <font color="green">{dict_global_sample[pathway][bins][2]}</font> ]; """)
+        # NO MODULES NO NEED
         # outfile.write("""</td>
         # <td class="modules">
         # """)
@@ -635,6 +638,7 @@ def write_html_bins(dict_global_bin, output,
                     gene_name = re.split("NAME\s+", data_gene)[1]
                     outfile.write(
                         f"""<a href="https://www.kegg.jp/dbget-bin/www_bget?{gene}">[{gene_name}]</a>; """)
+                # NO MODULES NO NEED
                 # outfile.write("""</td>
                 # <td class="modules">
                 # """)
