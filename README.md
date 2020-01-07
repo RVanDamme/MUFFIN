@@ -36,6 +36,10 @@ MAFIN uses the following software
 | *De novo* transcript and quantification | [Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki) |  |  |  |
 |  | [Salmon](https://github.com/COMBINE-lab/salmon) |  |  |  |
 
+## Figure
+![GitHub Logo](/.figure/MAFIN_FLOWCHART.png)
+
+
 
 ## Installation
 
