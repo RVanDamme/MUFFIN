@@ -1,6 +1,6 @@
 process spades {
     label 'spades'
-    if (params.assembly == true ) { publishDir "${params.output}/${name}_assembly/", mode: 'copy', pattern: "assembly.fasta" }
+    publishDir "${params.output}/${name}/spades_assembly/", mode: 'copy', pattern: "assembly.fasta" 
     input:
     set val(name), file(illumina), file(ont)
     output:
@@ -11,4 +11,5 @@ process spades {
     spades.py -1 ${illumina[0]} -2 ${illumina[1]}  --meta --nanopore ${ont} -o spades_output -t ${task.cpus}
     mv spades_output/contigs.fasta  assembly.fasta
     """
+
 }

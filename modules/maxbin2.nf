@@ -1,6 +1,6 @@
 process maxbin2 {
     label 'maxbin2'
-    if (params.out_maxbin == true ) { publishDir "${params.output}/${name}_maxbin2/", mode: 'copy', pattern: "maxbin_bin/*" }
+    publishDir "${params.output}/${name}/maxbin2_bins/", mode: 'copy', pattern: "maxbin_bin" 
     input:
     set val(name), file(assembly), file(ont), file(illumina)
     output:
@@ -11,4 +11,5 @@ process maxbin2 {
     mkdir maxbin_bin
     mv maxbin2.*.fasta maxbin_bin/
     """
+        
 }  // add -prob_threshold 0.5 -markerset 40 ??

@@ -1,15 +1,16 @@
 process reads_retrieval {
     label 'seqtk'
-    if (params.out_bin_reads == true ) {publishDir "${params.output}/${name}_bins_reads/", mode: 'copy', pattern: "\$bin*.fastq"}
+    publishDir "${params.output}/${name}/reads_mapped_to_metawrap_bins/", mode: 'copy', pattern: "*.fastq"
     input:
     set val(name), file(contig_list), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
     output:
-    set val(name), file(contig_list), file("*_illumina_R{1,2}.fastq"), file("*_ont.fastq")
+    set val(name), val(file(file(file(contig_list).baseName).baseName).baseName), file("*_illumina_R{1,2}.fastq"), file("*_ont.fastq")
     shell:
     // first I extract the reads that NEED TO REDO IT WITH FRESH MIND (include BWA.nf)
     """
     bin=\$(basename -s .fa.contigs.list !{contig_list})
     list=\$(cat !{contig_list} | tr "\\n" " " ) 
+
     
     ## illumina mapped reads retrieval
     samtools index -@ !{task.cpus} !{ill_bam}
@@ -32,6 +33,7 @@ process reads_retrieval {
     rm ont_mapped_contigs.sam
     rm *.bam.bai
     """
+
 }
 
 // TODO PUT THE UNMAPPING AS A STAND ALONE STEP RETRIEVEING ALL UNMAPPED AS ONE FILE
@@ -41,7 +43,7 @@ process reads_retrieval {
 
 process unmapped_retrieve {
     label 'seqtk'
-    publishDir "${params.output}/${name}_unmapped_bam/", mode: 'copy', pattern: "*unmapped_*.fastq"
+    publishDir "${params.output}/${name}/reads_unmapped_to_metawrap_bins/", mode: 'copy', pattern: "*unmapped_*.fastq"
     input:
     set val(name), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
     output:
@@ -64,4 +66,5 @@ process unmapped_retrieve {
     rm ont_unmapped_contigs.sam
     rm ont_unmapped.list
     """
+
 }

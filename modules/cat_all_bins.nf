@@ -6,6 +6,6 @@ process cat_all_bins {
     set val(name) , file("all_bins.fa") 
     script:
     """
-    cat ${bins} > all_bins.fa
+    cat ${bins}/bin.*.fa > all_bins.fa
     """
 }

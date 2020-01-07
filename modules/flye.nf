@@ -1,6 +1,6 @@
 process flye {
     label 'flye'
-    if (params.assembly == true ) {publishDir "${params.output}/${name}_assembly/", mode: 'copy', pattern: "assembly.fasta"}
+    publishDir "${params.output}/${name}/flye_assembly/", mode: 'copy', pattern: "assembly.fasta"
     input:
     set val(name), file(ont), file(genome_size)
     output:

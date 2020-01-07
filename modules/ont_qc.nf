@@ -28,13 +28,14 @@ process filtlong {
 
 process merge {
     label 'ubuntu'
-    if (params.out_qc == true ) { publishDir "${params.output}/${name}_ont_qc/", mode: 'copy', pattern: "${name}.fastq" }
+    publishDir "${params.output}/${name}/nanopore_qc_out/", mode: 'copy', pattern: "*_all.fastq" 
     input:
     set val(name) , file(filtered)
     output:
-    set val(name), file("${name}.fastq")
+    set val(name), file("${name}_all.fastq")
     script:
     """
-    cat *.fastq > ${name}.fastq
+    cat *.fastq > ${name}_all.fastq
     """
+
 }

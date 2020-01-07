@@ -1,6 +1,6 @@
 process metabat2 {
     label 'metabat2'
-    if (params.out_metabat == true ) { publishDir "${params.output}/${name}_metabat2/", mode: 'copy', pattern: "bins_dir/metabat_bin/*" }
+    publishDir "${params.output}/${name}/metabat2_bins/", mode: 'copy', pattern: "bins_dir"
     input:
     set val(name), file(assembly), file(ont_bam), file(illumina_bam)
     output:
@@ -13,7 +13,7 @@ process metabat2 {
 
 process metabat2_extra {
     label 'metabat2'
-    if (params.out_metabat == true ) { publishDir "${params.output}/${name}_metabat2/", mode: 'copy', pattern: "bins_dir/metabat_bin/*" }
+    publishDir "${params.output}/${name}/metabat2_bins/", mode: 'copy', pattern: "bins_dir" 
     input:
     set val(name), file(assembly), file(ont_bam), file(illumina_bam)
     file(extra_bam)
@@ -23,4 +23,5 @@ process metabat2_extra {
     """
     metabat -i ${assembly} ${ont_bam} ${illumina_bam} ${extra_bam} -o bins_dir/metabat_bin -t ${task.cpus}
     """
+
 }

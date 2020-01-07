@@ -1,6 +1,7 @@
 # MAFIN
 Metagenomic Assembly pipeline using nextFlow for Illumina and Nanopore reads
 
+# MAFIN is still under development and unstable 
 
 ## Introduction
 
@@ -30,6 +31,10 @@ MAFIN uses the following software
 |  | [concoct](https://github.com/BinPro/CONCOCT) |  |  |  |
 |  | [metawrap](https://github.com/bxlab/metaWRAP) |  |  |  |
 | qc binning | [checkm](https://ecogenomics.github.io/CheckM/) |  |  |  |
+|Taxonomic Classification  | [sourmash](https://sourmash.readthedocs.io/en/latest/) using the [gt-DataBase](https://gtdb.ecogenomic.org/) |  |  |  |
+| Annotations (bin and RNA) | [eggNOG](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2) |  |  |  |
+| *De novo* transcript and quantification | [Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki) |  |  |  |
+|  | [Salmon](https://github.com/COMBINE-lab/salmon) |  |  |  |
 
 
 ## Installation

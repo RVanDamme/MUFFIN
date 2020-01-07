@@ -39,4 +39,3 @@ process unicycler {
     mv output/assembly.fasta ${bin_name}".fa"
     mv output/assembly.gfa ${bin_name}".gfa"
     """
-}

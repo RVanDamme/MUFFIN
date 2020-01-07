@@ -25,7 +25,7 @@ process medaka {
 
 process pilon {
     label 'pilon'
-    if (params.assembly == true ) { publishDir "${params.output}/${name}_assembly/", mode: 'copy', pattern: "polished_assembly.fasta" }
+    publishDir "${params.output}/${name}/flye_assembly/", mode: 'copy', pattern: "polished_assembly.fasta" 
     input:
         set val(name), file(assembly), file(ont_read)
         val(iteration)
@@ -45,35 +45,9 @@ process pilon {
     done
     mv !{iteration}"_polished_assembly.fasta" polished_assembly.fasta
     """
+
 }
 
-
-process pilon_final {
-    label 'pilon'
-    publishDir "${params.output}/${name}_polished_contig_unicycler/", mode: 'copy', pattern: "*_illumina_polished.fasta"
-    input:
-        set val(name), file(assembly), file(ill_read), file(ont_read)
-        val(iteration)
-    output:
-        set val(name), file("*_illumina_polished.fasta") 
-    shell:
-    """
-        mem=\$(echo !{task.memory} | sed 's/ GB//g')
-        bin_name=\$(basename !{ont_read} | sed 's/_ont.fastq//g')
-        assemb="!{assembly}"
-        for ite in {1..!{iteration}}
-        do
-            bwa index \$assemb
-            bwa mem \$assemb !{ill_read[0]} !{ill_read[1]} > assembly_ill_mapped.sam
-            samtools view -bS assembly_ill_mapped.sam > assembly_ill_mapped.bam
-            samtools sort -@ !{task.cpus} assembly_ill_mapped.bam > \$ite.bam
-            samtools index -@ !{task.cpus} \$ite.bam
-            pilon -Xmx\$mem"g" --threads !{task.cpus} --genome \$assemb --frags \$ite.bam --output \$ite"_polished_assembly"
-            assemb=\$ite"_polished_assembly.fasta"
-        done
-        mv !{iteration}"_polished_assembly.fasta" \$bin_name"_illumina_polished.fasta"
-    """
-}
 
 
 //*********************************
