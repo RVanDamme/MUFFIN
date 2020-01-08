@@ -37,7 +37,7 @@ MAFIN uses the following software
 |  | [Salmon](https://github.com/COMBINE-lab/salmon) |  |  |  |
 
 ## Figure
-![GitHub Logo](/.figure/MAFIN_FLOWCHART.png)
+![MAFIN FLOWCHART FIGURE]("/.figure/MAFIN FLOWCHART.pdf")
 
 
 
