@@ -221,7 +221,7 @@ def write_html_sample(dict_global_sample, output,
                 <li>Pathway Summary represent the pathway with both the expressed and non expressed genes</li>
                 <li><font color="green">Pathway Expressed</font> represent the pathway with the genes present in both RNAseq and the bin</li>
                 <li><font color="#db6e00">Pathway Non expressed</font> represent the pathway with the genes present in the bin but absent from the RNAseq</li>
-                <li><font color="firebrick">Pathway All Genes</font> represent the pathway with all the genes present in the bin</li>
+                <li><font color="firebrick">Pathway All Genes</font> represent the pathway with all the genes present in the bin without disctintion by RNAseq</li>
                 <li>the column "Bins Composition" is the list of the bins with genes present in the pathway plus for each bin the number of genes from the bin present in the pathway and the number of genes present in the bins but also present in the RNAseq</li>
             </ul></li>
             <li> Figure detail
@@ -330,7 +330,7 @@ def write_html_sample(dict_global_sample, output,
                     <th class="header">represent the genes of the BINS that are in RNAseq in green and the one absent from RNAseq in orange</th>
                     <th class="header"><font color="green">represent only the genes of the bins that are in RNAseq in green</font></th>
                     <th class="header"><font color="#db6e00">represent only the genes of the bins that are not in RNAseq in orange</font></th>
-                    <th class="header"><font color="firebrick">represent all the genes of the bins</font></th>
+                    <th class="header"><font color="firebrick">represent all the genes of the bins without disctinction by RNAseq</font></th>
                     <th class="header">Bins [<font color="#db6e00">number of gene in the bin</font>, <font color="green">number of genes in the bin present in RNAseq</font>]</th>
                 </tr>
     """)
@@ -459,7 +459,7 @@ def write_html_bins(dict_global_bin, output,
                 <li>Pathway Summary represent the pathway with both the expressed and non expressed genes</li>
                 <li><font color="green">Pathway Expressed</font> represent the pathway with the genes present in both RNAseq and the bin</li>
                 <li><font color="#db6e00">Pathway Non expressed</font> represent the pathway with the genes present in the bin but absent from the RNAseq</li>
-                <li><font color="firebrick">Pathway All Genes</font> represent the pathway with all the genes present in the bin</li>
+                <li><font color="firebrick">Pathway All Genes</font> represent the pathway with all the genes present in the bin without any disctinction by RNAseq</li>
                 <li><font color="green">Expressed genes</font is the list of the genes of the pathway present in the RNAseq </li>
                 <li><font color="#db6e00">Non expressed genes</font> is the list of the genes of the pathway present in the bin but are absent of the RNAseq</li>
             </ul></li>
@@ -564,7 +564,7 @@ def write_html_bins(dict_global_bin, output,
                         <th class="header">Pathways Summary</th>
                         <th class="header"><font color="green">Pathways Expressed</font></th>
                         <th class="header"><font color="#db6e00">Pathways Non Expressed</font></th>
-                        <th class="header"><font color="#db6e00">Pathways All Genes</font></th>
+                        <th class="header"><font color="firebrick">Pathways All Genes</font></th>
                         <th class="header"><font color="green">Expressed Genes</font></th>
                         <th class="header"><font color="#db6e00">Non Expressed Genes</font></th>
                     </tr>
@@ -572,7 +572,7 @@ def write_html_bins(dict_global_bin, output,
                         <th class="header">Represent the genes of the Bin that are in RNAseq in green and the one absent from RNAseq in orange</th>
                         <th class="header">Represent only the genes of the bins that are in RNAseq in green</font></th>
                         <th class="header">Represent only the genes of the bins that are not in RNAseq in orange</font></th>
-                        <th class="header">Represent all the genes of the bins</font></th>
+                        <th class="header">Represent all the genes of the bins without discintction by RNAseq</font></th>
                         <th class="header">Genes of the bin present in RNAseq</th>
                         <th class="header">Genes of the bin absent in RNAseq</th>
 
@@ -625,7 +625,7 @@ def write_html_bins(dict_global_bin, output,
                 """
                 )
                 outfile.write(f"""
-                <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
+                <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_all_gene}">{pathway_name}</a></td>
                 <td class="pathway_gene">"""
                 )
                 
