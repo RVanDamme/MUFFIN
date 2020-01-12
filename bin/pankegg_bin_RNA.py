@@ -346,50 +346,50 @@ def write_html_sample(dict_global_sample, output,
             set_activgene = set()
             try:
                 for gene in dictrna[pathway]:
-					set_activgene.add(gene)
-				set_html_activgene= set()
-				for gene in set_activgene:
-					set_html_activgene.add(gene+"%09green,black/")
-				list_html_active_gene = "".join(set_html_activgene)
-            except KeyError:
-                list_active_gene = ""
-			set_gene = set()
-			list_inactive_gene = []
-			for bins in dict_global_sample[pathway]:
-				for gene in dict_global_sample[pathway][bins][1]:
-					set_gene.add(gene)
-
-			for inactiv in list(set_gene):
-				if inactiv not in list(set_activgene):
-					list_inactive_gene.append(inactiv)
-			list_html_inactive_gene = "".join([
-				inactiv+"%09orange,black/" for inactiv in list_inactive_gene])
-			list_html_all_gene = "".join([
-				gene+"%09red,black/" for gene in list(set_gene)])
-			outfile.write(f"""
+                    set_activgene.add(gene)
+                set_html_activgene= set()
+                for gene in set_activgene:
+                    set_html_activgene.add(gene+"%09green,black/")
+                list_html_active_gene = "".join(set_html_activgene)
+                except KeyError:
+                    list_active_gene = ""
+            set_gene = set()
+            list_inactive_gene = []
+            for bins in dict_global_sample[pathway]:
+                for gene in dict_global_sample[pathway][bins][1]:
+                    set_gene.add(gene)
+            
+            for inactiv in list(set_gene):
+                if inactiv not in list(set_activgene):
+                    list_inactive_gene.append(inactiv)
+            list_html_inactive_gene = "".join([
+                inactiv+"%09orange,black/" for inactiv in list_inactive_gene])
+            list_html_all_gene = "".join([
+                gene+"%09red,black/" for gene in list(set_gene)])
+            outfile.write(f"""
 			<tr>
 			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}/{list_html_active_gene}">{pathway_name}</a></td>
 			"""
-						  )        
-			outfile.write(f"""
+						  )
+            outfile.write(f"""
 
 			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}">{pathway_name}</a></td>
 			"""
 						  )        
-			outfile.write(f"""
+		    outfile.write(f"""
 
 			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
 			"""
 						  )
-			outfile.write(f"""
+		    outfile.write(f"""
 
 			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_all_gene}">{pathway_name}</a></td>
 			<td class="pathway_gene">"""
 						  )
 			
-			for bins in dict_global_sample[pathway]:
-				outfile.write(f"""{bins}[ <font color="#db6e00"> {dict_global_sample[pathway][bins][0]}</font> 
-						  , <font color="green">{dict_global_sample[pathway][bins][2]}</font> ]; """)
+		    for bins in dict_global_sample[pathway]:
+		        outfile.write(f"""{bins}[ <font color="#db6e00"> {dict_global_sample[pathway][bins][0]}</font> 
+		    			  , <font color="green">{dict_global_sample[pathway][bins][2]}</font> ]; """)
 			# NO MODULES NO NEED
 			# outfile.write("""</td>
 			# <td class="modules">
@@ -403,10 +403,9 @@ def write_html_sample(dict_global_sample, output,
 			#             outfile.write(f"""<a href='https://www.kegg.jp/module/{mod}+{list_active_gene}'>
 			#             {mod}</a>; 
 			#             """)
-
-			outfile.write("""</td>
-			</tr>
-			"""
+		    outfile.write("""</td>
+		    </tr>
+		    """
 						  )
         except:
             outfile.write(f"""<tr>
