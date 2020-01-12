@@ -339,11 +339,11 @@ def write_html_sample(dict_global_sample, output,
         request = 'http://rest.kegg.jp/get/'+pathway
         print(request)
         try:
-			req = urlopen(request)
-			data = req.read().decode()
-			data = data.split('\n')[1]
-			pathway_name = re.split("NAME\s+", data)[1]
-			set_activgene = set()
+            req = urlopen(request)
+            data = req.read().decode()
+            data = data.split('\n')[1]
+            pathway_name = re.split("NAME\s+", data)[1]
+            set_activgene = set()
 			try:
 				for gene in dictrna[pathway]:
 					set_activgene.add(gene)
@@ -351,8 +351,8 @@ def write_html_sample(dict_global_sample, output,
 				for gene in set_activgene:
 					set_html_activgene.add(gene+"%09green,black/")
 				list_html_active_gene = "".join(set_html_activgene)
-			except KeyError:
-				list_active_gene = ""
+            except KeyError:
+                list_active_gene = ""
 			set_gene = set()
 			list_inactive_gene = []
 			for bins in dict_global_sample[pathway]:
@@ -408,9 +408,9 @@ def write_html_sample(dict_global_sample, output,
 			</tr>
 			"""
 						  )
-		except:
-			outfile.write(f"""<tr>
-			<td class="pathway_gene"> {pathway} unknow by the KEGG DATABASE </td></tr> """)
+        except:
+            outfile.write(f"""<tr>
+            <td class="pathway_gene"> {pathway} unknow by the KEGG DATABASE </td></tr> """)
     outfile.close()
 
 
@@ -586,12 +586,12 @@ def write_html_bins(dict_global_bin, output,
         for pathway in dict_global_bin[bin_html]:
                 request = 'http://rest.kegg.jp/get/'+pathway
                 print(request)
-				try:
-					req = urlopen(request)
-					data = req.read().decode()
-					data = data.split('\n')[1]
-					pathway_name = re.split("NAME\s+", data)[1]
-					set_active_gene = set()
+                try:
+	                req = urlopen(request)
+	                data = req.read().decode()
+		            data = data.split('\n')[1]
+	                pathway_name = re.split("NAME\s+", data)[1]
+                    set_active_gene = set()
 					set_html_active_gene = set()
 					if dict_global_bin[bin_html][pathway][3] != "":
 						for gene in dict_global_bin[bin_html][pathway][3]:
@@ -637,15 +637,15 @@ def write_html_bins(dict_global_bin, output,
 					for gene in list_active_gene:
 						request_gene = 'http://rest.kegg.jp/get/'+gene
 						print(request_gene)
-						try:
-							req_gene = urlopen(request_gene)
+			            try:
+					        req_gene = urlopen(request_gene)
 							data_gene = req_gene.read().decode()
 							data_gene = data_gene.split('\n')[1]
 							gene_name = re.split("NAME\s+", data_gene)[1]
-							outfile.write(
-								f"""<a href="https://www.kegg.jp/dbget-bin/www_bget?{gene}">[{gene_name}]</a>; """)
-						except:
-							outfile.write(f"""[{gene} unknown by KEGG DB]""")
+				            outfile.write(
+				                f"""<a href="https://www.kegg.jp/dbget-bin/www_bget?{gene}">[{gene_name}]</a>; """)
+		                except:
+				            outfile.write(f"""[{gene} unknown by KEGG DB]""")
 					# NO MODULES NO NEED
 					# outfile.write("""</td>
 					# <td class="modules">
@@ -664,22 +664,22 @@ def write_html_bins(dict_global_bin, output,
 					for gene in list_inactive_gene:
 						request_gene = 'http://rest.kegg.jp/get/'+gene
 						print(request_gene)
-						try:
-							req_gene = urlopen(request_gene)
-							data_gene = req_gene.read().decode()
-							data_gene = data_gene.split('\n')[1]
-							gene_name = re.split("NAME\s+", data_gene)[1]
-							outfile.write(
-								f"""<a href="https://www.kegg.jp/dbget-bin/www_bget?{gene}">[{gene_name}]</a>; """)
-						except:
-							outfile.write(f"""[{gene} unknown by KEGG DB]""")
+		                try:
+			                req_gene = urlopen(request_gene)
+			                data_gene = req_gene.read().decode()
+			                data_gene = data_gene.split('\n')[1]
+			                gene_name = re.split("NAME\s+", data_gene)[1]
+			                outfile.write(
+					            f"""<a href="https://www.kegg.jp/dbget-bin/www_bget?{gene}">[{gene_name}]</a>; """)
+		                except:
+		                    outfile.write(f"""[{gene} unknown by KEGG DB]""")
 					outfile.write("""</td>
 					</tr>
 					"""
 					)
-				except:
-					outfile.write(f"""<tr>
-					<td class="pathway_gene"> {pathway} unknow by the KEGG DATABASE </td></tr> """)	
+	            except:
+		            outfile.write(f"""<tr>
+		            <td class="pathway_gene"> {pathway} unknow by the KEGG DATABASE </td></tr> """)	
         outfile.close()
 
 
