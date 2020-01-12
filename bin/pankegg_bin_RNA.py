@@ -344,8 +344,8 @@ def write_html_sample(dict_global_sample, output,
             data = data.split('\n')[1]
             pathway_name = re.split("NAME\s+", data)[1]
             set_activgene = set()
-			try:
-				for gene in dictrna[pathway]:
+            try:
+                for gene in dictrna[pathway]:
 					set_activgene.add(gene)
 				set_html_activgene= set()
 				for gene in set_activgene:
