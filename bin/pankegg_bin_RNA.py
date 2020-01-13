@@ -390,7 +390,7 @@ def write_html_sample(dict_global_sample, output,
             <font color="green">from bins in RNAseq</font></a></td>
 			"""
 	        			  )        
-	        outfile.write(f"""
+            outfile.write(f"""
 
 	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}
             <font color="#db6e00">from bin not in RNAseq</font></a></td>
@@ -402,17 +402,17 @@ def write_html_sample(dict_global_sample, output,
             <font color="#730099">all genes from RNAseq (total: {n_rnaseq_gene})</font></a></td>
 	        """
 	        			  )
-	        outfile.write(f"""
+            outfile.write(f"""
 
 	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_all_gene}">{pathway_name}
             <font color="firebrick">all genes from the bins</font></a></td>
 	        <td class="pathway_gene">"""
 	        			  )
 			
-	        for bins in dict_global_sample[pathway]:
-	            outfile.write(f"""{bins}[ <font color="#db6e00"> {dict_global_sample[pathway][bins][0]}</font> 
-	        			  , <font color="green">{dict_global_sample[pathway][bins][2]}</font> ]; """)
-			# NO MODULES NO NEED
+            for bins in dict_global_sample[pathway]:
+                outfile.write(f"""{bins}[ <font color="#db6e00"> {dict_global_sample[pathway][bins][0]}</font> 
+            			  , <font color="green">{dict_global_sample[pathway][bins][2]}</font> ]; """)
+    		# NO MODULES NO NEED
 			# outfile.write("""</td>
 			# <td class="modules">
 			# """)
@@ -425,7 +425,7 @@ def write_html_sample(dict_global_sample, output,
 			#             outfile.write(f"""<a href='https://www.kegg.jp/module/{mod}+{list_active_gene}'>
 			#             {mod}</a>; 
 			#             """)
-	        outfile.write("""</td>
+            outfile.write("""</td>
 	        </tr>
 	        """
 	        			  )
