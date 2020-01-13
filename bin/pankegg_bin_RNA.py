@@ -59,9 +59,9 @@ def quant_parse(dictquant, level):
                         line_count += 1
             else:
                 if not row[0] in dictquant:
-                    dictquant[row[0]] = [row[4]]
+                    dictquant[row[0]] = [row[3]]
                 else:
-                    dictquant[row[0]].append(row[4])
+                    dictquant[row[0]].append(row[3])
                 line_count += 1
         return dictquant
 
@@ -71,7 +71,7 @@ def genelevel(output, dict_transcript, dictquant):
     with open(out, mode='w', newline='') as gene_file:
         gene_write = csv.writer(gene_file, delimiter=',',
                                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        gene_write.writerow(["transcript id", "pathways", "Number of reads"])
+        gene_write.writerow(["transcript id", "pathways", "TPM"])
         for transcript in dict_transcript.keys():
             try:
                 gene_write.writerow(
