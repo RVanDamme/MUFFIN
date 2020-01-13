@@ -221,14 +221,17 @@ def write_html_sample(dict_global_sample, output,
                 <li>Pathway Summary represent the pathway with both the expressed and non expressed genes</li>
                 <li><font color="green">Pathway Expressed</font> represent the pathway with the genes present in both RNAseq and the bin</li>
                 <li><font color="#db6e00">Pathway Non expressed</font> represent the pathway with the genes present in the bin but absent from the RNAseq</li>
-                <li><font color="firebrick">Pathway All Genes</font> represent the pathway with all the genes present in the bin</li>
+                <li><font color="#730099">Pathway RNA</font> represent the pathway with all the genes present in the RNAseq</li>
+                <li><font color="firebrick">Pathway bins</font> represent the pathway with all the genes present in the bins</li>
                 <li>the column "Bins Composition" is the list of the bins with genes present in the pathway plus for each bin the number of genes from the bin present in the pathway and the number of genes present in the bins but also present in the RNAseq</li>
             </ul></li>
             <li> Figure detail
             <ul>
                 <li>The Figures in the links: <ul> 
-                    <li>The gene expressed by RNA are in green</li>
+                    <li>The gene in both RNA and in the bins are in green</li>
                     <li>The gene present in the bins but that are not in the RNA are in orange</li>
+                    <li>The gene present in the RNA are in purple</li>
+                    <li>The gene present in the bins are in red</li>
                     <li>The genes absent from the samples are in blue</li></ul></li></ul></li>
             <li>Troubleshooting
             <ul>
@@ -323,14 +326,16 @@ def write_html_sample(dict_global_sample, output,
                     <th class="header">Pathways Summary</th>
                     <th class="header"><font color="green">Pathways Expressed</font></th>
                     <th class="header"><font color="#db6e00">Pathways Non Expressed</font></th>
-                    <th class="header"><font color="firebrick">Pathways All Genes</font></th>
+                    <th class="header"><font color="#730099">Pathways RNA</font></th>
+                    <th class="header"><font color="firebrick">Pathways bins</font></th>
                     <th class="header">Bins Compositions</th>
                 </tr>
                 <tr>
                     <th class="header">represent the genes of the BINS that are in RNAseq in green and the one absent from RNAseq in orange</th>
                     <th class="header"><font color="green">represent only the genes of the bins that are in RNAseq in green</font></th>
                     <th class="header"><font color="#db6e00">represent only the genes of the bins that are not in RNAseq in orange</font></th>
-                    <th class="header"><font color="firebrick">represent all the genes of the bins</font></th>
+                    <th class="header"><font color="#730099">represent all the genes that are in RNAseq in purple</font></th>
+                    <th class="header"><font color="firebrick">represent all the genes that are in the bins in red</font></th>
                     <th class="header">Bins [<font color="#db6e00">number of gene in the bin</font>, <font color="green">number of genes in the bin present in RNAseq</font>]</th>
                 </tr>
     """)
@@ -347,18 +352,25 @@ def write_html_sample(dict_global_sample, output,
             try:
                 for gene in dictrna[pathway]:
                     set_activgene.add(gene)
+                n_rnaseq_gene = len(set_activgene)
                 set_html_activgene= set()
+                for bins in dict_global_sample[pathway]:
+                    for gene in dict_global_sample[pathway][bins][3]:
+                        set_html_activgene.add(gene+"%09green,black/")
+                set_html_rnagene = set()
                 for gene in set_activgene:
-                    set_html_activgene.add(gene+"%09green,black/")
+                    set_html_rnagene.add(gene+"%09purple,black/")
                 list_html_active_gene = "".join(set_html_activgene)
+                list_html_rnagene = "".join(set_html_rnagene)
             except KeyError:
                 list_active_gene = ""
+                n_rnaseq_gene = ""
             set_gene = set()
             list_inactive_gene = []
             for bins in dict_global_sample[pathway]:
                 for gene in dict_global_sample[pathway][bins][1]:
                     set_gene.add(gene)
-            
+
             for inactiv in list(set_gene):
                 if inactiv not in list(set_activgene):
                     list_inactive_gene.append(inactiv)
@@ -368,22 +380,32 @@ def write_html_sample(dict_global_sample, output,
                 gene+"%09red,black/" for gene in list(set_gene)])
             outfile.write(f"""
 			<tr>
-			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}/{list_html_active_gene}">{pathway_name}</a></td>
+			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}/{list_html_active_gene}">{pathway_name}
+            <font color="green">from bins in RNAseq</font> and <font color="#db6e00">from bin not in RNAseq</font></a></td>
 			"""
 						  )
             outfile.write(f"""
 
-			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}">{pathway_name}</a></td>
+			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}">{pathway_name}
+            <font color="green">from bins in RNAseq</font></a></td>
 			"""
-						  )        
-		    outfile.write(f"""
+	        			  )        
+	        outfile.write(f"""
 
-	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
+	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}
+            <font color="#db6e00">from bin not in RNAseq</font></a></td>
+	        """
+	        			  )
+            outfile.write(f"""
+
+	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_rnagene}">{pathway_name}
+            <font color="#730099">all genes from RNAseq (total: {n_rnaseq_gene})</font></a></td>
 	        """
 	        			  )
 	        outfile.write(f"""
 
-	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_all_gene}">{pathway_name}</a></td>
+	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_all_gene}">{pathway_name}
+            <font color="firebrick">all genes from the bins</font></a></td>
 	        <td class="pathway_gene">"""
 	        			  )
 			
@@ -406,7 +428,7 @@ def write_html_sample(dict_global_sample, output,
 	        outfile.write("""</td>
 	        </tr>
 	        """
-						  )
+	        			  )
         except:
             outfile.write(f"""<tr>
             <td class="pathway_gene"> {pathway} unknow by the KEGG DATABASE </td></tr> """)
@@ -586,65 +608,65 @@ def write_html_bins(dict_global_bin, output,
                 request = 'http://rest.kegg.jp/get/'+pathway
                 print(request)
                 try:
-	                req = urlopen(request)
-	                data = req.read().decode()
-		            data = data.split('\n')[1]
-	                pathway_name = re.split("NAME\s+", data)[1]
+                    req = urlopen(request)
+                    data = req.read().decode()
+                    data = data.split('\n')[1]
+                    pathway_name = re.split("NAME\s+", data)[1]
                     set_active_gene = set()
-					set_html_active_gene = set()
-					if dict_global_bin[bin_html][pathway][3] != "":
-						for gene in dict_global_bin[bin_html][pathway][3]:
-							set_active_gene.add(gene)
-							set_html_active_gene.add(gene+"%09green,black/")
-					set_gene = set()
-					for gene in dict_global_bin[bin_html][pathway][1]:
-						set_gene.add(gene)
-					list_html_all_gene = "".join([
-						gene+"%09red,black/" for gene in list(set_gene)])
-					list_inactive_gene=[]
-					if dict_global_bin[bin_html][pathway][3] != "":
-						list_html_active_gene = "".join(set_html_active_gene)
-						list_active_gene = list(set_active_gene)
-						for elem in list(set_gene):
-							if elem not in list_active_gene:
-								list_inactive_gene.append(elem+"%09orange,black/")
-						list_html_inactive_gene = "".join([
-							inactiv for inactiv in list_inactive_gene])
-					else:
-						list_html_active_gene = ""
-						list_html_inactive_gene = ""
-						list_active_gene = ""
-						list_inactive_gene = list(set_gene)
-					outfile.write(f"""
+                    set_html_active_gene = set()
+                    if dict_global_bin[bin_html][pathway][3] != "":
+                    for gene in dict_global_bin[bin_html][pathway][3]:
+                            set_active_gene.add(gene)
+                            set_html_active_gene.add(gene+"%09green,black/")
+                    set_gene = set()
+                    for gene in dict_global_bin[bin_html][pathway][1]:
+                        set_gene.add(gene)
+                    list_html_all_gene = "".join([
+                        gene+"%09red,black/" for gene in list(set_gene)])
+                    list_inactive_gene=[]
+                    if dict_global_bin[bin_html][pathway][3] != "":
+                        list_html_active_gene = "".join(set_html_active_gene)
+                        list_active_gene = list(set_active_gene)
+                        for elem in list(set_gene):
+                            if elem not in list_active_gene:
+                                list_inactive_gene.append(elem)
+                        list_html_inactive_gene = "".join([
+                            inactiv+"%09orange,black/" for inactiv in list_inactive_gene])
+                    else:
+                        list_html_active_gene = ""
+                        list_html_inactive_gene = ""
+                        list_active_gene = ""
+                        list_inactive_gene = list(set_gene)
+                    outfile.write(f"""
 					<tr>
 					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/{list_html_inactive_gene}">{pathway_name}</a></td>
 					"""
 					)
-					outfile.write(f"""
+                    outfile.write(f"""
 					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}">{pathway_name}</a></td>
 					"""
 					)
-					outfile.write(f"""
+                    outfile.write(f"""
 					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
 					"""
 					)
-					outfile.write(f"""
+                    outfile.write(f"""
 					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
 					<td class="pathway_gene">"""
 					)
 					
-					for gene in list_active_gene:
-						request_gene = 'http://rest.kegg.jp/get/'+gene
-						print(request_gene)
-			            try:
-					        req_gene = urlopen(request_gene)
-							data_gene = req_gene.read().decode()
-							data_gene = data_gene.split('\n')[1]
-							gene_name = re.split("NAME\s+", data_gene)[1]
-				            outfile.write(
+                    for gene in list_active_gene:
+                        request_gene = 'http://rest.kegg.jp/get/'+gene
+                        print(request_gene)
+                        try:
+                            req_gene = urlopen(request_gene)
+                            data_gene = req_gene.read().decode()
+                            data_gene = data_gene.split('\n')[1]
+                            gene_name = re.split("NAME\s+", data_gene)[1]
+                            outfile.write(
 				                f"""<a href="https://www.kegg.jp/dbget-bin/www_bget?{gene}">[{gene_name}]</a>; """)
-		                except:
-				            outfile.write(f"""[{gene} unknown by KEGG DB]""")
+                        except:
+                            outfile.write(f"""[{gene} unknown by KEGG DB]""")
 					# NO MODULES NO NEED
 					# outfile.write("""</td>
 					# <td class="modules">
@@ -657,27 +679,27 @@ def write_html_bins(dict_global_bin, output,
 					#         outfile.write(f"""<a href='https://www.kegg.jp/module/{mod}+{list_html_gene}'>
 					#         {mod}</a>;
 					#         """)
-					outfile.write("""</td>
+                    outfile.write("""</td>
 						<td class="pathway_gene">
 						""")
-					for gene in list_inactive_gene:
-						request_gene = 'http://rest.kegg.jp/get/'+gene
-						print(request_gene)
-		                try:
-			                req_gene = urlopen(request_gene)
-			                data_gene = req_gene.read().decode()
-			                data_gene = data_gene.split('\n')[1]
-			                gene_name = re.split("NAME\s+", data_gene)[1]
-			                outfile.write(
+                    for gene in list_inactive_gene:
+                        request_gene = 'http://rest.kegg.jp/get/'+gene
+                        print(request_gene)
+                        try:
+                            req_gene = urlopen(request_gene)
+                            data_gene = req_gene.read().decode()
+                            data_gene = data_gene.split('\n')[1]
+                            gene_name = re.split("NAME\s+", data_gene)[1]
+                            outfile.write(
 					            f"""<a href="https://www.kegg.jp/dbget-bin/www_bget?{gene}">[{gene_name}]</a>; """)
-		                except:
-		                    outfile.write(f"""[{gene} unknown by KEGG DB]""")
-					outfile.write("""</td>
+                        except:
+                            outfile.write(f"""[{gene} unknown by KEGG DB]""")
+                    outfile.write("""</td>
 					</tr>
 					"""
 					)
-	            except:
-		            outfile.write(f"""<tr>
+                except:
+                    outfile.write(f"""<tr>
 		            <td class="pathway_gene"> {pathway} unknow by the KEGG DATABASE </td></tr> """)	
         outfile.close()
 
