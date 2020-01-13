@@ -146,6 +146,7 @@ def bin_parse(bins,
                 number_activ = len(dictactiv[pathw])
             except KeyError:
                 number_activ = 0
+            number_inactiv = number_ko - number_activ
             # NO MODULES SO NO NEED
             # try:
             #     if number_activ != 0:
@@ -161,14 +162,14 @@ def bin_parse(bins,
             # except KeyError:
             if number_activ != 0:
                 dict_global_sample[pathw][bin_name] = [
-                        number_ko, dictko[pathw], number_activ, dictactiv[pathw], ""]
+                    number_inactiv, dictko[pathw], number_activ, dictactiv[pathw], ""]
                 dict_global_bin[bin_name][pathw] = [
-                        number_ko, dictko[pathw], number_activ, dictactiv[pathw], ""]
+                    number_inactiv, dictko[pathw], number_activ, dictactiv[pathw], ""]
             else:
                 dict_global_sample[pathw][bin_name] = [
-                        number_ko, dictko[pathw], number_activ, "", ""]
+                    number_inactiv, dictko[pathw], number_activ, "", ""]
                 dict_global_bin[bin_name][pathw] = [
-                        number_ko, dictko[pathw], number_activ, "", ""]
+                    number_inactiv, dictko[pathw], number_activ, "", ""]
     globalpathwaylist = list(set(pathwaylist))
     return dict_global_sample, dict_global_bin, globalpathwaylist, binnamelist
 
@@ -589,7 +590,7 @@ def write_html_bins(dict_global_bin, output,
                         <th class="header">Pathways Summary</th>
                         <th class="header"><font color="green">Pathways Expressed</font></th>
                         <th class="header"><font color="#db6e00">Pathways Non Expressed</font></th>
-                        <th class="header"><font color="#db6e00">Pathways All Genes</font></th>
+                        <th class="header"><font color="firebrick">Pathways All Genes</font></th>
                         <th class="header"><font color="green">Expressed Genes</font></th>
                         <th class="header"><font color="#db6e00">Non Expressed Genes</font></th>
                     </tr>
@@ -638,7 +639,7 @@ def write_html_bins(dict_global_bin, output,
                         list_active_gene = ""
                         list_inactive_gene = list(set_gene)
                     set_html_all_gene = set()
-                    for gene in dict_global_bin[bin_html][pathway][3]:
+                    for gene in dict_global_bin[bin_html][pathway][1]:
                         set_html_all_gene.add(gene+"%09red,black/")
                     list_html_all_gene = "".join(set_html_all_gene)
                     outfile.write(f"""
