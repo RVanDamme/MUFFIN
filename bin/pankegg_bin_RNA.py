@@ -615,7 +615,7 @@ def write_html_bins(dict_global_bin, output,
                     set_active_gene = set()
                     set_html_active_gene = set()
                     if dict_global_bin[bin_html][pathway][3] != "":
-                    for gene in dict_global_bin[bin_html][pathway][3]:
+                        for gene in dict_global_bin[bin_html][pathway][3]:
                             set_active_gene.add(gene)
                             set_html_active_gene.add(gene+"%09green,black/")
                     set_gene = set()
@@ -637,6 +637,10 @@ def write_html_bins(dict_global_bin, output,
                         list_html_inactive_gene = ""
                         list_active_gene = ""
                         list_inactive_gene = list(set_gene)
+                    set_html_all_gene = set()
+                    for gene in dict_global_bin[bin_html][pathway][3]:
+                        set_html_all_gene.add(gene+"%09red,black/")
+                    list_html_all_gene = "".join(set_html_all_gene)
                     outfile.write(f"""
 					<tr>
 					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/{list_html_inactive_gene}">{pathway_name}</a></td>
@@ -651,7 +655,7 @@ def write_html_bins(dict_global_bin, output,
 					"""
 					)
                     outfile.write(f"""
-					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
+					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_all_gene}">{pathway_name}</a></td>
 					<td class="pathway_gene">"""
 					)
 					
