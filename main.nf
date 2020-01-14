@@ -498,7 +498,7 @@ else {
 //************************
 // RNA annotation workflow
 //************************
-
+if (params.rna) {
 // QC
     include fastp_rna from 'modules/fastp'params(output : params.output)
     fastp_rna(rna_input_ch)
@@ -513,7 +513,7 @@ else {
     eggnog_rna_ch= transcript_ch.combine(eggnog_db)
     eggnog_rna(eggnog_rna_ch)
     rna_annot_ch=eggnog_rna.out[0].view()
-
+}
 
 //******************************************************
 // Parsing bin annot and RNA out into nice graphical out

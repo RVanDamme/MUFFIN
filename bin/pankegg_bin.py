@@ -466,7 +466,7 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
                             f"""<a href="https://www.kegg.jp/dbget-bin/www_bget?{gene}">[{gene_name}]</a>; 
                             """)
                     except:
-						outfile.write(f"""[{gene} unknown by KEGG DB]""")
+                        outfile.write(f"""[{gene} unknown by KEGG DB]""")
 
                 outfile.write("""</td>
                     <td class="listgene">
