@@ -482,14 +482,14 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
                         outfile.write(
                             f"""<a href="https://www.kegg.jp/dbget-bin/www_bget?{gene}">[{gene_name}]</a>; """)
                     except:
-						outfile.write(f"""[{gene} unknown by KEGG DB]""")
+                        outfile.write(f"""[{gene} unknown by KEGG DB]""")
                 outfile.write("""</td>
                     </tr>
                     """
                     )
             except:
                 outfile.write(f"""<tr>
-			        <td class="pathway_gene"> {pathway} unknow by the KEGG DATABASE </td></tr> """)
+                    <td class="pathway_gene"> {pathway} unknow by the KEGG DATABASE </td></tr> """)
         outfile.close()
 
 
