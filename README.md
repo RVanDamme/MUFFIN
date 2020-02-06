@@ -1,14 +1,14 @@
-# MAFIN
-Metagenomic Assembly pipeline using nextFlow for Illumina and Nanopore reads
+# MUFFIN
+MUFFIN is a hybrid assembly and differential binning workflow for metagenomics, transcriptomics and pathway analysis.
 
-# MAFIN is still under development and unstable 
+# MUFFIN is still under development and unstable 
 
 ## Introduction
 
-MAFIN aims at being a reproducible pipeline for metagenome assembly
+MUFFIN aims at being a reproducible pipeline for metagenome assembly
 of crossed illumina and nanopore reads.
 
-MAFIN uses the following software
+MUFFIN uses the following software
 
 | Task | Software | Version | Docker | integration|
 | --- | --- | --- | --- | --- |
@@ -72,10 +72,7 @@ Flye
 ```
 nextflow run MAFIN/main.nf --output results --assembler metaflye  --illumina fastq_ill/ --nanopore fastq_nano/ --core 2 --memory 16g  -profile conda
 ```
-A more advanced  usage
-```
-nextflow run MAFIN/main.nf --output results --assembler metaspades  --illumina fastq_ill/ --nanopore fastq_nano/ --core 24 --memory 80g --out_qc --out_metawrap --out_unmapped -profile conda 
-```
+
 ### Options
 
 #### --cpus
@@ -107,7 +104,7 @@ nextflow run MAFIN/main.nf --output results --assembler metaspades  --illumina f
 ```
     *********Metagenomic Assembly pipeline using nextFlow for Illumina and Nanopore reads*********
 
-    Mafin is composed of 2 part the retrieval of potential genome and the analysis of said genomes
+    Muffin is composed of 2 part the retrieval of potential genome and the analysis of said genomes
 
         Usage example for retrieval:
     nextflow run mafin --retrieve --ont /path/to/ont_dir --illumina /path/to/illumina_dir --metaspades -profile conda
