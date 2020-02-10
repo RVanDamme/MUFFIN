@@ -42,19 +42,12 @@ MUFFIN uses the following software
 
 ### The Workflow
 
-<<<<<<< HEAD
+
 ![MUFFIN FLOWCHART FIGURE](.figure/Muffin_Workflow_simple.png)
 
 ### The parser output
 
 ![PARSER OUTPUT FIGURE](.figure/PANKEGG_simple.png)
-=======
-![MUFFIN FLOWCHART FIGURE](Muffin_Workflow_simple.png)
-
-### The parser output
-
-![PARSER OUTPUT FIGURE](PANKEGG_simple.png)
->>>>>>> 224814abc0fa0f8a973bc744a389b64c42ce10aa
 
 
 
