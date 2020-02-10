@@ -33,7 +33,7 @@ process refine3 {
         set val(name), file(bins1), file(bins2), file(bins3)
         file(path)
     output:
-    set val(name), file("metawrap_bins")
+    set val(name), file("metawrap_bins/*.fa")
     file("${name}_binning_stats.txt")
     shell:
     """

@@ -3,7 +3,7 @@ process parser_bin_RNA {
     publishDir "${params.output}/${name}/", mode: 'copy', pattern: "parser_result/*"
     input:
         set val(name), file(rna_annot), file(quant)
-        set val(name), val(bin_id), file(bins_annot)
+        set val(name), file(bins_annot)
     output:
         file("parser_result/*") 
     script:
@@ -15,7 +15,7 @@ process parser_bin {
     label 'python38'
     publishDir "${params.output}/${name}/", mode: 'copy', pattern: "parser_result/*"
     input:
-        set val(name), val(bin_id), file(bins_annot)
+        set val(name), file(bins_annot)
     output:
         file("parser_result/*") 
     script:

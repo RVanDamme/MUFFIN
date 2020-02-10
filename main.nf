@@ -54,7 +54,10 @@ extra_ill_ch=Channel.fromPath(params.extra_ill).splitCsv().map { row ->
 // Help Message
 def helpMSG() {
     log.info """
-    *********Metagenomic Assembly pipeline using nextFlow for Illumina and Nanopore reads*********
+    *********hybrid assembly and differential binning workflow for metagenomics, transcriptomics and pathway analysis*********
+
+    MUFFIN is still under development please wait until the first non edge version realease before using it.
+    Please cite us using https://www.biorxiv.org/content/10.1101/2020.02.08.939843v1
 
     Mafin is composed of 2 part the retrieval of potential genome and the analysis of said genomes
 
@@ -91,9 +94,6 @@ def helpMSG() {
     --checkm_db                 path to an already INSTALLED checkm database (not the tar file)
     --checkm_tar_db             path to the tar checkm database (it will extract it in the dir)
     --sourmash_db               path to an already installed sourmash database
-    --dammit_db                 path to an already installed dammit databases
-    --dammmit_user_db           path to a personnal protein database
-    --busco_db                  the busco database you want to use in dammit (default: metazoa)
     
         Options:
     --skip_ill_qc               skip quality control of illumina files
@@ -104,8 +104,8 @@ def helpMSG() {
     --polish_iteration          number of iteration of pilon in the polish step (advanced)
     --extra_ill                 a list of additional ill sample file (with full path with a * instead of _R1,2.fastq) to use for the binning in Metabat2 and concoct
     --extra_ont                 a list of additional ont sample file (with full path) to use for the binning in Metabat2 and concoct
-    --SRA_ill                   a list of additional ill sample from SRA accession number to use for the binning in Metabat2 and concoct
-    --SRA_ont                   a list of additional ont sample from SRA accession number to use for the binning in Metabat2 and concoct
+    --SRA_ill                   a list of additional ill sample from SRA accession number to use for the binning in Metabat2 and concoct (not implemented yet)
+    --SRA_ont                   a list of additional ont sample from SRA accession number to use for the binning in Metabat2 and concoct (not implemented yet)
     --skip_metabat2             skip the binning using metabat2 (advanced)
     --skip_maxbin2              skip the binning using maxbin2 (advanced)
     --skip_concoct              skip the binning using concoct (advanced)
@@ -334,7 +334,7 @@ if (params.skip_metabat2==true) {
         include refine2 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
         refine2_ch = maxbin2_out.join(concoct_out)
         refine2(refine2_ch, checkm_db_path)
-        final_bin_ch = refine2.out[0]
+        final_bin_ch = refine2.out[0].transpose()
     }
 }
 
@@ -344,7 +344,7 @@ else if (params.skip_maxbin2==true) {
         include refine2 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
         refine2_ch = metabat2_out.join(concoct_out)
         refine2(refine2_ch, checkm_db_path)
-        final_bin_ch = refine2.out[0]
+        final_bin_ch = refine2.out[0].transpose()
     }
 }
 
@@ -354,7 +354,7 @@ else if (params.skip_concoct==true) {
         include refine2 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
         refine2_ch = metabat2_out.join(maxbin2_out)
         refine2(refine2_ch, checkm_db_path)
-        final_bin_ch = refine2.out[0]
+        final_bin_ch = refine2.out[0].transpose()
     }
 }
 
@@ -362,7 +362,7 @@ else {
     include refine3 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
     refine3_ch = metabat2_out.join(maxbin2_out).join(concoct_out)
     refine3(refine3_ch, checkm_db_path)
-    final_bin_dir_ch = refine3.out[0]
+    final_bin_ch = refine3.out[0]
 
 }
 
@@ -395,7 +395,7 @@ if (params.reassembly) {
     include unmapped_retrieve from 'modules/seqtk_retrieve_reads'params(out_unmapped: params.out_unmapped, output : params.output)
     include 'modules/unicycler_reassemble_from_bin' params(output : params.output)
     retrieve_unmapped_ch = ill_map_all_bin.join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
-    if (params.out_unmapped == true) {unmapped_retrieve(retrieve_unmapped_ch)}
+    unmapped_retrieve(retrieve_unmapped_ch)
     retrieve_reads_ch = extract_reads_ch.transpose().combine(ill_map_all_bin, by:0).combine( ont_map_all_bin, by:0).combine(illumina_input_ch, by:0).combine(ont_input_ch, by:0)
     reads_retrieval(retrieve_reads_ch).view()
     unicycler(reads_retrieval.out)
@@ -404,7 +404,7 @@ if (params.reassembly) {
     final_bins_ch=unicycler.out[0]
 }
 else {
-    collected_final_bins_ch=final_bin_dir_ch
+    collected_final_bins_ch=final_bin_ch.transpose()
 }
 //******
 // Done
@@ -426,7 +426,7 @@ if (params.bin_classify) {
     classify_ch = Channel
         .fromPath( params.bin_classify, checkIfExists: true )
         .splitCsv()
-        .map { row -> ["${row[0]}","${row[1]}", file("${row[2]}", checkIfExists: true)]  }
+        .map { row -> ["${row[0]}", file("${row[2]}", checkIfExists: true)]  }
         .view()
         }
 
@@ -437,8 +437,7 @@ else {classify_ch=final_bins_ch}
 //*************************
 
 //checkm of the final assemblies
-
-    include 'modules/checkm'params(output : params.output)
+    include checkm from 'modules/checkm'params(output : params.output)
     checkm(classify_ch.groupTuple(by:0))
 
 //sourmash classification using gtdb database
@@ -448,7 +447,6 @@ else {classify_ch=final_bins_ch}
 
     include sourmash_checkm_parser from 'modules/checkm_sourmash_parser'params(output: params.output)
     sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect())
-
 
 //*************************************************
 // STEP 3 annotation; kegg pathways + use or RNAseq
@@ -469,7 +467,7 @@ if (params.bin_annotate) {
     bins_input_ch = Channel
         .fromPath( params.bin_annotate, checkIfExists: true )
         .splitCsv()
-        .map { row -> ["${row[0]}","${row[1]}", file("${row[2]}", checkIfExists: true)]  }
+        .map { row -> ["${row[0]}", file("${row[2]}", checkIfExists: true)]  }
         .view() 
         }
 else {bins_input_ch = final_bins_ch }
@@ -498,7 +496,7 @@ else {
 //************************
 // RNA annotation workflow
 //************************
-
+if (params.rna) {
 // QC
     include fastp_rna from 'modules/fastp'params(output : params.output)
     fastp_rna(rna_input_ch)
@@ -513,7 +511,7 @@ else {
     eggnog_rna_ch= transcript_ch.combine(eggnog_db)
     eggnog_rna(eggnog_rna_ch)
     rna_annot_ch=eggnog_rna.out[0].view()
-
+}
 
 //******************************************************
 // Parsing bin annot and RNA out into nice graphical out

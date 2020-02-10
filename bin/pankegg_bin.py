@@ -102,121 +102,182 @@ def write_html_sample(dictgeneral, dict_global_sample, output,
     </div>
     """
     )
+    outfile.write("""
+      <style type="text/css">
+          .tg {
+              border-collapse: collapse;
+              border-spacing: 0;
+          }
+
+          .tg td {
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              padding: 10px 5px;
+              border-style: solid;
+              border-width: 1px;
+              overflow: hidden;
+              word-break: normal;
+              border-color: black;
+          }
+
+          .tg th {
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              font-weight: normal;
+              padding: 10px 5px;
+              border-style: solid;
+              border-width: 1px;
+              overflow: hidden;
+              word-break: normal;
+              border-color: black;
+          }
+
+          .tg .header {
+              font-size: x-large;
+              font-family: Georgia, serif !important;
+              ;
+              background-color: #7097AB;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .header2 {
+              font-size: large;
+              font-family: Georgia, serif !important;
+              ;
+              background-color: #7097AB;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .helpfont {
+              font-size: medium;
+              font-family: Georgia, serif !important;
+              ;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .pathway_gene {
+              font-size: medium;
+              font-family: Tahoma, Geneva, sans-serif !important;
+              ;
+              background-color: #E8E8E8;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: middle
+          }
+          .tg .modules {
+              font-size: small;
+              font-family: Tahoma, Geneva, sans-serif !important;
+              ;
+              border-color: inherit;
+              text-align: left;
+              vertical-align: middle
+          }
+          .collapsible {
+              background-color: #7097AB;
+              color: black;
+              cursor: pointer;
+              padding: 18px;
+              width: 100%;
+              border: none;
+              text-align: left;
+              outline: none;
+              font-size: large;
+            }
+
+        .active, .collapsible:hover {
+              background-color: #555;
+            }
+
+        .content {
+          padding: 0 18px;
+          display: none;
+          overflow: hidden;
+          background-color: #f1f1f1;
+        }
+
+          @media screen and (max-width: 767px) {
+              .tg {
+                  width: auto !important;
+              }
+
+              .tg col {
+                  width: auto !important;
+              }
+
+              .tg-wrap {
+                  overflow-x: auto;
+                  -webkit-overflow-scrolling: touch;
+              }
+          }
+      </style>
+    """)
     outfile.write(f"""
     <body>
         <div id='summary'>
         <h1>Help</h1>
-        <h2>
+        <button type="button" class="collapsible">Open Help</button>
+        <div class="content"><p>
         <ol>
             <li>INDEX of the table
             <ul>
-                <li>The columns "Pathways" is composed of name of each pathway present in the bins and link to a figure with the gene present in the bins in <font color="green">green</font></li>
-                <li>The column "Bins Composition" is the list of the bins with genes present in the pathway plus for each bin the number of genes from the bin present in the pathway</li>
-                <li>The column "Number of genes" is the total number of genes of the pathway present across all bins</li>
-                <li>The column "Genes" is the list of all the genes of the pathway present across all bins</li>
+                <li>The columns "Pathways" is composed of name of each pathway present in the bins and link to a figure with the orthologs present in the bins in <font color="green">green</font></li>
+                <li>The column "Bins Composition" is the list of the bins with orthologs present in the pathway plus for each bin the number of orthologs from the bin present in the pathway</li>
+                <li>The column "Number of orthologs" is the total number of orthologs of the pathway present across all bins</li>
+                <li>The column "Orthologs" is the list of all the orthologs of the pathway present across all bins</li>
             </ul></li>
             <li> Figure detail
             <ul>
                 <li>The Figures in the links: <ul> 
-                    <li>The gene present in the bins are in green</li>
+                    <li>The orthologs present in the bins are in green</li>
             <li>Troubleshooting
             <ul>
-                <li>When the link of the pathway is not loading or not showing anything, it means that there is too much gene to show on the figure.
+                <li>When the link of the pathway is not loading or not showing anything, it means that there is too much orthologs to show on the figure.
             Try to strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
             </ul></li>
         </ol>
-        </h2>
+        </p></div>
         </div>
     """
     )
+
+    outfile.write("""
+    <script>
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+          coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+              content.style.display = "none";
+            } else {
+              content.style.display = "block";
+            }
+          });
+        }
+        </script>
+    """)
+    
     outfile.write("""
     <h1>Pathways</h1>
-        <style type="text/css">
-            .tg {
-                border-collapse: collapse;
-                border-spacing: 0;
-            }
         
-            .tg td {
-                font-family: Arial, sans-serif;
-                font-size: 14px;
-                padding: 10px 5px;
-                border-style: solid;
-                border-width: 1px;
-                overflow: hidden;
-                word-break: normal;
-                border-color: black;
-            }
-        
-            .tg th {
-                font-family: Arial, sans-serif;
-                font-size: 14px;
-                font-weight: normal;
-                padding: 10px 5px;
-                border-style: solid;
-                border-width: 1px;
-                overflow: hidden;
-                word-break: normal;
-                border-color: black;
-            }
-        
-            .tg .header {
-                font-weight: bold;
-                text-decoration: underline;
-                font-size: x-large;
-                font-family: Georgia, serif !important;
-                ;
-                background-color: #82aaea;
-                border-color: inherit;
-                text-align: center;
-                vertical-align: top
-            }
-
-            .tg .pathway_gene {
-                font-size: medium;
-                font-family: Tahoma, Geneva, sans-serif !important;
-                ;
-                border-color: inherit;
-                text-align: center;
-                vertical-align: middle
-            }
-            .tg .listgenes {
-                font-size: small;
-                font-family: Tahoma, Geneva, sans-serif !important;
-                ;
-                border-color: inherit;
-                text-align: left;
-                vertical-align: middle
-            }
-        
-            @media screen and (max-width: 767px) {
-                .tg {
-                    width: auto !important;
-                }
-        
-                .tg col {
-                    width: auto !important;
-                }
-        
-                .tg-wrap {
-                    overflow-x: auto;
-                    -webkit-overflow-scrolling: touch;
-                }
-            }
-        </style>
         <div class="tg-wrap">
             <table class="tg">
                 <tr>
                     <th class="header">Pathways Summary</th>
                     <th class="header">Bins Compositions</th>
-                    <th class="header">Number of genes</th>
-                    <th class="header">Genes</th>
+                    <th class="header">Number of orthologs</th>
+                    <th class="header">Orthologs</th>
                 </tr>
                 <tr>
-                    <th class="header">represent the genes present in the Bins in green</th>
-                    <th class="header">structure: Bins[<font color="green">number of gene in the bin</font>]</th>
-                    <th class="header">represent the total number of genes present in the pathway across the bins</th>
-                    <th class="header">list of the genes present in the bins</th>
+                    <th class="header2"><font color="#e7bcd4">▉▉</font>represent the orthologs present in the Bins</th>
+                    <th class="header2">structure: Bins[<font color="#e7bcd4">▉▉</font>number of orthologs in the bin]</th>
+                    <th class="header2">represent the total number of orthologs present in the pathway across the bins</th>
+                    <th class="header2">list of the orthologs present in the bins</th>
                 </tr>
     """)
 
@@ -234,18 +295,19 @@ def write_html_sample(dictgeneral, dict_global_sample, output,
                     set_total_gene.add(gene)
                 set_html= set()
                 for gene in set_total_gene:
-                    set_html.add(gene+"%09green,black/")
+                    set_html.add(gene)
                 list_html = "".join(set_html)
             except KeyError:
                 list_html = ""
             outfile.write(f"""
             <tr>
-            <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html}">{pathway_name}</a></td>
+            <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html}/default%3d%23e7bcd4">{pathway_name}</a></td>
             <td class="pathway_gene">"""
                         )
             
             for bins in dict_global_sample[pathway]:
-                outfile.write(f"""{bins}[<font color="green">{len(dict_global_sample[pathway][bins][1])}</font>]; """)
+                outfile.write(
+                    f"""{bins}[<span style="background-color:#e7bcd4">{len(dict_global_sample[pathway][bins][1])}</span>]; """)
             n_gene=len(dictgeneral[pathway])
             outfile.write(f"""</td>
             <td class="pathway_gene">{n_gene}
@@ -308,128 +370,160 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
         """
         )
 
+        outfile.write("""
+      <style type="text/css">
+          .tg {
+              border-collapse: collapse;
+              border-spacing: 0;
+          }
+
+          .tg td {
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              padding: 10px 5px;
+              border-style: solid;
+              border-width: 1px;
+              overflow: hidden;
+              word-break: normal;
+              border-color: black;
+          }
+
+          .tg th {
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              font-weight: normal;
+              padding: 10px 5px;
+              border-style: solid;
+              border-width: 1px;
+              overflow: hidden;
+              word-break: normal;
+              border-color: black;
+          }
+
+          .tg .header {
+              font-size: x-large;
+              font-family: Georgia, serif !important;
+              ;
+              background-color: #7097AB;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .header2 {
+              font-size: large;
+              font-family: Georgia, serif !important;
+              ;
+              background-color: #7097AB;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .helpfont {
+              font-size: medium;
+              font-family: Georgia, serif !important;
+              ;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .pathway_gene {
+              font-size: medium;
+              font-family: Tahoma, Geneva, sans-serif !important;
+              ;
+              background-color: #E8E8E8;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: middle
+          }
+          .tg .modules {
+              font-size: small;
+              font-family: Tahoma, Geneva, sans-serif !important;
+              ;
+              border-color: inherit;
+              text-align: left;
+              vertical-align: middle
+          }
+          .collapsible {
+              background-color: #7097AB;
+              color: black;
+              cursor: pointer;
+              padding: 18px;
+              width: 100%;
+              border: none;
+              text-align: left;
+              outline: none;
+              font-size: large;
+            }
+
+        .active, .collapsible:hover {
+              background-color: #555;
+            }
+
+        .content {
+          padding: 0 18px;
+          display: none;
+          overflow: hidden;
+          background-color: #f1f1f1;
+        }
+
+          @media screen and (max-width: 767px) {
+              .tg {
+                  width: auto !important;
+              }
+
+              .tg col {
+                  width: auto !important;
+              }
+
+              .tg-wrap {
+                  overflow-x: auto;
+                  -webkit-overflow-scrolling: touch;
+              }
+          }
+      </style>
+        """)
         outfile.write(f"""
         <body>
         <div id='summary'>
         <h1>Help</h1>
-        <h2>
+        <button type="button" class="collapsible">Open Help</button>
+        <div class="content"><p>
         <ol>
             <li>INDEX of the table
             <ul>
-                <li>The column "Pathways" is composed of name of each pathway present in the bins and link to a figure with the gene present in this bin in <font color="green">green</font></li>
-                <li>The column "Genes" is the list of the genes of this bin present in the pathway </li>                
-                <li>The column "All genes" is the list of the genes of all bins present in the pathway </li>
+                <li>The column "Pathways" is composed of name of each pathway present in the bins and link to a figure with the orthologs present in this bin in <font color="#e7bcd4">▉▉</font></li>
+                <li>The column "Orthologs" is the list of the orthologs of this bin present in the pathway </li>                
+                <li>The column "All orthologs" is the list of the orthologs of all bins present in the pathway </li>
             </ul></li>
             <li> Figure detail
             <ul>
                 <li>The Figures in the links: <ul> 
-                    <li>The gene present from the bin are in green</li>
+                    <li>The orthologs present from the bin are in <font color="#e7bcd4">▉▉</font></li>
             <li>Troubleshooting
             <ul>
-                <li>When the link of the pathway is not loading or not showing anything, it means that there is too much gene to show on the figure.
+                <li>When the link of the pathway is not loading or not showing anything, it means that there is too much orthologs to show on the figure.
             Try to strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
             </ul></li>
         </ol>
-        </h2>
+        </p></div>
         </div>
         """
         )
 
         outfile.write("""
         <h1>Pathways</h1>
-            <style type="text/css">
-                .tg {
-                    border-collapse: collapse;
-                    border-spacing: 0;
-                }
             
-                .tg td {
-                    font-family: Arial, sans-serif;
-                    font-size: 14px;
-                    padding: 10px 5px;
-                    border-style: solid;
-                    border-width: 1px;
-                    overflow: hidden;
-                    word-break: normal;
-                    border-color: black;
-                }
-            
-                .tg th {
-                    font-family: Arial, sans-serif;
-                    font-size: 14px;
-                    font-weight: normal;
-                    padding: 10px 5px;
-                    border-style: solid;
-                    border-width: 1px;
-                    overflow: hidden;
-                    word-break: normal;
-                    border-color: black;
-                }
-            
-                .tg .header {
-                    font-weight: bold;
-                    text-decoration: underline;
-                    font-size: x-large;
-                    font-family: Georgia, serif !important;
-                    ;
-                    background-color: #82aaea;
-                    border-color: inherit;
-                    text-align: center;
-                    vertical-align: top
-                }
-
-            
-                .tg .pathway_gene {
-                    font-size: medium;
-                    font-family: Tahoma, Geneva, sans-serif !important;
-                    ;
-                    border-color: inherit;
-                    text-align: center;
-                    vertical-align: middle
-                }
-                .tg .listgenes {
-                font-size: small;
-                font-family: Tahoma, Geneva, sans-serif !important;
-                ;
-                border-color: inherit;
-                text-align: left;
-                vertical-align: middle
-                }
-
-                .tg .green {
-                    font-color: green
-                }
-                
-                .tg .red {
-                    font-color: red
-                }
-
-                @media screen and (max-width: 767px) {
-                    .tg {
-                        width: auto !important;
-                    }
-            
-                    .tg col {
-                        width: auto !important;
-                    }
-            
-                    .tg-wrap {
-                        overflow-x: auto;
-                        -webkit-overflow-scrolling: touch;
-                    }
-                }
-            </style>
             <div class="tg-wrap">
                 <table class="tg">
                     <tr>
                         <th class="header">Pathways</th>
-                        <th class="header">Genes</th>
-                        <th class="header">All genes</th>
+                        <th class="header">Orthologs</th>
+                        <th class="header">All orthologs</th>
                     </tr>
                     <tr>
-                        <th class="header">Represent the genes of the Bin in green</th>
-                        <th class="header">List of the genes of the bin</th>
-                        <th class="header">List of the genes of all bins</th>
+                        <li><font color="#e7bcd4">▉▉</font>Represent the orthologs of the Bin</th>
+                        <th class="header">List of the orthologs of the bin</th>
+                        <th class="header">List of the orthologs of all bins</th>
 
                     </tr>
         """)
@@ -447,11 +541,11 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
                         set_gene.add(gene)
                     set_html = set()
                     for gene in set_gene:
-                        set_html.add(gene+"%09green,black/")
+                        set_html.add(gene)
                     list_html = "".join(set_html)
                 outfile.write(f"""
                     <tr>
-                    <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html}">{pathway_name}</a></td>
+                    <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html}/default%3d%23e7bcd4">{pathway_name}</a></td>
                     <td class="listgene">
                     """)
                 for gene in set_gene:
@@ -466,7 +560,7 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
                             f"""<a href="https://www.kegg.jp/dbget-bin/www_bget?{gene}">[{gene_name}]</a>; 
                             """)
                     except:
-						outfile.write(f"""[{gene} unknown by KEGG DB]""")
+                        outfile.write(f"""[{gene} unknown by KEGG DB]""")
 
                 outfile.write("""</td>
                     <td class="listgene">
@@ -482,14 +576,14 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
                         outfile.write(
                             f"""<a href="https://www.kegg.jp/dbget-bin/www_bget?{gene}">[{gene_name}]</a>; """)
                     except:
-						outfile.write(f"""[{gene} unknown by KEGG DB]""")
+                        outfile.write(f"""[{gene} unknown by KEGG DB]""")
                 outfile.write("""</td>
                     </tr>
                     """
                     )
             except:
                 outfile.write(f"""<tr>
-			        <td class="pathway_gene"> {pathway} unknow by the KEGG DATABASE </td></tr> """)
+                    <td class="pathway_gene"> {pathway} unknow by the KEGG DATABASE </td></tr> """)
         outfile.close()
 
 

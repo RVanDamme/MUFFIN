@@ -22,13 +22,14 @@ process sourmash_bins {
     label 'sourmash' 
     publishDir "${params.output}/${name}/sourmash/${bin_id}/", mode: 'copy', pattern: "*.txt"
     input:
-    set val(name), val(bin_id), file(bins)
+    set val(name), file(bins)
     file(json)
     output:
     file('*.txt')
     shell:
     """
-    sourmash compute -p !{task.cpus} --scaled 10000 -k 31 !{bins} -o !{bins}.sig
-    sourmash lca classify --query !{bins}.sig --db !{json} > !{bin_id}.txt   
+    bin_id=$(basename !{bins} | sed -r "s/\\.\\w+//2"")
+    sourmash compute -p !{task.cpus} --scaled 10000 -k 31 !{bins} -o \$bin_id.sig
+    sourmash lca classify --query !{bins}.sig --db !{json} > \$bin_id.txt   
     """
 }

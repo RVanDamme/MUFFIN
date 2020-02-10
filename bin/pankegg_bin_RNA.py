@@ -59,9 +59,9 @@ def quant_parse(dictquant, level):
                         line_count += 1
             else:
                 if not row[0] in dictquant:
-                    dictquant[row[0]] = [row[4]]
+                    dictquant[row[0]] = [row[3]]
                 else:
-                    dictquant[row[0]].append(row[4])
+                    dictquant[row[0]].append(row[3])
                 line_count += 1
         return dictquant
 
@@ -71,7 +71,7 @@ def genelevel(output, dict_transcript, dictquant):
     with open(out, mode='w', newline='') as gene_file:
         gene_write = csv.writer(gene_file, delimiter=',',
                                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        gene_write.writerow(["transcript id", "pathways", "Number of reads"])
+        gene_write.writerow(["transcript id", "pathways", "TPM"])
         for transcript in dict_transcript.keys():
             try:
                 gene_write.writerow(
@@ -146,6 +146,7 @@ def bin_parse(bins,
                 number_activ = len(dictactiv[pathw])
             except KeyError:
                 number_activ = 0
+            number_inactiv = number_ko - number_activ
             # NO MODULES SO NO NEED
             # try:
             #     if number_activ != 0:
@@ -161,14 +162,14 @@ def bin_parse(bins,
             # except KeyError:
             if number_activ != 0:
                 dict_global_sample[pathw][bin_name] = [
-                        number_ko, dictko[pathw], number_activ, dictactiv[pathw], ""]
+                    number_inactiv, dictko[pathw], number_activ, dictactiv[pathw], ""]
                 dict_global_bin[bin_name][pathw] = [
-                        number_ko, dictko[pathw], number_activ, dictactiv[pathw], ""]
+                    number_inactiv, dictko[pathw], number_activ, dictactiv[pathw], ""]
             else:
                 dict_global_sample[pathw][bin_name] = [
-                        number_ko, dictko[pathw], number_activ, "", ""]
+                    number_inactiv, dictko[pathw], number_activ, "", ""]
                 dict_global_bin[bin_name][pathw] = [
-                        number_ko, dictko[pathw], number_activ, "", ""]
+                    number_inactiv, dictko[pathw], number_activ, "", ""]
     globalpathwaylist = list(set(pathwaylist))
     return dict_global_sample, dict_global_bin, globalpathwaylist, binnamelist
 
@@ -209,134 +210,192 @@ def write_html_sample(dict_global_sample, output,
     </div>
     """
     )
-    outfile.write(f"""
-    <body>
-        <div id='summary'>
-        <h1>Help</h1>
-        <h2>
-        <ol>
-            <li>INDEX of the table
-            <ul>
-                <li>The columns "Pathways" are composed of name of each pathway present in the bins and link to a figure</li>
-                <li>Pathway Summary represent the pathway with both the expressed and non expressed genes</li>
-                <li><font color="green">Pathway Expressed</font> represent the pathway with the genes present in both RNAseq and the bin</li>
-                <li><font color="#db6e00">Pathway Non expressed</font> represent the pathway with the genes present in the bin but absent from the RNAseq</li>
-                <li><font color="#730099">Pathway RNA</font> represent the pathway with all the genes present in the RNAseq</li>
-                <li><font color="firebrick">Pathway bins</font> represent the pathway with all the genes present in the bins</li>
-                <li>the column "Bins Composition" is the list of the bins with genes present in the pathway plus for each bin the number of genes from the bin present in the pathway and the number of genes present in the bins but also present in the RNAseq</li>
-            </ul></li>
-            <li> Figure detail
-            <ul>
-                <li>The Figures in the links: <ul> 
-                    <li>The gene in both RNA and in the bins are in green</li>
-                    <li>The gene present in the bins but that are not in the RNA are in orange</li>
-                    <li>The gene present in the RNA are in purple</li>
-                    <li>The gene present in the bins are in red</li>
-                    <li>The genes absent from the samples are in blue</li></ul></li></ul></li>
-            <li>Troubleshooting
-            <ul>
-                <li>When the link of the pathway is not loading or not showing anything, it means that there is too much gene to show on the figure.
-            Either try the link of another column or strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
-                <li>In the figure you can have Green case that also contains orange.
-            If the case is composed of multiple genes and some are in RNA and some only in the bins the case will be highlighted in green even tough it should be green and orange</li>
-            </ul></li>
-        </ol>
-        </h2>
-        </div>
-    """
-    )
     outfile.write("""
-    <h1>Pathways</h1>
-        <style type="text/css">
-            .tg {
-                border-collapse: collapse;
-                border-spacing: 0;
-            }
-        
-            .tg td {
-                font-family: Arial, sans-serif;
-                font-size: 14px;
-                padding: 10px 5px;
-                border-style: solid;
-                border-width: 1px;
-                overflow: hidden;
-                word-break: normal;
-                border-color: black;
-            }
-        
-            .tg th {
-                font-family: Arial, sans-serif;
-                font-size: 14px;
-                font-weight: normal;
-                padding: 10px 5px;
-                border-style: solid;
-                border-width: 1px;
-                overflow: hidden;
-                word-break: normal;
-                border-color: black;
-            }
-        
-            .tg .header {
-                font-weight: bold;
-                text-decoration: underline;
-                font-size: x-large;
-                font-family: Georgia, serif !important;
-                ;
-                background-color: #82aaea;
-                border-color: inherit;
-                text-align: center;
-                vertical-align: top
+          <style type="text/css">
+          .tg {
+              border-collapse: collapse;
+              border-spacing: 0;
+          }
+
+          .tg td {
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              padding: 10px 5px;
+              border-style: solid;
+              border-width: 1px;
+              overflow: hidden;
+              word-break: normal;
+              border-color: black;
+          }
+
+          .tg th {
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              font-weight: normal;
+              padding: 10px 5px;
+              border-style: solid;
+              border-width: 1px;
+              overflow: hidden;
+              word-break: normal;
+              border-color: black;
+          }
+
+          .tg .header {
+              font-size: x-large;
+              font-family: Georgia, serif !important;
+              ;
+              background-color: #7097AB;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .header2 {
+              font-size: large;
+              font-family: Georgia, serif !important;
+              ;
+              background-color: #7097AB;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .helpfont {
+              font-size: medium;
+              font-family: Georgia, serif !important;
+              ;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .pathway_gene {
+              font-size: medium;
+              font-family: Tahoma, Geneva, sans-serif !important;
+              ;
+              background-color: #E8E8E8;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: middle
+          }
+          .tg .modules {
+              font-size: small;
+              font-family: Tahoma, Geneva, sans-serif !important;
+              ;
+              border-color: inherit;
+              text-align: left;
+              vertical-align: middle
+          }
+          .collapsible {
+              background-color: #7097AB;
+              color: black;
+              cursor: pointer;
+              padding: 18px;
+              width: 100%;
+              border: none;
+              text-align: left;
+              outline: none;
+              font-size: large;
             }
 
-            .tg .pathway_gene {
-                font-size: medium;
-                font-family: Tahoma, Geneva, sans-serif !important;
-                ;
-                border-color: inherit;
-                text-align: center;
-                vertical-align: middle
+        .active, .collapsible:hover {
+              background-color: #555;
             }
-            .tg .modules {
-                font-size: small;
-                font-family: Tahoma, Geneva, sans-serif !important;
-                ;
-                border-color: inherit;
-                text-align: left;
-                vertical-align: middle
+
+        .content {
+          padding: 0 18px;
+          display: none;
+          overflow: hidden;
+          background-color: #f1f1f1;
+        }
+
+          @media screen and (max-width: 767px) {
+              .tg {
+                  width: auto !important;
+              }
+
+              .tg col {
+                  width: auto !important;
+              }
+
+              .tg-wrap {
+                  overflow-x: auto;
+                  -webkit-overflow-scrolling: touch;
+              }
+          }
+      </style>
+    """)
+    outfile.write(f"""
+        <div id='summary'>
+        <h1>Help</h1>
+        <button type="button" class="collapsible">Open Help</button>
+        <div class="content"><p>
+          <ol>
+              <li>INDEX of the table
+              <ul>
+                  <li>The columns "Pathways" are composed of name of each pathway present in the bins and link to a figure</li>
+                  <li>Pathway Summary represent the pathway with both the expressed and non expressed orthologs</li>
+                  <li><font color="#e7bcd4">▉▉</font>Pathway Expressed represent the pathway with the orthologs present in both RNA-seq and the bin</li>
+                  <li><font color="#7f5b6c">▉▉</font>Pathway Non expressed represent the pathway with the orthologs present in the bin but absent from the RNA-seq</li>
+                  <li><font color="#3bbc9a">▉▉</font>Pathway RNA-seq represent the pathway with all the orthologs present in the RNAseq</li>
+                  <li><font color="#f3c98b">▉▉</font>Pathway bins represent the pathway with all the orthologs present in the bins</li>
+                  <li>the column "Bins Composition" is the list of the bins with orthologs present in the pathway plus for each bin the number of orthologs from the bin present in the pathway and the number of orthologs present in the bins but also present in the RNAseq</li>
+              </ul></li>
+              <li> Figure detail
+              <ul>
+                  <li>The Figures in the links: <ul>
+                      <li>The orthologs in both RNA-seq and in the bins are in green</li>
+                      <li>The orthologs present in the bins but that are not in the RNA-seq are in orange</li>
+                      <li>The orthologs present in the RNA-seq are in purple</li>
+                      <li>The orthologs present in the bins are in red</li>
+                      <li>The orthologs absent from the samples are in blue</li></ul></li></ul></li>
+              <li>Troubleshooting
+              <ul>
+                  <li>When the link of the pathway is not loading or not showing anything, it means that there is too much orthologs to show on the figure.
+              Either try the link of another column or strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
+                  <li>In the figure you can have Green case that also contains orange.
+              If the case is composed of multiple orthologs and some are in RNA and some only in the bins the case will be highlighted in green even tough it should be green and orange</li>
+              </ul></li>
+          </ol>
+        </p></div>
+        </div>
+        """)s
+
+    outfile.write("""<script>
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+          coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+              content.style.display = "none";
+            } else {
+              content.style.display = "block";
             }
+          });
+        }
+        </script>
+        """)
+
+    outfile.write("""
+    <h1>Pathways</h1>
         
-            @media screen and (max-width: 767px) {
-                .tg {
-                    width: auto !important;
-                }
-        
-                .tg col {
-                    width: auto !important;
-                }
-        
-                .tg-wrap {
-                    overflow-x: auto;
-                    -webkit-overflow-scrolling: touch;
-                }
-            }
-        </style>
         <div class="tg-wrap">
             <table class="tg">
                 <tr>
                     <th class="header">Pathways Summary</th>
-                    <th class="header"><font color="green">Pathways Expressed</font></th>
-                    <th class="header"><font color="#db6e00">Pathways Non Expressed</font></th>
-                    <th class="header"><font color="#730099">Pathways RNA</font></th>
-                    <th class="header"><font color="firebrick">Pathways bins</font></th>
+                    <th class="header">Pathways Expressed</th>
+                    <th class="header">Pathways Non Expressed</th>
+                    <th class="header">Pathways RNA-seq</th>
+                    <th class="header">Pathways bins</th>
                     <th class="header">Bins Compositions</th>
                 </tr>
                 <tr>
-                    <th class="header">represent the genes of the BINS that are in RNAseq in green and the one absent from RNAseq in orange</th>
-                    <th class="header"><font color="green">represent only the genes of the bins that are in RNAseq in green</font></th>
-                    <th class="header"><font color="#db6e00">represent only the genes of the bins that are not in RNAseq in orange</font></th>
-                    <th class="header"><font color="#730099">represent all the genes that are in RNAseq in purple</font></th>
-                    <th class="header"><font color="firebrick">represent all the genes that are in the bins in red</font></th>
-                    <th class="header">Bins [<font color="#db6e00">number of gene in the bin</font>, <font color="green">number of genes in the bin present in RNAseq</font>]</th>
+                    <th class="header2"><font color="#e7bcd4">▉▉</font>Orthologs common to bins and RNA-seq annotation <font color="#7f5b6c">▉▉</font> Orthologs present in bins but not in RNA-seq annotation</th>
+                    <th class="header2"><font color="#e7bcd4">▉▉</font>Orthologs common to bins and RNA-seq annotation</th>
+                    <th class="header2"><font color="#7f5b6c">▉▉</font>Orthologs present in bins but not in RNA-seq annotation</th>
+                    <th class="header2"><font color="#3bbc9a">▉▉</font>Orthologs based on RNA-seq annotation</th>
+                    <th class="header2"><font color="#f3c98b">▉▉</font>Orthologs based on bins annotation</th>
+                    <th class="header2">Bins [<font color="#7f5b6c">▉▉</font>n° orthologs in bin and not in RNA-seq, <font color="#e7bcd4">▉▉</font>n° orthologs in both bin and RNA-seq]</th>
                 </tr>
     """)
 
@@ -356,10 +415,10 @@ def write_html_sample(dict_global_sample, output,
                 set_html_activgene= set()
                 for bins in dict_global_sample[pathway]:
                     for gene in dict_global_sample[pathway][bins][3]:
-                        set_html_activgene.add(gene+"%09green,black/")
+                        set_html_activgene.add(gene)
                 set_html_rnagene = set()
                 for gene in set_activgene:
-                    set_html_rnagene.add(gene+"%09purple,black/")
+                    set_html_rnagene.add(gene)
                 list_html_active_gene = "".join(set_html_activgene)
                 list_html_rnagene = "".join(set_html_rnagene)
             except KeyError:
@@ -374,45 +433,47 @@ def write_html_sample(dict_global_sample, output,
             for inactiv in list(set_gene):
                 if inactiv not in list(set_activgene):
                     list_inactive_gene.append(inactiv)
+            list_html_inactive_gene_coded = "".join([
+                inactiv+"%09%237f5b6c,black/" for inactiv in list_inactive_gene])            
             list_html_inactive_gene = "".join([
-                inactiv+"%09orange,black/" for inactiv in list_inactive_gene])
+                inactiv" for inactiv in list_inactive_gene])
             list_html_all_gene = "".join([
-                gene+"%09red,black/" for gene in list(set_gene)])
+                gene for gene in list(set_gene)])
             outfile.write(f"""
 			<tr>
-			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}/{list_html_active_gene}">{pathway_name}
-            <font color="green">from bins in RNAseq</font> and <font color="#db6e00">from bin not in RNAseq</font></a></td>
+			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene_with_code}/{list_html_active_gene}/default%3d%23e7bcd4">{pathway_name}
+            <font color="#e7bcd4">▉▉</font>from bins and in RNA-seq and <font color="#7f5b6c">▉▉</font>from bins and not in RNA-seq</a></td>
 			"""
 						  )
             outfile.write(f"""
 
-			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}">{pathway_name}
-            <font color="green">from bins in RNAseq</font></a></td>
+			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/default%3d%23e7bcd4">{pathway_name}
+            <font color="#e7bcd4">▉▉</font>from bins in RNAseq</a></td>
 			"""
 	        			  )        
-	        outfile.write(f"""
+            outfile.write(f"""
 
-	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}
-            <font color="#db6e00">from bin not in RNAseq</font></a></td>
+	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}/default%3d%237f5b6c">{pathway_name}
+            <font color="#7f5b6c">▉▉</font>from bin not in RNAseq</a></td>
 	        """
 	        			  )
             outfile.write(f"""
 
-	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_rnagene}">{pathway_name}
-            <font color="#730099">all genes from RNAseq (total: {n_rnaseq_gene})</font></a></td>
+	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_rnagene}/default%3d%233bbc9a">{pathway_name}
+            <font color="#3bbc9a">▉▉</font>all orthologs from RNAseq (total: {n_rnaseq_gene})</font></a></td>
 	        """
 	        			  )
-	        outfile.write(f"""
+            outfile.write(f"""
 
-	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_all_gene}">{pathway_name}
-            <font color="firebrick">all genes from the bins</font></a></td>
+	        <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_all_gene}/default%3d%23f3c98b">{pathway_name}
+            <font color="#f3c98b">▉▉</font></span>all orthologs from the bins</a></td>
 	        <td class="pathway_gene">"""
 	        			  )
 			
-	        for bins in dict_global_sample[pathway]:
-	            outfile.write(f"""{bins}[ <font color="#db6e00"> {dict_global_sample[pathway][bins][0]}</font> 
-	        			  , <font color="green">{dict_global_sample[pathway][bins][2]}</font> ]; """)
-			# NO MODULES NO NEED
+            for bins in dict_global_sample[pathway]:
+                outfile.write(f"""{bins}[ <span style="background-color:#7f5b6c"> {dict_global_sample[pathway][bins][0]}</span> 
+            			  , <span style="background-color:#e7bcd4">{dict_global_sample[pathway][bins][2]}</span> ]; """)
+    		# NO MODULES NO NEED
 			# outfile.write("""</td>
 			# <td class="modules">
 			# """)
@@ -425,7 +486,7 @@ def write_html_sample(dict_global_sample, output,
 			#             outfile.write(f"""<a href='https://www.kegg.jp/module/{mod}+{list_active_gene}'>
 			#             {mod}</a>; 
 			#             """)
-	        outfile.write("""</td>
+            outfile.write("""</td>
 	        </tr>
 	        """
 	        			  )
@@ -472,134 +533,193 @@ def write_html_bins(dict_global_bin, output,
         """
         )
 
+        outfile.write("""
+                  <style type="text/css">
+          .tg {
+              border-collapse: collapse;
+              border-spacing: 0;
+          }
+
+          .tg td {
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              padding: 10px 5px;
+              border-style: solid;
+              border-width: 1px;
+              overflow: hidden;
+              word-break: normal;
+              border-color: black;
+          }
+
+          .tg th {
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              font-weight: normal;
+              padding: 10px 5px;
+              border-style: solid;
+              border-width: 1px;
+              overflow: hidden;
+              word-break: normal;
+              border-color: black;
+          }
+
+          .tg .header {
+              font-size: x-large;
+              font-family: Georgia, serif !important;
+              ;
+              background-color: #7097AB;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .header2 {
+              font-size: large;
+              font-family: Georgia, serif !important;
+              ;
+              background-color: #7097AB;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .helpfont {
+              font-size: medium;
+              font-family: Georgia, serif !important;
+              ;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: top
+          }
+          .tg .pathway_gene {
+              font-size: medium;
+              font-family: Tahoma, Geneva, sans-serif !important;
+              ;
+              background-color: #E8E8E8;
+              border-color: inherit;
+              text-align: center;
+              vertical-align: middle
+          }
+          .tg .modules {
+              font-size: small;
+              font-family: Tahoma, Geneva, sans-serif !important;
+              ;
+              border-color: inherit;
+              text-align: left;
+              vertical-align: middle
+          }
+          .collapsible {
+              background-color: #7097AB;
+              color: black;
+              cursor: pointer;
+              padding: 18px;
+              width: 100%;
+              border: none;
+              text-align: left;
+              outline: none;
+              font-size: large;
+            }
+
+        .active, .collapsible:hover {
+              background-color: #555;
+            }
+
+        .content {
+          padding: 0 18px;
+          display: none;
+          overflow: hidden;
+          background-color: #f1f1f1;
+        }
+
+          @media screen and (max-width: 767px) {
+              .tg {
+                  width: auto !important;
+              }
+
+              .tg col {
+                  width: auto !important;
+              }
+
+              .tg-wrap {
+                  overflow-x: auto;
+                  -webkit-overflow-scrolling: touch;
+              }
+          }
+      </style>
+        """)
+
         outfile.write(f"""
-        <body>
+        
         <div id='summary'>
         <h1>Help</h1>
-        <h2>
+        <button type="button" class="collapsible">Open Help</button>
+        <div class="content"><p>
         <ol>
             <li>INDEX of the table
             <ul>
                 <li>The columns "Pathways" are composed of name of each pathway present in the bins and link to a figure</li>
-                <li>Pathway Summary represent the pathway with both the expressed and non expressed genes</li>
-                <li><font color="green">Pathway Expressed</font> represent the pathway with the genes present in both RNAseq and the bin</li>
-                <li><font color="#db6e00">Pathway Non expressed</font> represent the pathway with the genes present in the bin but absent from the RNAseq</li>
-                <li><font color="firebrick">Pathway All Genes</font> represent the pathway with all the genes present in the bin</li>
-                <li><font color="green">Expressed genes</font is the list of the genes of the pathway present in the RNAseq </li>
-                <li><font color="#db6e00">Non expressed genes</font> is the list of the genes of the pathway present in the bin but are absent of the RNAseq</li>
+                <li>Pathway Summary represent the pathway with both the expressed and non expressed orthologs</li>
+                <li><font color="#e7bcd4">▉▉</font>Pathway Expressed represent the pathway with the orthologs present in both RNA-seq and the bin</li>
+                <li><font color="#7f5b6c">▉▉</font>Pathway Non expressed represent the pathway with the orthologs present in the bin but absent from the RNA-seq</li>
+                <li><font color="#f3c98b">▉▉</font>Pathway All orthologs represent the pathway with all the orthologs present in the bin</li>
+                <li><font color="#e7bcd4">Expressed orthologs</font> is the list of the orthologs of the pathway present in the RNAseq </li>
+                <li><font color="#7f5b6c">Non expressed orthologs</font> is the list of the orthologs of the pathway present in the bin but are absent of the RNAseq</li>
             </ul></li>
             <li> Figure detail
             <ul>
                 <li>The Figures in the links: <ul> 
-                    <li>The gene expressed by RNA are in green</li>
-                    <li>The gene present in the bins but that are not in the RNA are in orange</li>
-                    <li>The genes absent from the samples are in blue</li></ul></li></ul></li>
+                    <li>The orthologs expressed by RNA are in green</li>
+                    <li>The orthologs present in the bins but that are not in the RNA are in orange</li>
+                    <li>The orthologs absent from the samples are in blue</li></ul></li></ul></li>
             <li>Troubleshooting
             <ul>
-                <li>When the link of the pathway is not loading or not showing anything, it means that there is too much gene to show on the figure.
+                <li>When the link of the pathway is not loading or not showing anything, it means that there is too much orthologs to show on the figure.
             Either try the link of another column or strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
                 <li>In the figure you can have Green case that also contains orange.
-            If the case is composed of multiple genes and some are in RNA and some only in the bins the case will be highlighted in green even tough it should be green and orange</li>
+            If the case is composed of multiple orthologs and some are in RNA and some only in the bins the case will be highlighted in green even tough it should be green and orange</li>
             </ul></li>
         </ol>
-        </h2>
+        </p></div>
         </div>
         """
         )
 
         outfile.write("""
+        <script>
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+          coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+              content.style.display = "none";
+            } else {
+              content.style.display = "block";
+            }
+          });
+        }
+        </script>
+        """)
+        
+        outfile.write("""
         <h1>Pathways</h1>
-            <style type="text/css">
-                .tg {
-                    border-collapse: collapse;
-                    border-spacing: 0;
-                }
-            
-                .tg td {
-                    font-family: Arial, sans-serif;
-                    font-size: 14px;
-                    padding: 10px 5px;
-                    border-style: solid;
-                    border-width: 1px;
-                    overflow: hidden;
-                    word-break: normal;
-                    border-color: black;
-                }
-            
-                .tg th {
-                    font-family: Arial, sans-serif;
-                    font-size: 14px;
-                    font-weight: normal;
-                    padding: 10px 5px;
-                    border-style: solid;
-                    border-width: 1px;
-                    overflow: hidden;
-                    word-break: normal;
-                    border-color: black;
-                }
-            
-                .tg .header {
-                    font-weight: bold;
-                    text-decoration: underline;
-                    font-size: x-large;
-                    font-family: Georgia, serif !important;
-                    ;
-                    background-color: #82aaea;
-                    border-color: inherit;
-                    text-align: center;
-                    vertical-align: top
-                }
-
-            
-                .tg .pathway_gene {
-                    font-size: medium;
-                    font-family: Tahoma, Geneva, sans-serif !important;
-                    ;
-                    border-color: inherit;
-                    text-align: center;
-                    vertical-align: middle
-                }
-
-                .tg .green {
-                    font-color: green
-                }
-                
-                .tg .red {
-                    font-color: red
-                }
-
-                @media screen and (max-width: 767px) {
-                    .tg {
-                        width: auto !important;
-                    }
-            
-                    .tg col {
-                        width: auto !important;
-                    }
-            
-                    .tg-wrap {
-                        overflow-x: auto;
-                        -webkit-overflow-scrolling: touch;
-                    }
-                }
-            </style>
             <div class="tg-wrap">
                 <table class="tg">
                     <tr>
                         <th class="header">Pathways Summary</th>
-                        <th class="header"><font color="green">Pathways Expressed</font></th>
-                        <th class="header"><font color="#db6e00">Pathways Non Expressed</font></th>
-                        <th class="header"><font color="#db6e00">Pathways All Genes</font></th>
-                        <th class="header"><font color="green">Expressed Genes</font></th>
-                        <th class="header"><font color="#db6e00">Non Expressed Genes</font></th>
+                        <th class="header">Pathways Expressed</font></th>
+                        <th class="header">Pathways Non Expressed</font></th>
+                        <th class="header">Pathways All orthologs</font></th>
+                        <th class="header">Expressed orthologs</font></th>
+                        <th class="header">Non Expressed orthologs</font></th>
                     </tr>
                     <tr>
-                        <th class="header">Represent the genes of the Bin that are in RNAseq in green and the one absent from RNAseq in orange</th>
-                        <th class="header">Represent only the genes of the bins that are in RNAseq in green</font></th>
-                        <th class="header">Represent only the genes of the bins that are not in RNAseq in orange</font></th>
-                        <th class="header">Represent all the genes of the bins</font></th>
-                        <th class="header">Genes of the bin present in RNAseq</th>
-                        <th class="header">Genes of the bin absent in RNAseq</th>
+                        <th class="header2"><font color="#e7bcd4">▉▉</font>Orthologs common to bins and RNA-seq annotation <font color="#7f5b6c">▉▉</font> Orthologs present in bins but not in RNA-seq annotation</th>
+                        <th class="header2"><font color="#e7bcd4">▉▉</font>Orthologs common to bins and RNA-seq annotation</th>
+                        <th class="header2"><font color="#7f5b6c">▉▉</font>Orthologs present in bins but not in RNA-seq annotation</th>
+                        <th class="header2"><font color="#f3c98b">▉▉</font>Orthologs based on bins annotation</th>
+                        <th class="header2"><font color="#e7bcd4">▉▉</font>list of orthologs of the bin present in RNAseq</th>
+                        <th class="header2"><font color="#e7bcd4">▉▉</font>list of orthologs of the bin absent in RNAseq</th>
 
                     </tr>
         """)
@@ -615,14 +735,14 @@ def write_html_bins(dict_global_bin, output,
                     set_active_gene = set()
                     set_html_active_gene = set()
                     if dict_global_bin[bin_html][pathway][3] != "":
-                    for gene in dict_global_bin[bin_html][pathway][3]:
+                        for gene in dict_global_bin[bin_html][pathway][3]:
                             set_active_gene.add(gene)
-                            set_html_active_gene.add(gene+"%09green,black/")
+                            set_html_active_gene.add(gene)
                     set_gene = set()
                     for gene in dict_global_bin[bin_html][pathway][1]:
                         set_gene.add(gene)
                     list_html_all_gene = "".join([
-                        gene+"%09red,black/" for gene in list(set_gene)])
+                        gene for gene in list(set_gene)])
                     list_inactive_gene=[]
                     if dict_global_bin[bin_html][pathway][3] != "":
                         list_html_active_gene = "".join(set_html_active_gene)
@@ -630,28 +750,38 @@ def write_html_bins(dict_global_bin, output,
                         for elem in list(set_gene):
                             if elem not in list_active_gene:
                                 list_inactive_gene.append(elem)
+                        list_html_inactive_gene_coded = "".join([
+                            inactiv+"%09%237f5b6c,black/" for inactiv in list_inactive_gene])
                         list_html_inactive_gene = "".join([
-                            inactiv+"%09orange,black/" for inactiv in list_inactive_gene])
+                            inactiv for inactiv in list_inactive_gene])
                     else:
                         list_html_active_gene = ""
                         list_html_inactive_gene = ""
                         list_active_gene = ""
                         list_inactive_gene = list(set_gene)
+                    set_html_all_gene = set()
+                    for gene in dict_global_bin[bin_html][pathway][1]:
+                        set_html_all_gene.add(gene)
+                    list_html_all_gene = "".join(set_html_all_gene)
                     outfile.write(f"""
 					<tr>
-					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/{list_html_inactive_gene}">{pathway_name}</a></td>
+					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/{list_html_inactive_gene_coded}/default%3d%23e7bcd4">{pathway_name}
+                    <font color="#e7bcd4">▉▉</font>from the bin and in RNAseq and <font color="#7f5b6c">▉▉</font>from the bin and not in RNAseq</a></td>
 					"""
 					)
                     outfile.write(f"""
-					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}">{pathway_name}</a></td>
+					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/default%3d%23e7bcd4">{pathway_name}
+                    <font color="#e7bcd4">▉▉</font>from the bin and in RNAseq</a></td>
 					"""
 					)
                     outfile.write(f"""
-					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
+					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}/default%3d%237f5b6c">{pathway_name}
+                    <font color="#7f5b6c">▉▉</font>from the bin and not in RNAseq</a></td>
 					"""
 					)
                     outfile.write(f"""
-					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene}">{pathway_name}</a></td>
+					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_all_gene}/default%3d%23feffbe">{pathway_name}
+                    <font color="#f3c98b">▉▉</font></span>all orthologs from the bin</a></td>
 					<td class="pathway_gene">"""
 					)
 					

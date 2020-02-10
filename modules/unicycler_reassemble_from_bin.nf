@@ -8,7 +8,7 @@ process unicycler {
     input:
     set val(name), val(bin_name), file(illumina), file(ont)    
     output:
-    set val(name), val(bin_name), file("*.fa") optional true
+    set val(name), file("*.fa") optional true
     file("*.gfa") optional true
     shell:
     if (task.attempt == 1)
