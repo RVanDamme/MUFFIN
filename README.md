@@ -10,39 +10,49 @@ of crossed illumina and nanopore reads.
 
 MUFFIN uses the following software
 
-| Task | Software | Version | Docker | integration|
+| Task | Software | Version | Docker | Image version|
 | --- | --- | --- | --- | --- |
-| QC illumina | [fastp](https://github.com/OpenGene/fastp) |  |  |  |
+| QC illumina | [fastp](https://github.com/OpenGene/fastp) | 0.20.0 | [LINK](https://hub.docker.com/r/nanozoo/fastp) | 0.20.0--78a7c63 |
 | QC ont | automated way to discard shortest reads |  |  |  |
-|  | [filtlong](https://github.com/rrwick/Filtlong) |  |  |  |
-| metagenomic composition of ont | [sourmash](https://sourmash.readthedocs.io/en/latest/) |  |  |  |
-| Hybrid assembly | [Meta-spades](http://cab.spbu.ru/software/spades/) |  |  |  |
-|  | [unicycler](https://github.com/rrwick/Unicycler) |  |  |  |
-| Long read assembly | [MetaFlye](https://github.com/fenderglass/Flye) |  |  |  |
-| polishing | [racon](https://github.com/lbcb-sci/racon) |  |  |  |
-|  | [medaka](https://github.com/nanoporetech/medaka) |  |  |  |
-|  | [pilon](https://github.com/broadinstitute/pilon/wiki) |  |  |  |
-| mapping | [minimap2](https://github.com/lh3/minimap2) |  |  |  |
-|  | [bwa](http://bio-bwa.sourceforge.net/) |  |  |  |
-|  | [samtools](http://www.htslib.org/) |  |  |  |
-| retrieve reads mapped to contig | [seqtk](https://github.com/lh3/seqtk) |  |  |  |
-| Binning | [Metabat2](https://bitbucket.org/berkeleylab/metabat/src/master/) |  |  |  |
-|  | [maxbin2](https://sourceforge.net/projects/maxbin2/) |  |  |  |
-|  | [concoct](https://github.com/BinPro/CONCOCT) |  |  |  |
-|  | [metawrap](https://github.com/bxlab/metaWRAP) |  |  |  |
-| qc binning | [checkm](https://ecogenomics.github.io/CheckM/) |  |  |  |
-|Taxonomic Classification  | [sourmash](https://sourmash.readthedocs.io/en/latest/) using the [gt-DataBase](https://gtdb.ecogenomic.org/) |  |  |  |
-| Annotations (bin and RNA) | [eggNOG](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2) |  |  |  |
-| *De novo* transcript and quantification | [Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki) |  |  |  |
-|  | [Salmon](https://github.com/COMBINE-lab/salmon) |  |  |  |
+|  | [filtlong](https://github.com/rrwick/Filtlong) | 0.2.0 | [LINK](https://hub.docker.com/r/nanozoo/filtlong) | v0.2.0--afa175e |
+| metagenomic composition of ont | [sourmash](https://sourmash.readthedocs.io/en/latest/) | 2.0.0a10 | [LINK](https://hub.docker.com/r/nanozoo/sourmash) | 2.0.1--6970ddc |
+| Hybrid assembly | [Meta-spades](http://cab.spbu.ru/software/spades/) | 3.13.1 | [LINK](https://hub.docker.com/r/nanozoo/spades) | 3.13.1--2c2a4c0 |
+|  | [unicycler](https://github.com/rrwick/Unicycler) | 0.4.8 | [LINK](https://hub.docker.com/r/nanozoo/unicycler) | 0.4.7-0--c0404e6 |
+| Long read assembly | [MetaFlye](https://github.com/fenderglass/Flye) | 2.6 | [LINK](https://hub.docker.com/r/nanozoo/flye) | 2.5--bae51d9 |
+| polishing | [racon](https://github.com/lbcb-sci/racon) | 1.4.7 | [LINK](https://hub.docker.com/r/nanozoo/racon) | 1.4.7--239559c |
+|  | [medaka](https://github.com/nanoporetech/medaka) | 0.11.0 | [LINK](https://hub.docker.com/r/nanozoo/medaka) | 0.10.0--1e71fdd |
+|  | [pilon](https://github.com/broadinstitute/pilon/wiki) | 1.23 | [LINK](https://hub.docker.com/r/nanozoo/shovill) | 1.0.9--dc1de54 |
+| mapping | [minimap2](https://github.com/lh3/minimap2) | 2.17 | [LINK](https://hub.docker.com/r/nanozoo/minimap2) | 2.17--caba7af |
+|  | [bwa](http://bio-bwa.sourceforge.net/) | 0.7.17 | [LINK](https://hub.docker.com/r/nanozoo/shovill) | 1.0.9--dc1de54 |
+|  | [samtools](http://www.htslib.org/) | 1.9 | [LINK](https://hub.docker.com/r/nanozoo/minimap2) | 2.17--caba7af |
+| retrieve reads mapped to contig | [seqtk](https://github.com/lh3/seqtk) | 1.3 | [LINK](https://hub.docker.com/r/nanozoo/seqtk) | 1.3--dc0d16b |
+| Binning | [Metabat2](https://bitbucket.org/berkeleylab/metabat/src/master/) | 2.14 | [LINK](https://hub.docker.com/r/nanozoo/metabat2) | 2.13--0e2577e |
+|  | [maxbin2](https://sourceforge.net/projects/maxbin2/) | 2.2.4 | [LINK](https://hub.docker.com/r/nanozoo/maxbin2) | 2.2.7--b643a6b |
+|  | [concoct](https://github.com/BinPro/CONCOCT) | 1.0.0 | [LINK](https://hub.docker.com/r/nanozoo/concoct) | 1.1.0--03a3888 |
+|  | [metawrap](https://github.com/bxlab/metaWRAP) | 1.2.4 | [LINK](https://hub.docker.com/r/nanozoo/metawrap) | 1.2.2--de94241 |
+| qc binning | [checkm](https://ecogenomics.github.io/CheckM/) | 1.0.18 | [LINK](https://hub.docker.com/r/nanozoo/nanoplot) | 1.25.0--4e2882f |
+|Taxonomic Classification  | [sourmash](https://sourmash.readthedocs.io/en/latest/) using the [gt-DataBase](https://gtdb.ecogenomic.org/) | 2.0.0a10 | [LINK](https://hub.docker.com/r/nanozoo/sourmash) | 2.0.1--6970ddc |
+|  | [GTDB](https://gtdb.ecogenomic.org/) | version r89 |  |  |
+| Annotations (bin and RNA) | [eggNOG](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2) | 2.0.1 | [LINK](https://hub.docker.com/r/) | TBD |
+|  | [eggNOG DB](http://eggnog5.embl.de/#/app/home) | v5.0 |  |  |
+| *De novo* transcript and quantification | [Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki) | 2.8.5 | [LINK](https://hub.docker.com/r/) | TBD |
+|  | [Salmon](https://github.com/COMBINE-lab/salmon) | 0.15.0 | [LINK](https://hub.docker.com/r/) | TBD |
 
 ## Figure
-![MAFIN FLOWCHART FIGURE](.figure/MAFIN_FLOWCHART.png)
+
+### The Workflow
+
+![MUFFIN FLOWCHART FIGURE](Muffin_Workflow_simple.png)
+
+### The parser output
+
+![PARSER OUTPUT FIGURE](PANKEGG_simple.png)
 
 
 
 ## Installation
 
+!!! The actual version cannot run between step 1 and 2/3 it will be fixed soon
 At the moment to install this pipeline and run this pipeline you need to use the conda installation:
 ```sh
 #install the pipeline
