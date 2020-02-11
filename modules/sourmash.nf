@@ -28,7 +28,7 @@ process sourmash_bins {
     file('*.txt')
     shell:
     """
-    bin_id=\$(basename !{bins} | sed -r "s/\\.\\w+//2"")
+    bin_id=\$(basename !{bins} | sed -r "s/\\.\\w+//2")
     sourmash compute -p !{task.cpus} --scaled 10000 -k 31 !{bins} -o \$bin_id.sig
     sourmash lca classify --query !{bins}.sig --db !{json} > \$bin_id.txt   
     """
