@@ -362,7 +362,8 @@ else {
     include refine3 from 'modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
     refine3_ch = metabat2_out.join(maxbin2_out).join(concoct_out)
     refine3(refine3_ch, checkm_db_path)
-    final_bin_ch = refine3.out[0]
+    reassembly_ch = refine3.out[0]
+    metawrap_out_ch = refine3.out[0].transpose()
 
 }
 
@@ -373,7 +374,7 @@ if (params.reassembly) {
         // retrieve the ids of each bin contigs
 
     include 'modules/list_ids'
-    contig_list(final_bin_ch)
+    contig_list(reassembly_ch)
     extract_reads_ch = contig_list.out.view()
 
  
@@ -382,7 +383,7 @@ if (params.reassembly) {
     include 'modules/cat_all_bins'
     include bwa_bin from 'modules/bwa'  
     include minimap2_bin from 'modules/minimap2'
-    cat_all_bins(final_bin_ch)
+    cat_all_bins(reassembly_ch)
     fasta_all_bin = cat_all_bins.out
     bwa_all_bin = fasta_all_bin.join(illumina_input_ch)
     ill_map_all_bin = bwa_bin(bwa_all_bin)    
@@ -404,7 +405,7 @@ if (params.reassembly) {
     final_bins_ch=unicycler.out[0]
 }
 else {
-    collected_final_bins_ch=final_bin_ch.transpose()
+    final_bins_ch=metawrap_out_ch
 }
 //******
 // Done
