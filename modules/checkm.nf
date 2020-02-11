@@ -16,7 +16,7 @@ process checkm {
     mkdir temporary
     mkdir ${name}_bin
     mv *.fa ${name}_bin/
-    checkm lineage_wf --tmpdir temporary --pplacer_threads ${task.cpus} -t ${task.cpus} --reduced_tree -x fa ${name}_bin ${name}_checkm > summary.txt
+    checkm lineage_wf --tmpdir temporary --pplacer_threads 4 -t ${task.cpus} --reduced_tree -x fa ${name}_bin ${name}_checkm > summary.txt
     checkm bin_qa_plot --image_type png -x fa ${name}_checkm ${name}_bin ${name}_checkm_plot
     checkm tree_qa ${name}_checkm > taxonomy.txt
      """
