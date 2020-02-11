@@ -26,13 +26,13 @@ if (params.assembler!='metaflye' && params.assembler!='metaspades') {
 
 // DATA INPUT (ONT and ILLUMINA)
 illumina_input_ch = Channel
-        .fromFilePairs( "${params.illumina}*_R{1,2}.fastq{,.gz}", checkIfExists: true)
+        .fromFilePairs( "${params.illumina}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
         .view() 
 // reads_illumina = "${params.illumina}*_R{1,2}.fastq.gz"
 // illumina_input_ch = Channel.fromFilePairs(reads_illumina).ifEmpty { error "Cannot find any Illumina reads in the directory: ${params.illumina} \n Delfault is ./illumina \n ${reads_illumina}" }.view()
 
 // reads_ont= "${params.ont}*.fastq.gz"
-ont_input_ch = Channel.fromPath("${params.ont}*.fastq{,.gz}",checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
+ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}",checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
 
 // extra ont reads
 if (params.extra_ont != false) {
@@ -459,7 +459,7 @@ else {classify_ch=final_bins_ch}
 
 //RNAseq
 if (params.rna) {rna_input_ch = Channel
-        .fromFilePairs( "${params.rna}*_R{1,2}.fastq{,.gz}", checkIfExists: true)
+        .fromFilePairs( "${params.rna}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
         .view()
 }
 
