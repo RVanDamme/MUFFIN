@@ -223,7 +223,7 @@ if (params.assembler=="metaflye") {
     minimap_polish(flye_to_map)
     map_to_racon = ont_input_ch.join(flye.out).join(minimap_polish.out)
     medaka(racon(map_to_racon))
-    medaka_to_pilon = medaka.out.join(ont_input_ch)
+    medaka_to_pilon = medaka.out.join(illumina_input_ch)
     pilon(medaka_to_pilon, params.polish_iteration)
     assembly_ch = pilon.out
 }

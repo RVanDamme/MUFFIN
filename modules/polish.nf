@@ -27,7 +27,7 @@ process pilon {
     label 'pilon'
     publishDir "${params.output}/${name}/flye_assembly/", mode: 'copy', pattern: "polished_assembly.fasta" 
     input:
-        set val(name), file(assembly), file(ont_read)
+        set val(name), file(assembly), file(ill_read)
         val(iteration)
     output:
         set val(name) , file("polished_assembly.fasta")
@@ -38,7 +38,7 @@ process pilon {
     for ite in {1..!{iteration}}
     do
         bwa index \$assemb
-        bwa mem \$assemb !{ont_read} | samtools view -bS - | samtools sort -@ !{task.cpus} - > \$ite.bam
+        bwa mem \$assemb !{ill_read} | samtools view -bS - | samtools sort -@ !{task.cpus} - > \$ite.bam
         samtools index -@ !{task.cpus} \$ite.bam
         pilon -Xmx\$mem"g" --threads !{task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
         assemb=\$ite"_polished_assembly.fasta"
