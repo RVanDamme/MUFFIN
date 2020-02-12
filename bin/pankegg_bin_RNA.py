@@ -356,7 +356,7 @@ def write_html_sample(dict_global_sample, output,
           </ol>
         </p></div>
         </div>
-        """)s
+        """)
 
     outfile.write("""<script>
         var coll = document.getElementsByClassName("collapsible");
@@ -436,7 +436,7 @@ def write_html_sample(dict_global_sample, output,
             list_html_inactive_gene_coded = "".join([
                 inactiv+"%09%237f5b6c,black/" for inactiv in list_inactive_gene])            
             list_html_inactive_gene = "".join([
-                inactiv" for inactiv in list_inactive_gene])
+                inactiv for inactiv in list_inactive_gene])
             list_html_all_gene = "".join([
                 gene for gene in list(set_gene)])
             outfile.write(f"""
