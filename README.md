@@ -20,7 +20,7 @@ MUFFIN uses the following software
 |  | [unicycler](https://github.com/rrwick/Unicycler) | 0.4.8 | [LINK](https://hub.docker.com/r/nanozoo/unicycler) | 0.4.7-0--c0404e6 |
 | Long read assembly | [MetaFlye](https://github.com/fenderglass/Flye) | 2.6 | [LINK](https://hub.docker.com/r/nanozoo/flye) | 2.5--bae51d9 |
 | polishing | [racon](https://github.com/lbcb-sci/racon) | 1.4.7 | [LINK](https://hub.docker.com/r/nanozoo/racon) | 1.4.7--239559c |
-|  | [medaka](https://github.com/nanoporetech/medaka) | 0.11.0 | [LINK](https://hub.docker.com/r/nanozoo/medaka) | 0.10.0--1e71fdd |
+|  | [medaka](https://github.com/nanoporetech/medaka) | 0.11.2 | [LINK](https://hub.docker.com/r/nanozoo/medaka) | 0.10.0--1e71fdd |
 |  | [pilon](https://github.com/broadinstitute/pilon/wiki) | 1.23 | [LINK](https://hub.docker.com/r/nanozoo/shovill) | 1.0.9--dc1de54 |
 | mapping | [minimap2](https://github.com/lh3/minimap2) | 2.17 | [LINK](https://hub.docker.com/r/nanozoo/minimap2) | 2.17--caba7af |
 |  | [bwa](http://bio-bwa.sourceforge.net/) | 0.7.17 | [LINK](https://hub.docker.com/r/nanozoo/shovill) | 1.0.9--dc1de54 |
