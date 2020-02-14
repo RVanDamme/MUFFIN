@@ -6,6 +6,7 @@ process sourmash_download_db {
       output:
         file("gtdb.lca.json")
       script:
-        """wget https://ndownloader.figshare.com/files/18809423?private_link=ed98a281ef089c033352 -O gtdb.lca.json
+        """
+        wget https://ndownloader.figshare.com/files/18809423?private_link=ed98a281ef089c033352 -O gtdb.lca.json
         """
     }
