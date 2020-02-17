@@ -1,11 +1,14 @@
 #!/usr/bin/env nextflow
 nextflow.preview.dsl=2
 
-start_var = """*********Start running MUFFIN*********
+start_var = """
+*********Start running MUFFIN*********
 MUFFIN is a hybrid assembly and differential binning workflow for metagenomics, transcriptomics and pathway analysis.
 
 If you use MUFFIN for your research pleace cite:
+
 https://www.biorxiv.org/content/10.1101/2020.02.08.939843v1 
+
 or
 
 Van Damme R., Hölzer M., Viehweger H., Müller B., Bongcam-Rudloff E., Brandt C., 2020
@@ -25,59 +28,67 @@ def helpMSG() {
     MUFFIN is still under development please wait until the first non edge version realease before using it.
     Please cite us using https://www.biorxiv.org/content/10.1101/2020.02.08.939843v1
 
-    Mafin is composed of 2 part the retrieval of potential genome and the analysis of said genomes
+    Mafin is composed of 3 part the assembly of potential metagenome assembled genomes (MAGs); the classification of the MAGs; and the annotation of the MAGs.
 
-        Usage example for retrieval:
+        Usage example:
     nextflow run mafin --retrieve --ont /path/to/ont_dir --illumina /path/to/illumina_dir --metaspades -profile conda
     or 
     nextflow run mafin --retrieve --ont /path/to/ont_dir --illumina /path/to/illumina_dir --metaflye -profile conda
 
         Input:
-    --ont                       path to the directory containing the nanopore read file (fastq) (default: ./nanopore)
-    --illumina                 path to the directory containing the illumina read file (fastq) (default: ./illumina)
-    --rna                       path to the directory containing the illumina read file (fastq) (default: none)
+    --ont                       path to the directory containing the nanopore read file (fastq) (default: $params.ont)
+    --illumina                  path to the directory containing the illumina read file (fastq) (default: $params.illumina)
+    --rna                       path to the directory containing the RNA-seq read file (fastq) (default: none)
+    --bin_classify              path to the directory containing the bins files to classify (default: none)
+    --bin_annotate              path to the directory containing the bins files to annotate (default: none)
 
-        Output (default output is reassemblies from each bins):
+        Optional input:
+    --check_db                  path to the checkm database
+    --check_tar_db              path to the checkm database tar compressed
+    --sourmash_db               path to the LCA database for sourmash (default: GTDB LCA formated)
+    --eggnog_db                 path to the eggNOG database
+
+        Output:
     --output                    path to the output directory (default: $params.output)
+
         Outputed files:
-    assembly                    the original assembly contigs file 
-    qc                          the reads file after qc
-    metabat                     the bins produce by metabat2
-    concoct                     the bins produce by concoct
-    maxbin                      the bins produce by meaxbin2
-    metawrap                    the bins produce by metawrap refining
-    mapped bin reads            the fastq files containing the reads mapped to each metawrap bin
-    unmapped bin reads          the fastq files containing the unmmaped reads of illumina and nanopore
+    QC                          The reads file after qc
+    Assembly                    The assembly contigs file 
+    Bins                        The bins produced by CONCOCT, MetaBAT2, MaxBin2 and MetaWRAP (the refining of bins)
+    Mapped bin reads            The fastq files containing the reads mapped to each metawrap bin
+    Unmapped bin reads          The fastq files containing the unmmaped reads of illumina and nanopore
+    Reassembly                  The reassembly files of the bins (.fa and .gfa)
+    Checkm                      Various file outputed by CheckM (summary, taxonomy, plots and output dir)
+    Sourmash                    The classification done by sourmash
+    Classify summary            The summary of the classification and quality control of the bins (csv file)
+    RNA output                  The de novo assembled transcript and the quantification by Salmon
+    Annotation                  The annotations files from eggNOG (tsv format)
+    Parsed output               HTML files that summarize the annotations and show graphically the pathways
 
 
     
 
-        Parameter:
+        Basic Parameter:
     --cpus                      max cores for local use [default: $params.cpus]
     --memory                    80% of available RAM in GB for --metamaps [default: $params.memory]
 
-        Databases:
-    --checkm_db                 path to an already INSTALLED checkm database (not the tar file)
-    --checkm_tar_db             path to the tar checkm database (it will extract it in the dir)
-    --sourmash_db               path to an already installed sourmash database
-    
-        Options:
+
+        Workflow Options:
     --skip_ill_qc               skip quality control of illumina files
     --skip_ont_qc               skip quality control of nanopore file
     --short_qc                  minimum size of the reads to be kept (default: $params.short_qc )
     --filtlong                  use filtlong to improve the quality furthermore (default: false)
-    --model                     the model medaka will use (default: r941_min_high)
-    --polish_iteration          number of iteration of pilon in the polish step (advanced)
+    --model                     the model medaka will use (default: $params.model)
+    --polish_iteration          number of iteration of pilon in the polish step (default: $params.polish_iteration)
     --extra_ill                 a list of additional ill sample file (with full path with a * instead of _R1,2.fastq) to use for the binning in Metabat2 and concoct
     --extra_ont                 a list of additional ont sample file (with full path) to use for the binning in Metabat2 and concoct
-    --SRA_ill                   a list of additional ill sample from SRA accession number to use for the binning in Metabat2 and concoct (not implemented yet)
-    --SRA_ont                   a list of additional ont sample from SRA accession number to use for the binning in Metabat2 and concoct (not implemented yet)
     --skip_metabat2             skip the binning using metabat2 (advanced)
     --skip_maxbin2              skip the binning using maxbin2 (advanced)
     --skip_concoct              skip the binning using concoct (advanced)
 
         Nextflow options:
     -profile                    change the profile of nextflow (currently available conda)
+    -resume                     resume the workflow where it stopped
     -with-report rep.html       cpu / ram usage (may cause errors)
     -with-dag chart.html        generates a flowchart for the process tree
     -with-timeline time.html    timeline (may cause errors)
@@ -453,6 +464,7 @@ if (params.modular=="full" | params.modular=="classify" | params.modular=="assem
 
         include sourmash_checkm_parser from 'modules/checkm_sourmash_parser'params(output: params.output)
         sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect())
+    final_bins_ch = classify_ch
 }
 
 
