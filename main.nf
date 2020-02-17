@@ -1,22 +1,20 @@
 #!/usr/bin/env nextflow
 nextflow.preview.dsl=2
 
-// if params.mode==retrieval {whole step one script}
-// if params.mode==analysis {whole bin analysis and genome analysis}
-// TODO publish of file in output (need to deicide what to keep)
+start_var = """*********Start running MUFFIN*********
+MUFFIN is a hybrid assembly and differential binning workflow for metagenomics, transcriptomics and pathway analysis.
 
+If you use MUFFIN for your research pleace cite:
+https://www.biorxiv.org/content/10.1101/2020.02.08.939843v1 
+or
 
-//*****************************************
-// Input, check(command) and stdout (params and such)
-//*****************************************
-// if (params.out_all == true) {
-//     params.assembly = true
-//     params.out_qc = true
-//     params.out_metawrap = true
-//     params.out_bin_reads = true
-//     params.out_unmapped = true
-//     }
-// fool proof checks
+Van Damme R., Hölzer M., Viehweger H., Müller B., Bongcam-Rudloff E., Brandt C., 2020
+"Metagenomics workflow for hybrid assembly, differential coverage binning, transcriptomics and pathway analysis (MUFFIN)",
+doi: https://doi.org/10.1101/2020.02.08.939843 
+**************************************
+"""
+println start_var
+
 if (params.help) { exit 0, helpMSG() }
 
 // Help Message
