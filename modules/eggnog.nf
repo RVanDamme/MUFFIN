@@ -1,6 +1,6 @@
 process eggnog_bin { 
         label 'eggnog' 
-        publishDir "${params.output}/${name}/bin_annotated/${bin_id}/", mode: 'copy', pattern: "*.tsv"
+        publishDir "${params.output}/${name}/bin_annotated/", mode: 'copy', pattern: "*.tsv"
       input:
         set val(name), file(bin), file(db)
       output:
