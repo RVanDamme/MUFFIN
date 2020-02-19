@@ -1,13 +1,14 @@
 process refine2 {
-    // label 'metawrap'
-    conda '/home/renaud/miniconda3/envs/metawrap-env'
+    
+    if (workflow.profile == 'conda') {conda '/home/renaud/miniconda3/envs/metawrap-env'}
+    else {label 'metawrap'}
     publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins" 
     publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
     input:
     set val(name1), file(bins1), file(bins2)
     file(path)
     output:
-    set val(name1), file("metawrap_bins")
+    set val(name1), file("metawrap_bins/*.fa")
     file("${name}_binning_stats.txt")
     shell:
     """
@@ -25,8 +26,8 @@ process refine2 {
 }
 
 process refine3 {
-    // label 'metawrap'
-    conda '/home/renaud/miniconda3/envs/metawrap-env'
+    if (workflow.profile == 'conda') {conda '/home/renaud/miniconda3/envs/metawrap-env'}
+    else {label 'metawrap'}
     publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins" 
     publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
     input:

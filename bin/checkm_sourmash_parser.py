@@ -28,7 +28,7 @@ def sourmash_parser(dict_checkm_sourmash,sourmash):
 
 
 def out_writing(dict_checkm_sourmash):
-    with open("step2_summary.csv", mode='w', newline='') as out_file:
+    with open("classify_step_summary.csv", mode='w', newline='') as out_file:
         out_writer = csv.writer(out_file, delimiter=',',quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         out_writer.writerow(

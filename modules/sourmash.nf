@@ -7,6 +7,9 @@ process sourmash_genome_size {
     set val(name), file(ont), file('genome_size.txt')
     shell:
     """
+    echo "100M" >genome_size.txt
+    """
+/*
     sourmash compute -p !{task.cpus} --scaled 10000 -k 31 !{ont} -o !{name}.sig 
     sourmash lca gather  !{name}.sig !{json} --ignore-abundance -o metagenomic-composition.txt
     sum_ont=\$(cat metagenomic-composition.txt | cut -d ',' -f 1 | paste -sd+ | bc)
@@ -14,13 +17,13 @@ process sourmash_genome_size {
     if (( \$(echo "\$total_m_ont < 100" |bc -l) ));
         then echo "100M" >genome_size.txt;
         else echo \$total_m_ont"M" >genome_size.txt;
-    fi
-    """
+    fi*/
+
 }
 
 process sourmash_bins {
     label 'sourmash' 
-    publishDir "${params.output}/${name}/sourmash/${bin_id}/", mode: 'copy', pattern: "*.txt"
+    publishDir "${params.output}/${name}/sourmash/", mode: 'copy', pattern: "*.txt"
     input:
     set val(name), file(bins)
     file(json)
