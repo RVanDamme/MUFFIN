@@ -16,7 +16,7 @@ process checkm_setup_db {
         if [ !{untar} == false ] ;
         then
                     path_db=\$(dirname !{db});
-                    mkdir \$path_db/db/;
+                    mkdir -p \$path_db/db/;
                     tar -xvf !{db} -C \$path_db/db/;
                     checkm data setRoot \$path_db/db;   
                     echo \$path_db/db > path_db.txt;
