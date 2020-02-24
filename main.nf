@@ -557,6 +557,8 @@ workflow { //start of the workflow
 
 } // end of workflow{}
 
+workflow.onComplete { 
+  log.info ( workflow.success ? "\nDone! Results are stored here --> $params.output \n" : "Oops .. something went wrong" )  }
 //***********
 // MAFIN DONE
 //***********
