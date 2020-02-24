@@ -96,8 +96,8 @@ def helpMSG() {
     """
 }
 
-if( !nextflow.version.matches('0.22+') ) {
-    println "This workflow requires Nextflow version 0.22 or greater -- You are running version $nextflow.version"
+if( !nextflow.version.matches('19.+') ) {
+    println "This workflow requires Nextflow version 19.07 or greater and under version 20 -- You are running version $nextflow.version"
     exit 1
 }
 
