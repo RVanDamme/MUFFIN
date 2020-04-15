@@ -60,7 +60,7 @@ At the moment to install this pipeline and run this pipeline you need to use the
 git clone https://github.com/RVanDamme/MAFIN.git
 
 #create an env and install metawrap
-conda -y -p /path/to/install/metawrap-env python=2.7
+conda create -y -p /path/to/install/metawrap-env python=2.7
 source activate /path/to/install/metawrap-env
 conda config --add channels defaults
 conda config --add channels conda-forge
@@ -77,11 +77,11 @@ conda deactivate
 the current 2 default usage are:
 Spades
 ```
-nextflow run MAFIN/main.nf --output results --assembler metaspades  --illumina fastq_ill/ --nanopore fastq_nano/ --core 2 --memory 16g  -profile conda
+nextflow run MAFIN/main.nf --output results --assembler metaspades  --illumina fastq_ill/ --ont fastq_nano/ --cpus 2 --memory 16g  -profile conda
 ```
 Flye
 ```
-nextflow run MAFIN/main.nf --output results --assembler metaflye  --illumina fastq_ill/ --nanopore fastq_nano/ --core 2 --memory 16g  -profile conda
+nextflow run MAFIN/main.nf --output results --assembler metaflye  --illumina fastq_ill/ --ont fastq_nano/ --cpus 2 --memory 16g  -profile conda
 ```
 
 ### Options

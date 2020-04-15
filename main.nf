@@ -86,6 +86,7 @@ def helpMSG() {
     --skip_metabat2             skip the binning using metabat2 (advanced)
     --skip_maxbin2              skip the binning using maxbin2 (advanced)
     --skip_concoct              skip the binning using concoct (advanced)
+    --reassembly                activate the reassembly of the bins using Unicycler (advanced and unstable)
 
         Nextflow options:
     -profile                    change the profile of nextflow (currently available conda)
@@ -426,39 +427,40 @@ workflow { //start of the workflow
 
         else {classify_ch=final_bins_ch}
 
-        // sourmash_db
-        if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
-        else {
-            include './modules/sourmashgetdatabase'
-            sourmash_download_db() 
-            database_sourmash = sourmash_download_db.out
-        }   
-        // checkm_db
-        if (workflow.profile == 'conda') {
-            if (params.checkm_db) {
-                include './modules/checkmsetupDB'
-                untar = true
-                checkm_setup_db(params.checkm_db, untar)
-                checkm_db_path = checkm_setup_db.out
-            }
-
-            else if (params.checkm_tar_db) {
-                include './modules/checkmsetupDB'
-                untar = false
-                checkm_setup_db(params.checkm_db, untar)
-                checkm_db_path = checkm_setup_db.out
-            }
-
+        if (params.modular=="classify" |params.modular=="class-annot") {
+            // sourmash_db
+            if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
             else {
-                include './modules/checkmsetupDB'
-                include './modules/checkmgetdatabases'
-                untar = false
-                checkm_setup_db(checkm_download_db(), untar)
-                checkm_db_path = checkm_setup_db.out
-            }
-        }
-        else { checkm_db_path = Channel.from("/checkm_database").collectFile() { item -> [ "path.txt", item ]  } }
+                include './modules/sourmashgetdatabase'
+                sourmash_download_db() 
+                database_sourmash = sourmash_download_db.out
+            }   
+            // checkm_db
+            if (workflow.profile == 'conda') {
+                if (params.checkm_db) {
+                    include './modules/checkmsetupDB'
+                    untar = true
+                    checkm_setup_db(params.checkm_db, untar)
+                    checkm_db_path = checkm_setup_db.out
+                }
 
+                else if (params.checkm_tar_db) {
+                    include './modules/checkmsetupDB'
+                    untar = false
+                    checkm_setup_db(params.checkm_db, untar)
+                    checkm_db_path = checkm_setup_db.out
+                }
+
+                else {
+                    include './modules/checkmsetupDB'
+                    include './modules/checkmgetdatabases'
+                    untar = false
+                    checkm_setup_db(checkm_download_db(), untar)
+                    checkm_db_path = checkm_setup_db.out
+                }
+            }
+            else { checkm_db_path = Channel.from("/checkm_database").collectFile() { item -> [ "path.txt", item ]  } }
+        }
         //*************************
         // Bins classify workflow
         //*************************
