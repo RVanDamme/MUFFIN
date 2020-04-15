@@ -2,9 +2,9 @@ process reads_retrieval {
     label 'seqtk'
     publishDir "${params.output}/${name}/reads_mapped_to_metawrap_bins/", mode: 'copy', pattern: "*.fastq"
     input:
-    set val(name), file(contig_list), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
+    tuple val(name), file(contig_list), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
     output:
-    set val(name), val(file(file(file(contig_list).baseName).baseName).baseName), file("*_illumina_R{1,2}.fastq"), file("*_ont.fastq")
+    tuple val(name), val(file(file(file(contig_list).baseName).baseName).baseName), file("*_illumina_R{1,2}.fastq"), file("*_ont.fastq")
     shell:
     // first I extract the reads that NEED TO REDO IT WITH FRESH MIND (include BWA.nf)
     """
@@ -45,7 +45,7 @@ process unmapped_retrieve {
     label 'seqtk'
     publishDir "${params.output}/${name}/reads_unmapped_to_metawrap_bins/", mode: 'copy', pattern: "*unmapped_*.fastq"
     input:
-    set val(name), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
+    tuple val(name), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
     output:
     file("unmapped_*.fastq") optionnal true
     shell:

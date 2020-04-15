@@ -2,7 +2,7 @@ process sourmash_checkm_parser {
     label 'python38'
     publishDir "${params.output}/${name}/", mode: 'copy', pattern: "classify_step_summary.csv"
     input:
-    set val(name), file(checkm)
+    tuple val(name), file(checkm)
     file(sourmash)
     output:
     file("classify_step_summary.csv")

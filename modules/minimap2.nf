@@ -3,9 +3,9 @@ process minimap2 {
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
-    set val(name), file(assembly), file(ont)
+    tuple val(name), file(assembly), file(ont)
     output:
-    set val(name) , file("ont_sorted.bam")
+    tuple val(name) , file("ont_sorted.bam")
     script:
     """
     minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
@@ -52,9 +52,9 @@ process minimap2_bin {
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
-    set val(name), file(assembly), file(ont)
+    tuple val(name), file(assembly), file(ont)
     output:
-    set val(name) , file("ont_sorted.bam")
+    tuple val(name) , file("ont_sorted.bam")
     script:
     """
     minimap2 -ax map-ont ${assembly} ${ont} > ont.sam

@@ -2,9 +2,9 @@ process eggnog_bin {
         label 'eggnog' 
         publishDir "${params.output}/${name}/bin_annotated/", mode: 'copy', pattern: "*.tsv"
       input:
-        set val(name), file(bin), file(db)
+        tuple val(name), file(bin), file(db)
       output:
-        set val(name), file("*.annotations.tsv")
+        tuple val(name), file("*.annotations.tsv")
         file("*.seed_orthologs.tsv")
       shell:
         """
@@ -19,9 +19,9 @@ process eggnog_rna {
         label 'eggnog' 
         publishDir "${params.output}/${name}/rna_annotated/", mode: 'copy', pattern: "*.tsv"
       input:
-        set val(name), val(transcript), file(quant), file(db)
+        tuple val(name), val(transcript), file(quant), file(db)
       output:
-        set val(name), file("*.annotations.tsv"), file(quant)
+        tuple val(name), file("*.annotations.tsv"), file(quant)
         file("*.seed_orthologs.tsv")
       shell:
         """

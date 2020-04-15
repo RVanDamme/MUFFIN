@@ -1,11 +1,12 @@
 process de_novo_transcript_and_quant {
+    maxForks 1
     label 'trinity'
     publishDir "${params.output}/${name}/de_novo_transcript/", mode: 'copy', pattern: "*_transcript.fasta"
     publishDir "${params.output}/${name}/quant_of_transcript/", mode: 'copy', pattern: "*_transcript_quant.sf"
     input:
-    set val(name), file(rna)
+    tuple val(name), file(rna)
     output:
-    set val(name), file("*_transcript.fasta"), file("*_transcript_quant.sf")
+    tuple val(name), file("*_transcript.fasta"), file("*_transcript_quant.sf")
     shell:
     """
     mem=\$(echo "!{task.memory}" | sed 's/ GB/G/g')

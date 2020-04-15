@@ -1,27 +1,31 @@
 process metabat2 {
+    maxForks 1
     label 'metabat2'
     publishDir "${params.output}/${name}/metabat2_bins/", mode: 'copy', pattern: "bins_dir"
     input:
-    set val(name), file(assembly), file(ont_bam), file(illumina_bam)
+    tuple val(name), file(assembly), file(ont_bam), file(illumina_bam)
     output:
-    set val(name), file("bins_dir")
+    tuple val(name), file("bins_dir")
     script:
     """
-    metabat -i ${assembly} ${ont_bam} ${illumina_bam} -o bins_dir/metabat_bins -t ${task.cpus}
+    jgi_summarize_bam_contig_depths --outputDepth depth.txt *.bam
+    metabat2 -i ${assembly} -a depth.txt -o bins_dir/metabat_bins -t ${task.cpus}
     """
 }
 
 process metabat2_extra {
+    maxForks 1
     label 'metabat2'
     publishDir "${params.output}/${name}/metabat2_bins/", mode: 'copy', pattern: "bins_dir" 
     input:
-    set val(name), file(assembly), file(ont_bam), file(illumina_bam)
+    tuple val(name), file(assembly), file(ont_bam), file(illumina_bam)
     file(extra_bam)
     output:
-    set val(name), file("bins_dir")
+    tuple val(name), file("bins_dir")
     script:
     """
-    metabat -i ${assembly} ${ont_bam} ${illumina_bam} ${extra_bam} -o bins_dir/metabat_bin -t ${task.cpus}
+    jgi_summarize_bam_contig_depths --outputDepth depth.txt *.bam
+    metabat2 -i ${assembly} -a depth.txt -o bins_dir/metabat_bin -t ${task.cpus}
     """
 
 }

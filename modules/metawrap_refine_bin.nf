@@ -5,10 +5,10 @@ process refine2 {
     publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins" 
     publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
     input:
-    set val(name1), file(bins1), file(bins2)
+    tuple val(name1), file(bins1), file(bins2)
     file(path)
     output:
-    set val(name1), file("metawrap_bins/*.fa")
+    tuple val(name1), file("metawrap_bins/*.fa")
     file("${name}_binning_stats.txt")
     shell:
     """
@@ -31,10 +31,10 @@ process refine3 {
     publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins" 
     publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
     input:
-        set val(name), file(bins1), file(bins2), file(bins3)
+        tuple val(name), file(bins1), file(bins2), file(bins3)
         file(path)
     output:
-    set val(name), file("metawrap_bins/*.fa")
+    tuple val(name), file("metawrap_bins/*.fa")
     file("${name}_binning_stats.txt")
     shell:
     """

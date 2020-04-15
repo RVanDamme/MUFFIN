@@ -1,9 +1,9 @@
 process racon {
     label 'racon'
     input:
-        set val(name), file(read), file(assembly), file(mapping) 
+        tuple val(name), file(read), file(assembly), file(mapping) 
     output:
-        set val(name), file(read), file("${name}_consensus.fasta") 
+        tuple val(name), file(read), file("${name}_consensus.fasta") 
     shell:
         """
         racon -t ${task.cpus} ${read} ${mapping} ${assembly} > ${name}_consensus.fasta
@@ -13,9 +13,9 @@ process racon {
 process medaka {
     label 'medaka'
     input:
-        set val(name), file(read), file(consensus) 
+        tuple val(name), file(read), file(consensus) 
     output:
-        set val(name), file("${name}_polished.fasta") 
+        tuple val(name), file("${name}_polished.fasta") 
     script:
         """
         medaka_consensus -i ${read} -d ${consensus} -o polished -t ${task.cpus} -m ${params.model}
@@ -27,10 +27,10 @@ process pilon {
     label 'pilon'
     publishDir "${params.output}/${name}/flye_assembly/", mode: 'copy', pattern: "polished_assembly.fasta" 
     input:
-        set val(name), file(assembly), file(ill_read)
+        tuple val(name), file(assembly), file(ill_read)
         val(iteration)
     output:
-        set val(name) , file("polished_assembly.fasta")
+        tuple val(name) , file("polished_assembly.fasta")
     shell:
     """
     mem=\$(echo !{task.memory} | sed 's/ GB//g')

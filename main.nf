@@ -96,7 +96,7 @@ def helpMSG() {
     """
 }
 
-if( !nextflow.version.matches('19.+') ) {
+if( !nextflow.version.matches('20.+') ) {
     println "This workflow requires Nextflow version 19.07 or greater and under version 20 -- You are running version $nextflow.version"
     exit 1
 }
@@ -145,29 +145,29 @@ workflow { //start of the workflow
         // sourmash_db
         if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) } //use the path to the sourmash DB
         else {
-            include './modules/sourmashgetdatabase'
+            include sourmash_download_db from './modules/sourmashgetdatabase'
             sourmash_download_db() 
             database_sourmash = sourmash_download_db.out
         }   
         // checkm_db
-        if (workflow.profile == 'conda') { // when using conda checkm needs to be set up first before any use
+        if (workflow.profile == 'local_conda' | workflow.profile == 'slurm_conda' ) { // when using conda checkm needs to be set up first before any use
             if (params.checkm_db) { // this one set in the env the path to checkm db uncompressed
-                include './modules/checkmsetupDB'
+                include checkm_setup_db from './modules/checkmsetupDB'
                 untar = true
                 checkm_setup_db(params.checkm_db, untar)
                 checkm_db_path = checkm_setup_db.out
             }
 
             else if (params.checkm_tar_db) { // untar the checkm db before setting up
-                include './modules/checkmsetupDB'
+                include checkm_setup_db from './modules/checkmsetupDB'
                 untar = false
                 checkm_setup_db(params.checkm_db, untar)
                 checkm_db_path = checkm_setup_db.out
             }
 
             else { // DLL the check db , untar then setup
-                include './modules/checkmsetupDB'
-                include './modules/checkmgetdatabases'
+                include checkm_setup_db from './modules/checkmsetupDB'
+                include checkm_download_db from './modules/checkmgetdatabases'
                 untar = false
                 checkm_setup_db(checkm_download_db(), untar)
                 checkm_db_path = checkm_setup_db.out
@@ -192,14 +192,14 @@ workflow { //start of the workflow
             else {
                 merging_ch = discard_short.out.groupTuple() 
             }
-            include merge from './modules/ont_qc' params(out_qc : params.out_qc, output : params.output)
+            include merge from './modules/ont_qc' params(output : params.output)
             merge(merging_ch)  // merge the splitted fastq
             ont_input_ch = merge.out
         }
             // QC check Illumina
         if (params.skip_ill_qc==true) {}
         else if (params.skip_ill_qc==false) {
-            include fastp from './modules/fastp' params(out_qc : params.out_qc, output : params.output) // simple QC done by fastp
+            include fastp from './modules/fastp' params(output : params.output) // simple QC done by fastp
             fastp(illumina_input_ch)
             illumina_input_ch = fastp.out
         }
@@ -210,7 +210,7 @@ workflow { //start of the workflow
             // Meta-SPADES
 
         if (params.assembler=="metaspades") { // hybrid and metagenomic assembly by spades
-            include './modules/spades' params(assembly : params.assembly, output : params.output)
+            include spades from './modules/spades' params(output : params.output)
             spades_ch= illumina_input_ch.join(ont_input_ch)
             spades(spades_ch)
             assembly_ch = spades.out
@@ -220,11 +220,11 @@ workflow { //start of the workflow
 
         if (params.assembler=="metaflye") { // metagenomic assembly by flye + hybrid polishing (combo racon; medaka; pilon with short reads)
             include sourmash_genome_size from './modules/sourmash'
-            include './modules/flye' params(assembly : params.assembly, output : params.output)
+            include flye from './modules/flye' params(output : params.output)
             include minimap_polish from'./modules/minimap2'
             include racon from './modules/polish'
             include medaka from './modules/polish' params(model : params.model)
-            include pilon from './modules/polish' params(assembly : params.assembly, output : params.output)
+            include pilon from './modules/polish' params(output : params.output)
             // FLYE + Pilon 
             flye(sourmash_genome_size(ont_input_ch,database_sourmash))
             flye_to_map = flye.out.join(ont_input_ch)
@@ -276,13 +276,13 @@ workflow { //start of the workflow
         if (params.skip_metabat2==true) {}
         else {
             if (params.extra_ont != false || params.extra_ill != false ) { // check if differential coverage binning possible
-                include metabat2_extra from './modules/metabat2' params(out_metabat : params.out_metabat, output : params.output)
+                include metabat2_extra from './modules/metabat2' params(output : params.output)
                 metabat2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
                 metabat2_extra(metabat2_ch, extra_bam)
                 metabat2_out = metabat2_extra.out
             }
             else {    
-                include metabat2 from './modules/metabat2' params(out_metabat : params.out_metabat, output : params.output)
+                include metabat2 from './modules/metabat2' params(output : params.output)
                 metabat2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
                 metabat2(metabat2_ch)
                 metabat2_out = metabat2.out
@@ -293,7 +293,7 @@ workflow { //start of the workflow
 
         if (params.skip_maxbin2==true) {}
         else {
-            include './modules/maxbin2' params(out_maxbin : params.out_maxbin, output : params.output)
+            include maxbin2 from './modules/maxbin2' params(output : params.output)
             maxbin2_ch = assembly_ch.join(ont_input_ch).join(illumina_input_ch)
             maxbin2(maxbin2_ch)
             maxbin2_out = maxbin2.out
@@ -304,13 +304,13 @@ workflow { //start of the workflow
         if (params.skip_concoct==true) {}
         else {
             if (params.extra_ont != false || params.extra_ill != false ) { // check if differential coverage binning possible
-                include concoct_extra from './modules/concoct' params(out_concoct : params.out_concoct, output : params.output)
+                include concoct_extra from './modules/concoct' params(output : params.output)
                 concoct_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
                 concoct_extra(concoct_ch, extra_bam)
                 concoct_out = concoct_extra.out
             }
             else {
-                include concoct from './modules/concoct' params(out_concoct : params.out_concoct, output : params.output)
+                include concoct from './modules/concoct' params(output : params.output)
                 concoct_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
                 concoct(concoct_ch)
                 concoct_out = concoct.out
@@ -322,10 +322,11 @@ workflow { //start of the workflow
         if (params.skip_metabat2==true) {
             if (  params.skip_maxbin2==true || params.skip_concoct==true) {} // no refine if 1 or less binning method used
             else {
-                include refine2 from './modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
+                include refine2 from './modules/metawrap_refine_bin' params(output : params.output)
                 refine2_ch = maxbin2_out.join(concoct_out)
                 refine2(refine2_ch, checkm_db_path) // use 2 binning method to refine
-                final_bin_ch = refine2.out[0].transpose() // the transpose is used to "split" the channel in a channel with each bin file individually
+                reassembly_ch = refine2.out[0]
+                metawrap_out_ch = refine2.out[0].transpose() // the transpose is used to "split" the channel in a channel with each bin file individually
                 // e.g without: ch:[ID,[bin1.fa,bin2.fa,bin3.fa]] with : ch:[[ID,bin1.fa],[ID,bin2.fa],[ID,bin3.fa]]
                 // this format is needed for further step
             }
@@ -334,10 +335,11 @@ workflow { //start of the workflow
         else if (params.skip_maxbin2==true) {
             if (  params.skip_metabat2==true || params.skip_concoct==true) {} // no refine if 1 or less binning method used
             else {
-                include refine2 from './modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
+                include refine2 from './modules/metawrap_refine_bin' params(output : params.output)
                 refine2_ch = metabat2_out.join(concoct_out)
                 refine2(refine2_ch, checkm_db_path) // use 2 binning method to refine
-                final_bin_ch = refine2.out[0].transpose() // the transpose is used to "split" the channel in a channel with each bin file individually
+                reassembly_ch = refine2.out[0]
+                metawrap_out_ch = refine2.out[0].transpose() // the transpose is used to "split" the channel in a channel with each bin file individually
                 // e.g without: ch:[ID,[bin1.fa,bin2.fa,bin3.fa]] with : ch:[[ID,bin1.fa],[ID,bin2.fa],[ID,bin3.fa]]
                 // this format is needed for further step
             }
@@ -346,17 +348,18 @@ workflow { //start of the workflow
         else if (params.skip_concoct==true) {
             if (  params.skip_metabat2==true || params.skip_maxbin2==true) {} // no refine if 1 or less binning method used
             else {
-                include refine2 from './modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
+                include refine2 from './modules/metawrap_refine_bin' params(output : params.output)
                 refine2_ch = metabat2_out.join(maxbin2_out)
                 refine2(refine2_ch, checkm_db_path) // use 2 binning method to refine
-                final_bin_ch = refine2.out[0].transpose() // the transpose is used to "split" the channel in a channel with each bin file individually
+                reassembly_ch = refine2.out[0]
+                metawrap_out_ch = refine2.out[0].transpose() // the transpose is used to "split" the channel in a channel with each bin file individually
                 // e.g without: ch:[ID,[bin1.fa,bin2.fa,bin3.fa]] with : ch:[[ID,bin1.fa],[ID,bin2.fa],[ID,bin3.fa]]
                 // this format is needed for further step
             }
         }
 
         else {
-            include refine3 from './modules/metawrap_refine_bin' params(out_metawrap : params.out_metawrap, output : params.output)
+            include refine3 from './modules/metawrap_refine_bin' params(output : params.output)
             refine3_ch = metabat2_out.join(maxbin2_out).join(concoct_out)
             refine3(refine3_ch, checkm_db_path)
             reassembly_ch = refine3.out[0]
@@ -371,14 +374,14 @@ workflow { //start of the workflow
         if (params.reassembly) {
             // retrieve the ids of each bin contigs
 
-            include './modules/list_ids'
+            include contig_list from './modules/list_ids'
             contig_list(reassembly_ch) //retrieve the list of contigs present for each bin
             extract_reads_ch = contig_list.out.view()
 
         
             // bam align the reads to ALL OF THE CONTIGS 
 
-            include './modules/cat_all_bins'
+            include cat_all_bins from './modules/cat_all_bins'
             include bwa_bin from './modules/bwa'  
             include minimap2_bin from './modules/minimap2'
             cat_all_bins(reassembly_ch) // assemble all bins' contigs in one file for the mapping
@@ -392,7 +395,8 @@ workflow { //start of the workflow
 
             include reads_retrieval from './modules/seqtk_retrieve_reads'params(out_bin_reads: params.out_bin_reads, output : params.output)
             include unmapped_retrieve from './modules/seqtk_retrieve_reads'params(out_unmapped: params.out_unmapped, output : params.output)
-            include './modules/unicycler_reassemble_from_bin' params(output : params.output)
+            include unicycler './modules/unicycler_reassemble_from_bin' params(output : params.output)
+            include unicycler './modules/unicycler_reassemble_from_bin' params(output : params.output)
             retrieve_unmapped_ch = ill_map_all_bin.join( ont_map_all_bin).join(illumina_input_ch).join(ont_input_ch)
             unmapped_retrieve(retrieve_unmapped_ch) //retrieve the reads that didn't map to the contigs to output reads set that can be analysed again
             retrieve_reads_ch = extract_reads_ch.transpose().combine(ill_map_all_bin, by:0).combine( ont_map_all_bin, by:0).combine(illumina_input_ch, by:0).combine(ont_input_ch, by:0)
@@ -425,40 +429,40 @@ workflow { //start of the workflow
                 }
 
         else {classify_ch=final_bins_ch}
-
-        // sourmash_db
-        if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
-        else {
-            include './modules/sourmashgetdatabase'
-            sourmash_download_db() 
-            database_sourmash = sourmash_download_db.out
-        }   
-        // checkm_db
-        if (workflow.profile == 'conda') {
-            if (params.checkm_db) {
-                include './modules/checkmsetupDB'
-                untar = true
-                checkm_setup_db(params.checkm_db, untar)
-                checkm_db_path = checkm_setup_db.out
-            }
-
-            else if (params.checkm_tar_db) {
-                include './modules/checkmsetupDB'
-                untar = false
-                checkm_setup_db(params.checkm_db, untar)
-                checkm_db_path = checkm_setup_db.out
-            }
-
+        if (params.modular=="classify" | params.modular=="class-annot") {
+            // sourmash_db
+            if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
             else {
-                include './modules/checkmsetupDB'
-                include './modules/checkmgetdatabases'
-                untar = false
-                checkm_setup_db(checkm_download_db(), untar)
-                checkm_db_path = checkm_setup_db.out
-            }
-        }
-        else { checkm_db_path = Channel.from("/checkm_database").collectFile() { item -> [ "path.txt", item ]  } }
+                include sourmash_download_db from './modules/sourmashgetdatabase'
+                sourmash_download_db() 
+                database_sourmash = sourmash_download_db.out
+            }   
+            // checkm_db
+            if (workflow.profile == 'conda') {
+                if (params.checkm_db) {
+                    include checkm_setup_db from './modules/checkmsetupDB'
+                    untar = true
+                    checkm_setup_db(params.checkm_db, untar)
+                    checkm_db_path = checkm_setup_db.out
+                }
 
+                else if (params.checkm_tar_db) {
+                    include checkm_setup_db from './modules/checkmsetupDB'
+                    untar = false
+                    checkm_setup_db(params.checkm_db, untar)
+                    checkm_db_path = checkm_setup_db.out
+                }
+
+                else {
+                    include checkm_setup_db from './modules/checkmsetupDB'
+                    include checkm_download_db from './modules/checkmgetdatabases'
+                    untar = false
+                    checkm_setup_db(checkm_download_db(), untar)
+                    checkm_db_path = checkm_setup_db.out
+                }
+            }
+            else { checkm_db_path = Channel.from("/checkm_database").collectFile() { item -> [ "path.txt", item ]  } }
+        }
         //*************************
         // Bins classify workflow
         //*************************
@@ -507,7 +511,7 @@ workflow { //start of the workflow
         if (params.eggnog_db) {eggnog_db=Channel
                 .fromPath( params.eggnog_db, checkIfExists: true )}
         else {
-            include './modules/eggnog_get_databases'
+            include eggnog_download_db from './modules/eggnog_get_databases'
             eggnog_download_db()
             eggnog_db = eggnog_download_db.out
             } 

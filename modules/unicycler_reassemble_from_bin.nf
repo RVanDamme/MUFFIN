@@ -6,9 +6,9 @@ process unicycler {
     errorStrategy { task.exitStatus in 1..1 ? 'retry' : 'terminate'}
     maxRetries 3
     input:
-    set val(name), val(bin_name), file(illumina), file(ont)    
+    tuple val(name), val(bin_name), file(illumina), file(ont)    
     output:
-    set val(name), file("*.fa") optional true
+    tuple val(name), file("*.fa") optional true
     file("*.gfa") optional true
     shell:
     if (task.attempt == 1)

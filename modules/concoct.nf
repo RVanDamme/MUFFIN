@@ -1,10 +1,11 @@
 process concoct {
+    maxForks 1
     label 'concoct'
     publishDir "${params.output}/${name}/concoct_bins/", mode: 'copy', pattern: "fasta_bins"
     input:
-    set val(name), file(assembly), file(ont_bam), file(illumina_bam)
+    tuple val(name), file(assembly), file(ont_bam), file(illumina_bam)
     output:
-    set val(name), file("fasta_bins")
+    tuple val(name), file("fasta_bins")
     script:
     """
     mkdir concoct_out
@@ -22,13 +23,14 @@ process concoct {
 }
 
 process concoct_extra {
+    maxForks 1
     label 'concoct'
     publishDir "${params.output}/${name}/concoct_bins/", mode: 'copy', pattern: "fasta_bins"
     input:
-    set val(name), file(assembly), file(ont_bam), file(illumina_bam)
+    tuple val(name), file(assembly), file(ont_bam), file(illumina_bam)
     file(extra_bam)
     output:
-    set val(name), file("fasta_bins")
+    tuple val(name), file("fasta_bins")
     script:
     """
     mkdir concoct_out

@@ -231,7 +231,7 @@ def write_html_sample(dictgeneral, dict_global_sample, output,
             <li> Figure detail
             <ul>
                 <li>The Figures in the links: <ul> 
-                    <li>The orthologs present in the bins are in green</li>
+                    <li>The orthologs present in the bins are in <font color="#e7bcd4">▉▉</font></li>
             <li>Troubleshooting
             <ul>
                 <li>When the link of the pathway is not loading or not showing anything, it means that there is too much orthologs to show on the figure.
@@ -296,7 +296,7 @@ def write_html_sample(dictgeneral, dict_global_sample, output,
                 set_html= set()
                 for gene in set_total_gene:
                     set_html.add(gene)
-                list_html = "".join(set_html)
+                list_html = "/".join(set_html)
             except KeyError:
                 list_html = ""
             outfile.write(f"""
@@ -542,7 +542,7 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
                     set_html = set()
                     for gene in set_gene:
                         set_html.add(gene)
-                    list_html = "".join(set_html)
+                    list_html = "/".join(set_html)
                 outfile.write(f"""
                     <tr>
                     <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html}/default%3d%23e7bcd4">{pathway_name}</a></td>

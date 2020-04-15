@@ -1,10 +1,11 @@
 process maxbin2 {
+    maxForks 1
     label 'maxbin2'
     publishDir "${params.output}/${name}/maxbin2_bins/", mode: 'copy', pattern: "maxbin_bin" 
     input:
-    set val(name), file(assembly), file(ont), file(illumina)
+    tuple val(name), file(assembly), file(ont), file(illumina)
     output:
-    set val(name), file("maxbin_bin/")
+    tuple val(name), file("maxbin_bin/")
     shell:
     """
     run_MaxBin.pl -contig !{assembly}  -reads !{illumina[0]} -reads2 !{illumina[1]} -reads3 !{ont}  -out maxbin2 -thread !{task.cpus}

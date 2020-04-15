@@ -1,10 +1,10 @@
 process sourmash_genome_size {
     label 'sourmash' 
     input:
-    set val(name), file(ont)
+    tuple val(name), file(ont)
     file(json)
     output:
-    set val(name), file(ont), file('genome_size.txt')
+    tuple val(name), file(ont), file('genome_size.txt')
     shell:
     """
     echo "100M" >genome_size.txt
@@ -25,7 +25,7 @@ process sourmash_bins {
     label 'sourmash' 
     publishDir "${params.output}/${name}/sourmash/", mode: 'copy', pattern: "*.txt"
     input:
-    set val(name), file(bins)
+    tuple val(name), file(bins)
     file(json)
     output:
     file('*.txt')

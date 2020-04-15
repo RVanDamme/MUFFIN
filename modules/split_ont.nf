@@ -1,7 +1,7 @@
 process split_ont {
     label 'ubuntu'
     input:
-        set val(name), file(ont)
+        tuple val(name), file(ont)
     output:
     val(name), file("part0.fastq")    emit:   ont_1
     val(name), file("part1.fastq")    emit:   ont_2
