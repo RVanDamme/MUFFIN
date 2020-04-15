@@ -33,7 +33,7 @@ process pilon {
         tuple val(name) , file("polished_assembly.fasta")
     shell:
     """
-    mem=\$(echo !{task.memory} | sed 's/ GB//g')
+    mem=\$(echo !{task.memory} | sed 's/g//g')
     assemb="!{assembly}"
     for ite in {1..!{iteration}}
     do

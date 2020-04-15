@@ -12,7 +12,7 @@ process refine2 {
     file("${name}_binning_stats.txt")
     shell:
     """
-    mem=\$(echo !{task.memory} | sed 's/ GB//g')
+    mem=\$(echo !{task.memory} | sed 's/g//g')
     path_db=\$(cat !{path})
     echo \$path_db
     echo -e "\$path_db" | checkm data setRoot
@@ -38,7 +38,7 @@ process refine3 {
     file("${name}_binning_stats.txt")
     shell:
     """
-    mem=\$(echo !{task.memory} | sed 's/ GB//g')
+    mem=\$(echo !{task.memory} | sed 's/g//g')
     path_db=\$(cat !{path})
     echo \$path_db
     echo -e "\$path_db" | checkm data setRoot

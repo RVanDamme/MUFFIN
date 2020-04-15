@@ -9,7 +9,7 @@ process de_novo_transcript_and_quant {
     tuple val(name), file("*_transcript.fasta"), file("*_transcript_quant.sf")
     shell:
     """
-    mem=\$(echo "!{task.memory}" | sed 's/ GB/G/g')
+    mem=\$(echo "!{task.memory}" | sed 's/g/G/g')
     echo \$mem
     Trinity --seqType fq --max_memory 20G --CPU !{task.cpus} --left !{rna[0]} --right !{rna[1]}
     cp trinity_out_dir/Trinity.fasta !{name}_transcript.fasta
