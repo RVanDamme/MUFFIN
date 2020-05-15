@@ -9,6 +9,8 @@ process sourmash_download_db {
       script:
         """
         #wget https://ndownloader.figshare.com/files/18809423?private_link=ed98a281ef089c033352 -O gtdb.lca.json
-        wget https://osf.io/4f8n3/download -O genbank-k31.lca.json.gz
+        wget https://osf.io/4f8n3/download -O genbank-k31.lca.json.gz 
         """
     }
+
+    The link use from osf.io require sourmash V3 (sourmash V3.3.0 is working))
