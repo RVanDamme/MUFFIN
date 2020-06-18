@@ -3,8 +3,8 @@ process unicycler {
     label 'unicycler'
     publishDir "${params.output}/${name}/unicycler_assembly/", mode: 'copy', pattern: "*.fa"
     publishDir "${params.output}/${name}/unicycler_assembly/", mode: 'copy', pattern: "*.gfa"
-    errorStrategy { task.exitStatus in 1..1 ? 'retry' : 'terminate'}
-    maxRetries 3
+    errorStrategy { task.exitStatus in 1..1 ? 'retry' : 'finish'}
+    maxRetries 4
     input:
     tuple val(name), val(bin_name), file(illumina), file(ont)    
     output:
@@ -18,24 +18,27 @@ process unicycler {
     mv output/assembly.fasta ${bin_name}".fa"
     mv output/assembly.gfa ${bin_name}".gfa"
     """
-    if (task.attempt == 2)
+    else if (task.attempt == 2)
     """
     mkdir spades_tmp
     unicycler -1 ${illumina[0]} -2 ${illumina[1]} -l ${ont} -o output -t ${task.cpus} --keep 0 --no_pilon --spades_tmp_dir spades_tmp --max_kmer_frac 0.85
     mv output/assembly.fasta ${bin_name}".fa"
     mv output/assembly.gfa ${bin_name}".gfa"
     """
-    if (task.attempt == 3)
+    else if (task.attempt == 3)
     """
     mkdir spades_tmp
     unicycler -1 ${illumina[0]} -2 ${illumina[1]} -l ${ont} -o output -t ${task.cpus} --keep 0 --no_pilon --spades_tmp_dir spades_tmp --max_kmer_frac 0.70
     mv output/assembly.fasta ${bin_name}".fa"
     mv output/assembly.gfa ${bin_name}".gfa"
     """
-    if (task.attempt == 4)
+    else if (task.attempt == 4)
     """
     mkdir spades_tmp
     unicycler -1 ${illumina[0]} -2 ${illumina[1]} -l ${ont} -o output -t ${task.cpus} --keep 0 --no_pilon --spades_tmp_dir spades_tmp --max_kmer_frac 0.50
     mv output/assembly.fasta ${bin_name}".fa"
     mv output/assembly.gfa ${bin_name}".gfa"
     """
+    else
+    error "Unicycler was unable to process your data please restart MUFFIN without Unicycler activated"
+}

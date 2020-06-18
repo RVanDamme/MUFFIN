@@ -20,9 +20,9 @@ process minimap_polish {
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
-    set val(name), file(assembly), file(ont)
+    tuple val(name), file(assembly), file(ont)
     output:
-    set val(name) , file("ont.sam")
+    tuple val(name) , file("ont.sam")
     script:
     """
     minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
@@ -34,9 +34,9 @@ process extra_minimap2 {
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
-    set val(name), file(assembly), file(ont)
+    tuple val(name), file(assembly), file(ont)
     output:
-    set val(name) , file("*_sorted.bam")
+    tuple val(name) , file("*_sorted.bam")
     script:
     """
     minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
