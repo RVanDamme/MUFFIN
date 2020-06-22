@@ -159,18 +159,20 @@ workflow { //start of the workflow
         include cat_all_bins from './modules/cat_all_bins'
         include bwa_bin from './modules/bwa'  
         include minimap2_bin from './modules/minimap2'
-        include reads_retrieval from './modules/seqtk_retrieve_reads'params(out_bin_reads: params.out_bin_reads, output : params.output)
-        include unmapped_retrieve from './modules/seqtk_retrieve_reads'params(out_unmapped: params.out_unmapped, output : params.output)
+        include reads_retrieval from './modules/seqtk_retrieve_reads' params(output : params.output)
+        include unmapped_retrieve from './modules/seqtk_retrieve_reads' params(output : params.output)
         include unicycler './modules/unicycler_reassemble_from_bin' params(output : params.output)
     }
     //module for classify
     if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot") {
-        include sourmash_download_db from './modules/sourmashgetdatabase'
-        include checkm_setup_db from './modules/checkmsetupDB'
-        include checkm_download_db from './modules/checkmgetdatabases'
         include checkm from './modules/checkm'params(output : params.output)
         include sourmash_bins from './modules/sourmash'params(output : params.output)
         include sourmash_checkm_parser from './modules/checkm_sourmash_parser'params(output: params.output)
+    }
+    if (params.modular=="classify" | params.modular=="class-annot") {
+        include sourmash_download_db from './modules/sourmashgetdatabase'
+        include checkm_setup_db from './modules/checkmsetupDB'
+        include checkm_download_db from './modules/checkmgetdatabases'
     }
     //module for annotate
     if (params.modular=="full" | params.modular=="annotate" | params.modular=="assem-annot" | params.modular=="class-annot") {
