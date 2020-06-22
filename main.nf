@@ -161,7 +161,7 @@ workflow { //start of the workflow
         include minimap2_bin from './modules/minimap2'
         include reads_retrieval from './modules/seqtk_retrieve_reads' params(output : params.output)
         include unmapped_retrieve from './modules/seqtk_retrieve_reads' params(output : params.output)
-        include unicycler './modules/unicycler_reassemble_from_bin' params(output : params.output)
+        //include unicycler './modules/unicycler_reassemble_from_bin' params(output : params.output)
     }
     //module for classify
     if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot") {
