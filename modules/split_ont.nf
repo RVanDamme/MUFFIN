@@ -9,9 +9,9 @@ process split_ont {
     val(name), file("part3.fastq")    emit:   ont_4
     script:
     """
-    total_line=$(wc -l !{ont} | cut -d ' ' -f 1)
+    total_line=$(wc -l ${ont} | cut -d ' ' -f 1)
     line_per_file=$((\$total_line/4))
-    split -d -a 1 -l \$line_per_file !{ont} part
+    split -d -a 1 -l \$line_per_file ${ont} part
     for part in part*; do mv \$part \$part".fastq"; done
     """
 

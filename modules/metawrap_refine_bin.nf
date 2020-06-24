@@ -12,12 +12,12 @@ process refine2 {
     file("${name}_binning_stats.txt")
     shell:
     """
-    mem=\$(echo !{task.memory} | sed 's/g//g')
-    path_db=\$(cat !{path})
+    mem=\$(echo ${task.memory} | sed 's/g//g')
+    path_db=\$(cat ${path})
     echo \$path_db
     echo -e "\$path_db" | checkm data setRoot
     echo "checkm done"
-    metawrap bin_refinement -t !{task.cpus} -m \$mem -o refined_bins -A !{bins1} -B !{bins2} -o refined_bins
+    metawrap bin_refinement -t ${task.cpus} -m \$mem -o refined_bins -A ${bins1} -B ${bins2} -o refined_bins
     mkdir metawrap_bins/
     mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
     mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
@@ -41,27 +41,27 @@ process refine3 {
     shell:
     if (task.attempt == 1)
     """
-    mem=\$(echo !{task.memory} | sed 's/g//g')
-    path_db=\$(cat !{path})
+    mem=\$(echo ${task.memory} | sed 's/g//g')
+    path_db=\$(cat ${path})
     echo \$path_db
     echo -e "\$path_db" | checkm data setRoot
     echo "checkm done"
-    metawrap bin_refinement -o refined_bins -A !{bins2} -B !{bins3} -C !{bins1} -t !{task.cpus} -m \$mem 
+    metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins3} -C ${bins1} -t ${task.cpus} -m \$mem 
     mkdir metawrap_bins/
     mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
-    mv refined_bins/metawrap_70_10_bins.stats !{name}_binning_stats.txt
+    mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
     """
     else if (task.attempt == 2)
     """
-    mem=\$(echo !{task.memory} | sed 's/g//g')
-    path_db=\$(cat !{path})
+    mem=\$(echo ${task.memory} | sed 's/g//g')
+    path_db=\$(cat ${path})
     echo \$path_db
     echo -e "\$path_db" | checkm data setRoot
     echo "checkm done"
-    metawrap bin_refinement -o refined_bins -A !{bins2} -B !{bins1} -t !{task.cpus} -m \$mem 
+    metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins1} -t ${task.cpus} -m \$mem 
     mkdir metawrap_bins/
     mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
-    mv refined_bins/metawrap_70_10_bins.stats !{name}_binning_stats.txt
+    mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
     """
     else 
     error "please pick the bins you want and submit them in the classification step then select the bins for the annotation step"

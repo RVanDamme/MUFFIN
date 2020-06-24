@@ -8,8 +8,10 @@ process spades {
     
     script:
     """
-    mem=\$(echo !{task.memory} | sed 's/g//g')
-    spades.py -1 !{illumina[0]} -2 !{illumina[1]}  --meta --nanopore !{ont} -o spades_output -t !{task.cpus} -m \$mem
+    mem=\$(echo ${task.memory} |sed 's/ GB//g' | sed 's/g//g')
+    cpus=\$(echo ${task.cpus})
+    echo \$cpus \$mem
+    spades.py -1 ${illumina[0]} -2 ${illumina[1]}  --meta --nanopore ${ont} -o spades_output -t \$cpus -m \$mem
     mv spades_output/contigs.fasta  assembly.fasta
     """
 

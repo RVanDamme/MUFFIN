@@ -593,7 +593,7 @@ workflow { //start of the workflow
 } // end of workflow{}
 
 workflow.onComplete { 
-  log.info ( workflow.success ? "\nDone! Results are stored here --> $params.output \n" : "Oops .. something went wrong" )  }
+  log.info ( workflow.success ? "\nDone! Results are stored here --> $params.output \n The Readme file in $params.output describe the structure of the results directories. \n" : "Oops .. something went wrong" )  }
 //***********
 // MAFIN DONE
 //***********

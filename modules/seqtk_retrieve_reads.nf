@@ -8,24 +8,24 @@ process reads_retrieval {
     shell:
     // first I extract the reads that NEED TO REDO IT WITH FRESH MIND (include BWA.nf)
     """
-    bin=\$(basename -s .fa.contigs.list !{contig_list})
-    list=\$(cat !{contig_list} | tr "\\n" " " ) 
+    bin=\$(basename -s .fa.contigs.list ${contig_list})
+    list=\$(cat ${contig_list} | tr "\\n" " " ) 
 
     
     ## illumina mapped reads retrieval
-    samtools index -@ !{task.cpus} !{ill_bam}
-    samtools view -bh !{ill_bam} \$list > illumina_contigs.bam  
+    samtools index -@ ${task.cpus} ${ill_bam}
+    samtools view -bh ${ill_bam} \$list > illumina_contigs.bam  
     samtools view -F4 illumina_contigs.bam > illumina_mapped_contigs.sam
     cut -f1 illumina_mapped_contigs.sam | sort | uniq > \$bin"_illumina_mapped.list"
-    seqtk subseq !{ill_reads[0]} \$bin"_illumina_mapped.list" > \$bin"_illumina_R1.fastq"
-    seqtk subseq !{ill_reads[1]} \$bin"_illumina_mapped.list" > \$bin"_illumina_R2.fastq"
+    seqtk subseq ${ill_reads[0]} \$bin"_illumina_mapped.list" > \$bin"_illumina_R1.fastq"
+    seqtk subseq ${ill_reads[1]} \$bin"_illumina_mapped.list" > \$bin"_illumina_R2.fastq"
 
     ## ONT mapped reads retrieval
-    samtools index -@ !{task.cpus} !{ont_bam}
-    samtools view -bh !{ont_bam} \$list > ont_contigs.bam  
+    samtools index -@ ${task.cpus} ${ont_bam}
+    samtools view -bh ${ont_bam} \$list > ont_contigs.bam  
     samtools view -F4 ont_contigs.bam > ont_mapped_contigs.sam
     cut -f1 ont_mapped_contigs.sam | sort | uniq > \$bin"_ont_mapped.list"
-    seqtk subseq !{ont_reads} \$bin"_ont_mapped.list" > \$bin"_ont.fastq"
+    seqtk subseq ${ont_reads} \$bin"_ont_mapped.list" > \$bin"_ont.fastq"
 
     rm illumina_contigs.bam
     rm illumina_mapped_contigs.sam
@@ -51,15 +51,15 @@ process unmapped_retrieve {
     shell:
     """
     ## illumina unmapped reads retrieval
-    samtools view -f4 !{ill_bam} > illumina_unmapped_contigs.sam
+    samtools view -f4 ${ill_bam} > illumina_unmapped_contigs.sam
     cut -f1 illumina_unmapped_contigs.sam | sort | uniq > illumina_unmapped.list
-    seqtk subseq !{ill_reads[0]} illumina_unmapped.list > unmapped_ILL_R1.fastq
-    seqtk subseq !{ill_reads[1]} illumina_unmapped.list > unmapped_ILL_R2.fastq
+    seqtk subseq ${ill_reads[0]} illumina_unmapped.list > unmapped_ILL_R1.fastq
+    seqtk subseq ${ill_reads[1]} illumina_unmapped.list > unmapped_ILL_R2.fastq
 
     ## ONT unmapped reads retrieval
-    samtools view -f4 !{ont_bam} > ont_unmapped_contigs.sam
+    samtools view -f4 ${ont_bam} > ont_unmapped_contigs.sam
     cut -f1 ont_unmapped_contigs.sam | sort | uniq > ont_unmapped.list
-    seqtk subseq !{ont_reads} ont_unmapped.list > unmapped_ONT.fastq
+    seqtk subseq ${ont_reads} ont_unmapped.list > unmapped_ONT.fastq
 
     rm illumina_unmapped_contigs.sam
     rm illumina_unmapped.list
