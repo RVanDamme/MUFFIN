@@ -178,7 +178,7 @@ def write_html_sample(dict_global_sample, output,
                       globalpathwaylist, binnamelist, rna_pathway_list,
                       dictrna):
 
-    out = output+"/MAFIN_sample_result.html"
+    out = output+"/MUFFIN_sample_result.html"
     outfile = open(out, "w")
 
     outfile.write("""
@@ -186,7 +186,7 @@ def write_html_sample(dict_global_sample, output,
     <html lang="en-US">
     <head>
         <meta charset="utf-8">
-        <title>MAFIN Sample result</title>
+        <title>MUFFIN Sample result</title>
         <meta name="author" content="Renaud Van Damme">
     </head>"""
                   )
@@ -204,7 +204,7 @@ def write_html_sample(dict_global_sample, output,
         <li>Total number of unique pathways in bins: {num_path}</li>
         <li>Total number of unique pathways in RNA: {num_path_rna}</li>
         <li>This file contains only the eggNOG annotation that have a kegg pathway id, for further research please look at the annotations.tsv files</li>
-        <li>This result file was produced by <a href="https://github.com/RVanDamme/MAFIN">MAFIN</a> </li>
+        <li>This result file was produced by <a href="https://github.com/RVanDamme/MUFFIN">MUFFIN</a> </li>
     </ul>
     </h2>
     </div>
@@ -499,7 +499,7 @@ def write_html_bins(dict_global_bin, output,
                     globalpathwaylist, rna_pathway_list,
                     dictrna):
     for bin_html in dict_global_bin.keys():
-        out = output+"/MAFIN_"+bin_html+"_result.html"
+        out = output+"/MUFFIN_"+bin_html+"_result.html"
         outfile = open(out, "w")
 
         outfile.write(f"""
@@ -507,7 +507,7 @@ def write_html_bins(dict_global_bin, output,
         <html lang="en-US">
         <head>
             <meta charset="utf-8">
-            <title>MAFIN {bin_html} result</title>
+            <title>MUFFIN {bin_html} result</title>
             <meta name="author" content="Renaud Van Damme">
         </head>"""
                       )
@@ -525,12 +525,13 @@ def write_html_bins(dict_global_bin, output,
             <li>Total number of unique pathways in all bins: {num_path}</li>
             <li>Total number of unique pathways in RNA: {num_path_rna}</li>
             <li>This file contains only the eggNOG annotation that have a kegg pathway id, for further research please look at the annotations.tsv files</li>
-            <li>This result file was produced by <a href="https://github.com/RVanDamme/MAFIN">MAFIN</a> </li>
+            <li>This result file was produced by <a href="https://github.com/RVanDamme/MUFFIN">MUFFIN</a> </li>
         </ul>
         </h2>
         </div>
         """
         )
+
 
         outfile.write("""
                   <style type="text/css">
