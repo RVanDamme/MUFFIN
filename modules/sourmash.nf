@@ -4,7 +4,7 @@ process sourmash_genome_size {
     tuple val(name), file(ont)
     file(json)
     output:
-    tuple val(name), file(ont), file('genome_size.txt')
+    tuple val(name), file(ont), path('genome_size.txt')
     shell:
     """
     echo "100M" >genome_size.txt
