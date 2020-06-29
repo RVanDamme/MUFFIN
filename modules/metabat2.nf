@@ -1,7 +1,7 @@
 process metabat2 {
     maxForks 1
     label 'metabat2'
-    publishDir "${params.output}/${name}/metabat2_bins/", mode: 'copy', pattern: "bins_dir"
+    publishDir "${params.output}/${name}/assemble/binning/metabat2/", mode: 'copy', pattern: "bins_dir"
     input:
     tuple val(name), file(assembly), file(ont_bam), file(illumina_bam)
     output:
@@ -16,7 +16,7 @@ process metabat2 {
 process metabat2_extra {
     maxForks 1
     label 'metabat2'
-    publishDir "${params.output}/${name}/metabat2_bins/", mode: 'copy', pattern: "bins_dir" 
+    publishDir "${params.output}/${name}/assemble/binning/metabat2/", mode: 'copy', pattern: "bins_dir" 
     input:
     tuple val(name), file(assembly), file(ont_bam), file(illumina_bam)
     file(extra_bam)

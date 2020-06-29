@@ -1,6 +1,6 @@
 process reads_retrieval {
     label 'seqtk'
-    publishDir "${params.output}/${name}/reads_mapped_to_metawrap_bins/", mode: 'copy', pattern: "*.fastq"
+    publishDir "${params.output}/${name}/assembled/reassembly/mapped_reads/", mode: 'copy', pattern: "*.fastq"
     input:
     tuple val(name), file(contig_list), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
     output:
@@ -43,7 +43,7 @@ process reads_retrieval {
 
 process unmapped_retrieve {
     label 'seqtk'
-    publishDir "${params.output}/${name}/reads_unmapped_to_metawrap_bins/", mode: 'copy', pattern: "*unmapped_*.fastq"
+    publishDir "${params.output}/${name}/assembled/reassembly/unmapped_reads/", mode: 'copy', pattern: "*unmapped_*.fastq"
     input:
     tuple val(name), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
     output:

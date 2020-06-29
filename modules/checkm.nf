@@ -1,10 +1,10 @@
 process checkm {
     maxForks 1
     label 'checkm'
-    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "summary.txt"
-    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "taxonomy.txt"
-    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "*_checkm"
-    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "*_checkm_plot"
+    publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "summary.txt"
+    publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "taxonomy.txt"
+    publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "*_checkm"
+    publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "*_checkm_plot"
     input:
     tuple val(name), file(bins_assemblies)
     output:

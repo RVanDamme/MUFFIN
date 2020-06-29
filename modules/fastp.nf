@@ -1,6 +1,6 @@
 process fastp {
     label 'fastp'
-    publishDir "${params.output}/${name}/illumina_qc_out/", mode: 'copy', pattern: "*_R*_clean.fastq"
+    publishDir "${params.output}/${name}/assemble/quality_control/illumina/", mode: 'copy', pattern: "*_R*_clean.fastq"
     input:
     tuple val(name), file(illumina)
     output:
@@ -13,7 +13,7 @@ process fastp {
 
 process fastp_rna {
     label 'fastp'
-    publishDir "${params.output}/${name}/rna_qc_out/", mode: 'copy', pattern: "*_R*_clean.fastq"
+    publishDir "${params.output}/${name}/annotate/rna_quality_control/", mode: 'copy', pattern: "*_R*_clean.fastq"
     input:
     tuple val(name), file(illumina)
     output:

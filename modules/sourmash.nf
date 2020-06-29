@@ -23,7 +23,7 @@ process sourmash_genome_size {
 
 process sourmash_bins {
     label 'sourmash' 
-    publishDir "${params.output}/${name}/sourmash/", mode: 'copy', pattern: "*.txt"
+    publishDir "${params.output}/${name}/classify/sourmash/", mode: 'copy', pattern: "*.txt"
     input:
     tuple val(name), file(bins)
     file(json)

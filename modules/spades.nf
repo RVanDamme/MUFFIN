@@ -1,6 +1,6 @@
 process spades {
     label 'spades'
-    publishDir "${params.output}/${name}/spades_assembly/", mode: 'copy', pattern: "assembly.fasta" 
+    publishDir "${params.output}/${name}/assemble/assembly/spades/", mode: 'copy', pattern: "assembly.fasta" 
     input:
     tuple val(name), file(illumina), file(ont)
     output:

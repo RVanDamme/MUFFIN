@@ -2,8 +2,8 @@ process refine2 {
     
     if (workflow.profile == 'conda') {conda '/home/renaud/miniconda3/envs/metawrap-env'}
     else {label 'metawrap'}
-    publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins" 
-    publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
+    publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins" 
+    publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
     input:
     tuple val(name1), file(bins1), file(bins2)
     file(path)
@@ -28,8 +28,8 @@ process refine2 {
 process refine3 {
     if (workflow.profile == 'conda') {conda '/home/renaud/miniconda3/envs/metawrap-env'}
     else {label 'metawrap'}
-    publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins" 
-    publishDir "${params.output}/${name}/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
+    publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins" 
+    publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
     errorStrategy { task.exitStatus in 1..1 ? 'retry' : 'finish'}
     maxRetries 2
     input:

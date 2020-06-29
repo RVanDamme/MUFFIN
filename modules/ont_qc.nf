@@ -28,7 +28,7 @@ process filtlong {
 
 process merge {
     label 'ubuntu'
-    publishDir "${params.output}/${name}/nanopore_qc_out/", mode: 'copy', pattern: "*_all.fastq" 
+    publishDir "${params.output}/${name}/assemble/quality_control/nanopore/", mode: 'copy', pattern: "*_all.fastq" 
     input:
     tuple val(name) , file(filtered)
     output:

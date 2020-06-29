@@ -25,7 +25,7 @@ process concoct {
 process concoct_extra {
     maxForks 1
     label 'concoct'
-    publishDir "${params.output}/${name}/concoct_bins/", mode: 'copy', pattern: "fasta_bins"
+    publishDir "${params.output}/${name}/assemble/binning/concoct/", mode: 'copy', pattern: "fasta_bins"
     input:
     tuple val(name), file(assembly), file(ont_bam), file(illumina_bam)
     file(extra_bam)

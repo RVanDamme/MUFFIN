@@ -1,7 +1,7 @@
 process sourmash_checkm_parser {
     //label 'python38'
     label 'ubuntu'
-    publishDir "${params.output}/${name}/", mode: 'copy', pattern: "classify_step_summary.csv"
+    publishDir "${params.output}/${name}/classify/", mode: 'copy', pattern: "classify_step_summary.csv"
     input:
     tuple val(name), file(checkm)
     file(sourmash)

@@ -25,7 +25,7 @@ process medaka {
 
 process pilon {
     label 'pilon'
-    publishDir "${params.output}/${name}/flye_assembly/", mode: 'copy', pattern: "polished_assembly.fasta" 
+    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "polished_assembly.fasta" 
     input:
         tuple val(name), file(assembly), file(ill_read)
         val(iteration)

@@ -1,6 +1,6 @@
 process parser_bin_RNA {
-    label 'python38'
-    publishDir "${params.output}/${name}/", mode: 'copy', pattern: "parser_result/*"
+    label 'ubuntu'
+    publishDir "${params.output}/${name}/annotate/", mode: 'copy', pattern: "parser_result/*"
     input:
         tuple val(name), file(rna_annot), file(quant)
         tuple val(name), file(bins_annot)
@@ -12,8 +12,8 @@ process parser_bin_RNA {
         """
     }
 process parser_bin {
-    label 'python38'
-    publishDir "${params.output}/${name}/", mode: 'copy', pattern: "parser_result/*"
+    label 'ubuntu'
+    publishDir "${params.output}/${name}/annotate/", mode: 'copy', pattern: "parser_result/*"
     input:
         tuple val(name), file(bins_annot)
     output:

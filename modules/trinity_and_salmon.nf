@@ -1,8 +1,8 @@
 process de_novo_transcript_and_quant {
     maxForks 1
     label 'trinity'
-    publishDir "${params.output}/${name}/de_novo_transcript/", mode: 'copy', pattern: "*_transcript.fasta"
-    publishDir "${params.output}/${name}/quant_of_transcript/", mode: 'copy', pattern: "*_transcript_quant.sf"
+    publishDir "${params.output}/${name}/annotate/de_novo_transcript/", mode: 'copy', pattern: "*_transcript.fasta"
+    publishDir "${params.output}/${name}/annotate/quant_of_transcript/", mode: 'copy', pattern: "*_transcript_quant.sf"
     input:
     tuple val(name), file(rna)
     output:

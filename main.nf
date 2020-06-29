@@ -184,6 +184,7 @@ workflow { //start of the workflow
         include parser_bin_RNA from './modules/parser'params(output: params.output)
         include parser_bin from './modules/parser'params(output: params.output)
     }
+    include readme_output from './modules/readme_output'params(output: params.output)
 
     //*************************************************
     // STEP 1 Assemble using hybrid method
@@ -589,6 +590,8 @@ workflow { //start of the workflow
         }
         // Share pathway to put and HTML file with
     } // end of step 3
+    
+    readme_output()
 
 } // end of workflow{}
 

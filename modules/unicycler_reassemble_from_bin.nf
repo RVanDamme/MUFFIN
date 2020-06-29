@@ -1,8 +1,8 @@
 process unicycler {
     maxForks 1
     label 'unicycler'
-    publishDir "${params.output}/${name}/unicycler_assembly/", mode: 'copy', pattern: "*.fa"
-    publishDir "${params.output}/${name}/unicycler_assembly/", mode: 'copy', pattern: "*.gfa"
+    publishDir "${params.output}/${name}/assemble/reassembly/unicycler_bins/", mode: 'copy', pattern: "*.fa"
+    publishDir "${params.output}/${name}/assemble/reassembly/unicycler_bins/", mode: 'copy', pattern: "*.gfa"
     errorStrategy { task.exitStatus in 1..1 ? 'retry' : 'finish'}
     maxRetries 4
     input:

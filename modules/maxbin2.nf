@@ -1,7 +1,7 @@
 process maxbin2 {
     maxForks 1
     label 'maxbin2'
-    publishDir "${params.output}/${name}/maxbin2_bins/", mode: 'copy', pattern: "maxbin_bin" 
+    publishDir "${params.output}/${name}/assemble/binning/maxbin2/", mode: 'copy', pattern: "maxbin_bin" 
     input:
     tuple val(name), file(assembly), file(ont), file(illumina)
     output:

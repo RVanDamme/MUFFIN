@@ -1,6 +1,6 @@
 process eggnog_bin { 
         label 'eggnog' 
-        publishDir "${params.output}/${name}/bin_annotated/", mode: 'copy', pattern: "*.tsv"
+        publishDir "${params.output}/${name}/annotate/bin_annotation/", mode: 'copy', pattern: "*.tsv"
       input:
         tuple val(name), file(bin), file(db)
       output:
@@ -17,7 +17,7 @@ process eggnog_bin {
 
 process eggnog_rna { 
         label 'eggnog' 
-        publishDir "${params.output}/${name}/rna_annotated/", mode: 'copy', pattern: "*.tsv"
+        publishDir "${params.output}/${name}/annotate/rna_annotation/", mode: 'copy', pattern: "*.tsv"
       input:
         tuple val(name), val(transcript), file(quant), file(db)
       output:
