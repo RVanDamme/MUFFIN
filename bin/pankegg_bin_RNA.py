@@ -675,6 +675,12 @@ def write_html_bins(dict_global_bin, output,
                 <li>In the figure you can have Green case that also contains orange.
             If the case is composed of multiple orthologs and some are in RNA and some only in the bins the case will be highlighted in green even tough it should be green and orange</li>
             </ul></li>
+            <li> Troubleshooting
+                <ul>
+                <li> When in the table an error message like this "ko00000 unknow by the KEGG DATABASE" appears it means that the ID given by the annotation software (eggNOG)
+                is not know by the KEGG database, this error is potentially due to version conflict between eggNOG and the KEGG database. 
+                </li></ul>
+            </li>
         </ol>
         </p></div>
         </div>
