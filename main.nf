@@ -196,33 +196,43 @@ workflow { //start of the workflow
 
         // stdout early usage (print header + default or modified params)
 
-        // DATA INPUT ILLUMINA
-        illumina_input_ch = Channel
-                .fromFilePairs( "${params.illumina}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
-                .view() 
-
-        // illumina_input_ch = Channel.fromFilePairs(reads_illumina).ifEmpty { error "Cannot find any Illumina reads in the directory: ${params.illumina} \n Delfault is ./illumina \n ${reads_illumina}" }.view()
-
-        // extra ill reads
-        if (params.extra_ill != false) {
-        extra_ill_ch=Channel.fromPath(params.extra_ill).splitCsv().map { row ->
-                    def path = file("${row[0]}")
-                    return path
-                }
+        // DATA INPUT TEST
+        if (workflow.profile.contains('test')) {
+            include test from './modules/test_data_dll'
+            test()
+            illumina_input_ch = test.out[0]
+            ont_input_ch = test.out[1]
+            rna_input_ch = test.out[2]
         }
 
-        // DATA INPUT ONT
-        ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}",checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
+        else {
+            // DATA INPUT ILLUMINA
+            illumina_input_ch = Channel
+                    .fromFilePairs( "${params.illumina}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
+                    .view() 
 
-        // extra ont reads
-        if (params.extra_ont != false) {
-        extra_ont_ch=Channel.fromPath(params.extra_ont).splitCsv().map { row ->
-                    def path = file("${row[0]}")
-                    return path
-                }
+            // illumina_input_ch = Channel.fromFilePairs(reads_illumina).ifEmpty { error "Cannot find any Illumina reads in the directory: ${params.illumina} \n Delfault is ./illumina \n ${reads_illumina}" }.view()
+
+            // extra ill reads
+            if (params.extra_ill != false) {
+            extra_ill_ch=Channel.fromPath(params.extra_ill).splitCsv().map { row ->
+                        def path = file("${row[0]}")
+                        return path
+                    }
+            }
+
+            // DATA INPUT ONT
+            ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}",checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
+
+            // extra ont reads
+            if (params.extra_ont != false) {
+            extra_ont_ch=Channel.fromPath(params.extra_ont).splitCsv().map { row ->
+                        def path = file("${row[0]}")
+                        return path
+                    }
+            }
+
         }
-
-
 
 
         // sourmash_db
@@ -520,13 +530,17 @@ workflow { //start of the workflow
             //**************
             // File handling
             //**************
-
-            //RNAseq
-            if (params.rna) {rna_input_ch = Channel
-                    .fromFilePairs( "${params.rna}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
-                    .view()
+            if (workflow.profile.contains('test')) {
+                params.rna = true
             }
 
+            else {
+            //RNAseq
+                if (params.rna) {rna_input_ch = Channel
+                        .fromFilePairs( "${params.rna}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
+                        .view()
+                }
+            }
             //bins (list with id (run id not bin) coma path/to/file)
             if (params.bin_annotate) {
                 bins_input_ch = Channel
