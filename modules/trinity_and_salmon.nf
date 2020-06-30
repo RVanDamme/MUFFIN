@@ -4,9 +4,9 @@ process de_novo_transcript_and_quant {
     publishDir "${params.output}/${name}/annotate/de_novo_transcript/", mode: 'copy', pattern: "*_transcript.fasta"
     publishDir "${params.output}/${name}/annotate/quant_of_transcript/", mode: 'copy', pattern: "*_transcript_quant.sf"
     input:
-    tuple val(name), file(rna)
+    tuple val(name), path(rna)
     output:
-    tuple val(name), file("*_transcript.fasta"), file("*_transcript_quant.sf")
+    tuple val(name), path("*_transcript.fasta"), path("*_transcript_quant.sf")
     shell:
     """
     mem=\$(echo "!{task.memory}" | sed 's/ GB/g/g' | sed 's/g/G/g')

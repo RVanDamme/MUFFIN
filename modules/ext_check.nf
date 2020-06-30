@@ -1,9 +1,9 @@
 process fasta_check { 
         label 'ubuntu'
       input:
-       tuple val(sample), val(bin_id), file(file)
+       tuple val(sample), val(bin_id), path(file)
       output:
-       tuple val(name), val(bin_id), file("${bin_id}.fa")
+       tuple val(name), val(bin_id), path("${bin_id}.fa")
       shell:
         """
        case "${file}" in

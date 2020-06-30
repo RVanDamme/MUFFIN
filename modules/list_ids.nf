@@ -1,9 +1,9 @@
 process contig_list {
     label 'ubuntu'
     input:
-    tuple val(name), file(bins)
+    tuple val(name), path(bins)
     output:
-    tuple val(name), file("*.contigs.list")
+    tuple val(name), path("*.contigs.list")
     shell:\
     """
     for bin in ${bins}/bin.*.fa

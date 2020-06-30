@@ -5,7 +5,7 @@ process eggnog_download_db {
         else { publishDir 'nextflow-autodownload-databases/eggnog', mode: 'copy', pattern: "eggnog-db" }
         label 'eggnog' 
       output:
-        file("eggnog-db")
+        path("eggnog-db")
       script:
         """
         mkdir eggnog-db

@@ -2,9 +2,9 @@ process spades {
     label 'spades'
     publishDir "${params.output}/${name}/assemble/assembly/spades/", mode: 'copy', pattern: "assembly.fasta" 
     input:
-    tuple val(name), file(illumina), file(ont)
+    tuple val(name), path(illumina), path(ont)
     output:
-    tuple val(name), file("assembly.fasta")
+    tuple val(name), path("assembly.fasta")
     
     script:
     """

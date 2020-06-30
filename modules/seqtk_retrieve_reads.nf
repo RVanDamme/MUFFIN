@@ -2,9 +2,9 @@ process reads_retrieval {
     label 'seqtk'
     publishDir "${params.output}/${name}/assembled/reassembly/mapped_reads/", mode: 'copy', pattern: "*.fastq"
     input:
-    tuple val(name), file(contig_list), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
+    tuple val(name), path(contig_list), path(ill_bam), path(ont_bam), path(ill_reads), path(ont_reads)
     output:
-    tuple val(name), val(file(file(file(contig_list).baseName).baseName).baseName), file("*_illumina_R{1,2}.fastq"), file("*_ont.fastq")
+    tuple val(name), val(file(file(file(contig_list).baseName).baseName).baseName), path("*_illumina_R{1,2}.fastq"), path("*_ont.fastq")
     shell:
     // first I extract the reads that NEED TO REDO IT WITH FRESH MIND (include BWA.nf)
     """
@@ -45,9 +45,9 @@ process unmapped_retrieve {
     label 'seqtk'
     publishDir "${params.output}/${name}/assembled/reassembly/unmapped_reads/", mode: 'copy', pattern: "*unmapped_*.fastq"
     input:
-    tuple val(name), file(ill_bam), file(ont_bam), file(ill_reads), file(ont_reads)
+    tuple val(name), path(ill_bam), path(ont_bam), path(ill_reads), path(ont_reads)
     output:
-    file("unmapped_*.fastq") optionnal true
+    path("unmapped_*.fastq") optionnal true
     shell:
     """
     ## illumina unmapped reads retrieval

@@ -3,9 +3,9 @@ process metabat2 {
     label 'metabat2'
     publishDir "${params.output}/${name}/assemble/binning/metabat2/", mode: 'copy', pattern: "bins_dir"
     input:
-    tuple val(name), file(assembly), file(ont_bam), file(illumina_bam)
+    tuple val(name), path(assembly), path(ont_bam), path(illumina_bam)
     output:
-    tuple val(name), file("bins_dir")
+    tuple val(name), path("bins_dir")
     script:
     """
     jgi_summarize_bam_contig_depths --outputDepth depth.txt *.bam
@@ -18,10 +18,10 @@ process metabat2_extra {
     label 'metabat2'
     publishDir "${params.output}/${name}/assemble/binning/metabat2/", mode: 'copy', pattern: "bins_dir" 
     input:
-    tuple val(name), file(assembly), file(ont_bam), file(illumina_bam)
-    file(extra_bam)
+    tuple val(name), path(assembly), path(ont_bam), path(illumina_bam)
+    path(extra_bam)
     output:
-    tuple val(name), file("bins_dir")
+    tuple val(name), path("bins_dir")
     script:
     """
     jgi_summarize_bam_contig_depths --outputDepth depth.txt *.bam

@@ -3,10 +3,10 @@ process sourmash_checkm_parser {
     label 'ubuntu'
     publishDir "${params.output}/${name}/classify/", mode: 'copy', pattern: "classify_step_summary.csv"
     input:
-    tuple val(name), file(checkm)
-    file(sourmash)
+    tuple val(name), path(checkm)
+    path(sourmash)
     output:
-    file("classify_step_summary.csv")
+    path("classify_step_summary.csv")
     shell:
     """
     grep -v "] INFO: " !{checkm} | grep -v "\\-\\-\\-\\-\\-\\-\\-" | grep -v "Bin Id" | sed -e 's/^[ \\t]*//'|sed 's/[ \\t]*\$//' |sed -r 's/ +/,/g'|sed '/^\$/d' >checkm.csv

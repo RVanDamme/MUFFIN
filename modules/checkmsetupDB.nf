@@ -4,7 +4,7 @@ process checkm_setup_db {
     val(db)
     val(untar)
     output:
-    file("path_db.txt")
+    path("path_db.txt")
     shell:
         """
         if [ !{untar} == true ] ;

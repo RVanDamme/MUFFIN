@@ -6,10 +6,10 @@ process checkm {
     publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "*_checkm"
     publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "*_checkm_plot"
     input:
-    tuple val(name), file(bins_assemblies)
+    tuple val(name), path(bins_assemblies)
     output:
-    tuple val(name), file("summary.txt")
-    tuple file("${name}_checkm"), file("${name}_checkm_plot"), file("taxonomy.txt")
+    tuple val(name), path("summary.txt")
+    tuple path("${name}_checkm"), path("${name}_checkm_plot"), path("taxonomy.txt")
     
     script:
     """

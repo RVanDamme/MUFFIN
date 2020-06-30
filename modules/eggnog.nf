@@ -2,10 +2,10 @@ process eggnog_bin {
         label 'eggnog' 
         publishDir "${params.output}/${name}/annotate/bin_annotation/", mode: 'copy', pattern: "*.tsv"
       input:
-        tuple val(name), file(bin), file(db)
+        tuple val(name), path(bin), path(db)
       output:
-        tuple val(name), file("*.annotations.tsv")
-        file("*.seed_orthologs.tsv")
+        tuple val(name), path("*.annotations.tsv")
+        path("*.seed_orthologs.tsv")
       shell:
         """
         bin_id=\$(basename !{bin} | sed -r "s/\\.\\w+//2")
@@ -19,10 +19,10 @@ process eggnog_rna {
         label 'eggnog' 
         publishDir "${params.output}/${name}/annotate/rna_annotation/", mode: 'copy', pattern: "*.tsv"
       input:
-        tuple val(name), val(transcript), file(quant), file(db)
+        tuple val(name), val(transcript), path(quant), path(db)
       output:
-        tuple val(name), file("*.annotations.tsv"), file(quant)
-        file("*.seed_orthologs.tsv")
+        tuple val(name), path("*.annotations.tsv"), path(quant)
+        path("*.seed_orthologs.tsv")
       shell:
         """
         emapper.py --data_dir ${db} -d bact -o ${name}_transcript  -m diamond -i ${transcript} --cpu ${task.cpus} --go_evidence non-electronic  --target_orthologs all --translate

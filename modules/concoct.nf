@@ -27,10 +27,10 @@ process concoct_extra {
     label 'concoct'
     publishDir "${params.output}/${name}/assemble/binning/concoct/", mode: 'copy', pattern: "fasta_bins"
     input:
-    tuple val(name), file(assembly), file(ont_bam), file(illumina_bam)
-    file(extra_bam)
+    tuple val(name), path(assembly), path(ont_bam), path(illumina_bam)
+    path(extra_bam)
     output:
-    tuple val(name), file("fasta_bins")
+    tuple val(name), path("fasta_bins")
     script:
     """
     mkdir concoct_out

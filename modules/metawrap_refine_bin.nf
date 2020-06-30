@@ -5,11 +5,11 @@ process refine2 {
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins/*" 
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
     input:
-    tuple val(name1), file(bins1), file(bins2)
-    file(path)
+    tuple val(name1), path(bins1), path(bins2)
+    path(path)
     output:
-    tuple val(name1), file("metawrap_bins/*.fa")
-    file("${name}_binning_stats.txt")
+    tuple val(name1), path("metawrap_bins/*.fa")
+    path("${name}_binning_stats.txt")
     shell:
     """
     mem=\$(echo ${task.memory} | sed 's/g//g')
@@ -33,11 +33,11 @@ process refine3 {
     errorStrategy { task.exitStatus in 1..1 ? 'retry' : 'finish'}
     maxRetries 2
     input:
-        tuple val(name), file(bins1), file(bins2), file(bins3)
-        file(path)
+        tuple val(name), path(bins1), path(bins2), path(bins3)
+        path(path)
     output:
-    tuple val(name), file("metawrap_bins/*.fa")
-    file("${name}_binning_stats.txt")
+    tuple val(name), path("metawrap_bins/*.fa")
+    path("${name}_binning_stats.txt")
     shell:
     if (task.attempt == 1)
     """

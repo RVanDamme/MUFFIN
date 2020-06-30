@@ -2,10 +2,10 @@ process parser_bin_RNA {
     label 'ubuntu'
     publishDir "${params.output}/${name}/annotate/", mode: 'copy', pattern: "parser_result/*"
     input:
-        tuple val(name), file(rna_annot), file(quant)
-        tuple val(name), file(bins_annot)
+        tuple val(name), path(rna_annot), path(quant)
+        tuple val(name), path(bins_annot)
     output:
-        file("parser_result/*") 
+        path("parser_result/*") 
     script:
         """
         pankegg_bin_RNA.py -b ${bins_annot} -r ${rna_annot} -l ${quant} -o parser_result 
@@ -15,9 +15,9 @@ process parser_bin {
     label 'ubuntu'
     publishDir "${params.output}/${name}/annotate/", mode: 'copy', pattern: "parser_result/*"
     input:
-        tuple val(name), file(bins_annot)
+        tuple val(name), path(bins_annot)
     output:
-        file("parser_result/*") 
+        path("parser_result/*") 
     script:
         """
         pankegg_bin.py -b ${bins_annot} -o parser_result 
