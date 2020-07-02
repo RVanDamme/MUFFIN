@@ -22,10 +22,10 @@ process minimap_polish {
     input:
     tuple val(name), path(assembly), path(ont)
     output:
-    tuple val(name) , path("ont.sam")
+    tuple val(name) , path("ont.paf")
     script:
     """
-    minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
+    minimap2 -x map-ont ${assembly} ${ont} > ont.paf
     """
 }
 
