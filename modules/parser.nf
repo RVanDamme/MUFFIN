@@ -1,6 +1,8 @@
 process parser_bin_RNA {
     label 'ubuntu'
     publishDir "${params.output}/${name}/annotate/", mode: 'copy', pattern: "parser_result/*"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
         tuple val(name), path(rna_annot), path(quant)
         tuple val(name), path(bins_annot)
@@ -14,6 +16,8 @@ process parser_bin_RNA {
 process parser_bin {
     label 'ubuntu'
     publishDir "${params.output}/${name}/annotate/", mode: 'copy', pattern: "parser_result/*"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
         tuple val(name), path(bins_annot)
     output:

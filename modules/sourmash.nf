@@ -24,6 +24,8 @@ process sourmash_genome_size {
 process sourmash_bins {
     label 'sourmash' 
     publishDir "${params.output}/${name}/classify/sourmash/", mode: 'copy', pattern: "*.txt"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
     tuple val(name), path(bins)
     path(json)

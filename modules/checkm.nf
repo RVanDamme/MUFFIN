@@ -5,6 +5,8 @@ process checkm {
     publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "taxonomy.txt"
     publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "*_checkm"
     publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "*_checkm_plot"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
     tuple val(name), path(bins_assemblies)
     output:
