@@ -1,6 +1,8 @@
 process flye {
     label 'flye'
     publishDir "${params.output}/${name}/assemble/assembly/flye_unpolished", mode: 'copy', pattern: "assembly.fasta"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
     tuple val(name), path(ont), path(genome_size)
     output:

@@ -2,6 +2,8 @@ process metabat2 {
     maxForks 1
     label 'metabat2'
     publishDir "${params.output}/${name}/assemble/binning/metabat2/", mode: 'copy', pattern: "bins_dir"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
     tuple val(name), path(assembly), path(ont_bam), path(illumina_bam)
     output:
@@ -17,6 +19,8 @@ process metabat2_extra {
     maxForks 1
     label 'metabat2'
     publishDir "${params.output}/${name}/assemble/binning/metabat2/", mode: 'copy', pattern: "bins_dir" 
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
     tuple val(name), path(assembly), path(ont_bam), path(illumina_bam)
     path(extra_bam)

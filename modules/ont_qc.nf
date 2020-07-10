@@ -15,6 +15,8 @@ process discard_short {
 
 process filtlong {
     label 'filtlong'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
     tuple val(name) , path(filtered)
     output:

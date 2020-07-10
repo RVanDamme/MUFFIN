@@ -2,6 +2,8 @@ process bwa {
     label 'bwa'
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "illumina.bam"  
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
     tuple val(name), path(assembly), path(illumina)
     output:
@@ -18,6 +20,8 @@ process bwa {
 
 process extra_bwa {
     label 'bwa'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "illumina.bam"  
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
@@ -36,6 +40,8 @@ process extra_bwa {
 
 process bwa_bin {
     label 'bwa'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "illumina.bam"  
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:

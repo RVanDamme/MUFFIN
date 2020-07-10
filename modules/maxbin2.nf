@@ -2,6 +2,8 @@ process maxbin2 {
     maxForks 1
     label 'maxbin2'
     publishDir "${params.output}/${name}/assemble/binning/maxbin2/", mode: 'copy', pattern: "maxbin_bin" 
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
     tuple val(name), path(assembly), path(ont), path(illumina)
     output:

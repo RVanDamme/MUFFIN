@@ -1,5 +1,7 @@
 process minimap2 {
     label 'minimap2'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
@@ -17,6 +19,8 @@ process minimap2 {
 
 process minimap_polish {
     label 'minimap2'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
@@ -31,6 +35,8 @@ process minimap_polish {
 
 process extra_minimap2 {
     label 'minimap2'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
@@ -49,6 +55,8 @@ process extra_minimap2 {
 
 process minimap2_bin {
     label 'minimap2'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:

@@ -3,6 +3,8 @@ process de_novo_transcript_and_quant {
     label 'trinity'
     publishDir "${params.output}/${name}/annotate/de_novo_transcript/", mode: 'copy', pattern: "*_transcript.fasta"
     publishDir "${params.output}/${name}/annotate/quant_of_transcript/", mode: 'copy', pattern: "*_transcript_quant.sf"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
     tuple val(name), path(rna)
     output:
