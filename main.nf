@@ -242,7 +242,7 @@ workflow { //start of the workflow
             database_sourmash = sourmash_download_db.out
         }   
         // checkm_db
-        if (workflow.profile == 'local_conda' | workflow.profile == 'slurm_conda' ) { // when using conda checkm needs to be set up first before any use
+        if (workflow.profile.contains('conda') ) { // when using conda checkm needs to be set up first before any use
             if (params.checkm_db) { // this one set in the env the path to checkm db uncompressed
                 untar = true
                 checkm_setup_db(params.checkm_db, untar)

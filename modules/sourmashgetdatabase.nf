@@ -13,4 +13,4 @@ process sourmash_download_db {
         """
     }
 
-    The link use from osf.io require sourmash V3 (sourmash V3.3.0 is working))
+    // The link use from osf.io require sourmash V3 (sourmash V3.3.0 is working))
