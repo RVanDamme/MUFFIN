@@ -1,7 +1,7 @@
 process concoct {
     maxForks 1
     label 'concoct'
-    publishDir "${params.output}/${name}/concoct_bins/", mode: 'copy', pattern: "fasta_bins"
+    publishDir "${params.output}/${name}/assemble/binning/concoct_bins/", mode: 'copy', pattern: "fasta_bins"
     errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
     maxRetries 3 
     input:
