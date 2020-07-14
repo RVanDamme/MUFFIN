@@ -528,7 +528,7 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
                         <th class="header">All orthologs</th>
                     </tr>
                     <tr>
-                        <li><font color="#e7bcd4">▉▉</font>Represent the orthologs of the Bin</th>
+                        <th class="header"><font color="#e7bcd4">▉▉</font>Represent the orthologs of the Bin</th>
                         <th class="header">List of the orthologs of the bin</th>
                         <th class="header">List of the orthologs of all bins</th>
 
