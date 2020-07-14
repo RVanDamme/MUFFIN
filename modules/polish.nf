@@ -40,13 +40,14 @@ process pilon {
     shell:
     """
     mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g')
+    partial_mem=\$(($mem*40/100))
     assemb="${assembly}"
     for ite in {1..${iteration}}
     do
         bwa index \$assemb
-        bwa mem \$assemb ${ill_read} | samtools view -bS - | samtools sort -@ ${task.cpus} - > \$ite.bam
+        bwa mem \$assemb ${ill_read[0]} ${ill_read[1]} | samtools view -bS - | samtools sort -@ ${task.cpus} - > \$ite.bam
         samtools index -@ ${task.cpus} \$ite.bam
-        pilon -Xmx\$mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
+        pilon -Xmx\$partial_mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
         assemb=\$ite"_polished_assembly.fasta"
     done
     mv ${iteration}"_polished_assembly.fasta" polished_assembly.fasta
