@@ -40,7 +40,7 @@ process pilon {
     shell:
     """
     mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g')
-    partial_mem=\$(($mem*40/100))
+    partial_mem=\$((\$mem*40/100))
     assemb="${assembly}"
     for ite in {1..${iteration}}
     do
