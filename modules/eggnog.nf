@@ -23,7 +23,7 @@ process eggnog_rna {
   errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
   maxRetries 3 
   input:
-    tuple val(name), val(transcript), path(quant), path(db)
+    tuple val(name), path(transcript), path(quant), path(db)
   output:
     tuple val(name), path("*.annotations.tsv"), path(quant)
     path("*.seed_orthologs.tsv")
