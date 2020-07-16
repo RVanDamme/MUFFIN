@@ -10,7 +10,7 @@ MUFFIN is a hybrid assembly and differential binning workflow for metagenomics, 
 3. [Installation](#installation) :
     - [base installation](#base-installation)
     - [conda usage](#for-conda-usage)
-    - [containers usage](#for-containers-usage-(docker/singularity))
+    - [containers usage](#for-containers-usage)
     - [software installe locally](#for-usage-of-software-installed-locally)
 4. [Usage](#usage) :
     - [Basic usage](#basic-usage)
@@ -109,8 +109,8 @@ conda deactivate
 #you need to change the line 3 and 25 to the path of your env (/path/to/install/metawrap-env)
 ```
 
-### For containers usage (docker/singularity)
-If you use containers, you don't need extra installations
+### For containers usage
+If you use containers either docker or singularity, you don't need extra installations
 
 ### For usage of software installed locally
 You just need to have all the software used in the pipeline (see table above) installed and in your $PATH
