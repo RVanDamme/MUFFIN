@@ -53,6 +53,7 @@ def helpMSG() {
     --output                    path to the output directory (default: $params.output)
 
         Outputed files:
+        You can see the output structure at https://osf.io/a6hru/
     QC                          The reads file after qc
     Assembly                    The assembly contigs file 
     Bins                        The bins produced by CONCOCT, MetaBAT2, MaxBin2 and MetaWRAP (the refining of bins)
@@ -88,7 +89,7 @@ def helpMSG() {
     --skip_concoct              skip the binning using concoct (advanced)
 
         Nextflow options:
-    -profile                    change the profile of nextflow (currently available conda)
+    -profile                    change the profile of nextflow both the engine and executor more details on github README
     -resume                     resume the workflow where it stopped
     -with-report rep.html       cpu / ram usage (may cause errors)
     -with-dag chart.html        generates a flowchart for the process tree
