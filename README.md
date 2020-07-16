@@ -72,7 +72,7 @@ MUFFIN uses the following software
 
 ## Installation
 
-### base installation :
+### base installation
 You need to install nextflow Version 20.01+ ( https://www.nextflow.io/ )
 ```sh
 # verify Java version (at least version 8+)
@@ -90,7 +90,7 @@ nextflow run  RVanDamme/MUFFIN --parameters.....
 
 ```
 
-### For conda usage :
+### For conda usage
 If you use conda you need to install Metawrap in an environment you create yourself, this is due to a known issue that will be fixed soon.
 
 ```sh
@@ -109,10 +109,10 @@ conda deactivate
 #you need to change the line 3 and 25 to the path of your env (/path/to/install/metawrap-env)
 ```
 
-### For containers usage (docker/singularity) :
+### For containers usage (docker/singularity)
 If you use containers, you don't need extra installations
 
-### For usage of software installed locally :
+### For usage of software installed locally
 You just need to have all the software used in the pipeline (see table above) installed and in your $PATH
 
 
