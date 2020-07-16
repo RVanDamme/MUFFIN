@@ -5,8 +5,8 @@ MUFFIN is a hybrid assembly and differential binning workflow for metagenomics, 
 
 1. [Introduction](#introduction)
 2. [Figure](#figure) :
-    - [Pipeline](#pipeline)
-    - [Parser output](#parser-output)
+    - [Workflow](#the-workflow)
+    - [Parser output](#the-parser-output)
 3. [Installation](#installation) :
     - [base installation](#base-installation)
     - [conda usage](#for-conda-usage)
