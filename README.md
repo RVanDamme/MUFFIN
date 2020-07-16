@@ -167,11 +167,11 @@ The results of the different test run are available at https://osf.io/m5czv/
 * If you run the pipeline with google life sciences and get error code 14
   It means the process was killed by google, you just need to run the pipeline again don't forget to add "-resume"
 
-* If either Metawrap or checkm have this error:
+* If either Metawrap or checkm have the following error
+  You need to increase the RAM in the command for local_engine and conda or in the "configs/containers.config"
 ```
 IOError: [Errno 2] No such file or directory: 'binsA.checkm/storage/tree/concatenated.tre' 
-```
-  You need to increase the RAM in the command for local_engine and conda or in the "configs/containers.config" 
+``` 
 
 * For other issue please open a ticket on ![github](https://github.com/RVanDamme/MUFFIN/issues)
 
