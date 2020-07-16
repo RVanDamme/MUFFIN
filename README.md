@@ -115,6 +115,15 @@ If you use containers either docker or singularity, you don't need extra install
 ### For usage of software installed locally
 You just need to have all the software used in the pipeline (see table above) installed and in your $PATH
 
+## Test the pipeline
+To test the pipeline we have a subset of 5 bins available at https://osf.io/9xmh4/
+A detailed explanation of all the parameter is available in [Usage](#usage), the most important for the test is the profile executor and engine.
+To run it you just need to add "test" in the -profile parameter e.g.:
+```
+nextflow run RVanDamme/MUFFIN --output results_dir --assembler metaspades --cpus 8 --memory 32g --modular full -profile gcloud,docker,test
+```
+The subset contains also RNA data to test with transcriptomics analysis you just need to activate it using "--rna"
+The results of the different test run are available at https://osf.io/m5czv/
 
 ## Usage
 
@@ -172,14 +181,6 @@ Samplename,path/to/binY.fa
 If you run "classify" with or without "annotation" use "--bin_classify"
 If you run "annotate" without "classify" use "--bin_annotate"
 
-### Test the pipeline
-To test the pipeline we have a subset of 5 bins available at https://osf.io/9xmh4/
-To run it you just need to add "test" in the -profile e.g.:
-```
-nextflow run RVanDamme/MUFFIN --output results_dir --assembler metaspades --cpus 8 --memory 32g --modular full -profile gcloud,docker,test
-```
-The subset contains also RNA data to test with transcriptomics analysis you just need to activate it using "--rna"
-The results of the different test run are available at https://osf.io/m5czv/
 
 ## Troubleshooting
 * If metawrap fail using conda check that you installed metawrap in a conda environment and put the path in "modules/metawrap_refine_bin.nf"
