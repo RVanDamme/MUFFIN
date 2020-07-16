@@ -162,18 +162,18 @@ The subset contains also RNA data to test with transcriptomics analysis you just
 The results of the different test run are available at https://osf.io/m5czv/
 
 ## Troubleshooting
-If metawrap fail using conda check that you installed metawrap in a conda environment and put the path in "modules/metawrap_refine_bin.nf"
+* If metawrap fail using conda check that you installed metawrap in a conda environment and put the path in "modules/metawrap_refine_bin.nf"
 
-If you run the pipeline with google life sciences and get error code 14
-It means the process was killed by google, you just need to run the pipeline again don't forget to add "-resume"
+* If you run the pipeline with google life sciences and get error code 14
+  It means the process was killed by google, you just need to run the pipeline again don't forget to add "-resume"
 
-If either Metawrap or checkm have this error:
+* If either Metawrap or checkm have this error:
 ```
 IOError: [Errno 2] No such file or directory: 'binsA.checkm/storage/tree/concatenated.tre' 
 ```
-You need to increase the RAM in the command for local_engine and conda or in the "configs/containers.config" 
+  You need to increase the RAM in the command for local_engine and conda or in the "configs/containers.config" 
 
-For other issue please open a ticket on ![github](https://github.com/RVanDamme/MUFFIN/issues)
+* For other issue please open a ticket on ![github](https://github.com/RVanDamme/MUFFIN/issues)
 
 ## Options
 
