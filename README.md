@@ -3,24 +3,24 @@ MUFFIN is a hybrid assembly and differential binning workflow for metagenomics, 
 
 ## INDEX
 
-1. [Introduction](#Introduction)
-2. [Figure](#Figure) :
-    - [Pipeline](#Pipeline)
-    - [Parser output](#Parser-output)
-3. [Installation](#Installation) :
+1. [Introduction](#introduction)
+2. [Figure](#figure) :
+    - [Pipeline](#pipeline)
+    - [Parser output](#parser-output)
+3. [Installation](#installation) :
     - [base installation](#base-installation)
-    - [conda usage](#For-conda-usage)
-    - [containers usage](#For-containers-usage-(docker/singularity))
-    - [software installe locally](#For-usage-of-software-installed-locally)
-4. [Usage](#Usage) :
-    - [Basic usage](#Basic-usage)
-    - [Advanced usage](#Advanced-usage)
-    - [Test the pipeline](#Test-the-pipeline)
-5. [Troubleshooting](#Troubleshooting)
-6. [Options](#Options)
-7. [Complete help and options](#Complete-help-and-options)
-8. [Bibliography](#Bibliography)
-9. [License](#Bibliography)
+    - [conda usage](#for-conda-usage)
+    - [containers usage](#for-containers-usage-(docker/singularity))
+    - [software installe locally](#for-usage-of-software-installed-locally)
+4. [Usage](#usage) :
+    - [Basic usage](#basic-usage)
+    - [Advanced usage](#advanced-usage)
+    - [Test the pipeline](#test-the-pipeline)
+5. [Troubleshooting](#troubleshooting)
+6. [Options](#options)
+7. [Complete help and options](#complete-help-and-options)
+8. [Bibliography](#bibliography)
+9. [License](#license)
 
 ## Introduction
 
