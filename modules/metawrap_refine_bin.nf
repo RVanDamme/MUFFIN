@@ -1,6 +1,6 @@
 process refine2 {
     
-    if (workflow.profile == 'conda') {conda '/home/renaud/miniconda3/envs/metawrap-env'}
+    if (workflow.profile.contains('conda')) {conda '/path/to/miniconda3/envs/metawrap-env'}
     else {label 'metawrap'}
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins/*" 
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
@@ -26,7 +26,7 @@ process refine2 {
 }
 
 process refine3 {
-    if (workflow.profile == 'conda') {conda '/home/renaud/miniconda3/envs/metawrap-env'}
+    if (workflow.profile.contains('conda')) {conda '/path/to/miniconda3/envs/metawrap-env'}
     else {label 'metawrap'}
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins/*" 
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
