@@ -96,7 +96,7 @@ If you use conda you need to install Metawrap in an environment you create yours
 ```sh
 
 #create an env and install metawrap
-conda -y -p /path/to/install/metawrap-env python=2.7
+conda create -y -p /path/to/install/metawrap-env python=2.7
 source activate /path/to/install/metawrap-env
 conda config --add channels defaults
 conda config --add channels conda-forge
