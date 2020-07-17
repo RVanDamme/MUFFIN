@@ -12,15 +12,15 @@ MUFFIN is a hybrid assembly and differential binning workflow for metagenomics, 
     - [conda usage](#for-conda-usage)
     - [containers usage](#for-containers-usage)
     - [software installe locally](#for-usage-of-software-installed-locally)
-4. [Usage](#usage) :
+4. [Test the pipeline](#test-the-pipeline)
+5. [Usage](#usage) :
     - [Basic usage](#basic-usage)
     - [Advanced usage](#advanced-usage)
-    - [Test the pipeline](#test-the-pipeline)
-5. [Troubleshooting](#troubleshooting)
-6. [Options](#options)
-7. [Complete help and options](#complete-help-and-options)
-8. [Bibliography](#bibliography)
-9. [License](#license)
+6. [Troubleshooting](#troubleshooting)
+7. [Options](#options)
+8. [Complete help and options](#complete-help-and-options)
+9. [Bibliography](#bibliography)
+10. [License](#license)
 
 ## Introduction
 
@@ -120,7 +120,16 @@ To test the pipeline we have a subset of 5 bins available at https://osf.io/9xmh
 A detailed explanation of all the parameter is available in [Usage](#usage), the most important for the test is the profile executor and engine.
 To run it you just need to add "test" in the -profile parameter e.g.:
 ```
-nextflow run RVanDamme/MUFFIN --output results_dir --assembler metaspades --cpus 8 --memory 32g --modular full -profile gcloud,docker,test
+#test locally with conda, you need to specify cpus and ram available
+nextflow run RVanDamme/MUFFIN --output results_dir  --cpus 8 --memory 32g -profile local,conda,test
+
+#test locally with docker, you can change the cpus and ram in configs/containers.config
+# this test also run the transcriptomics analysis with --rna
+nextflow run RVanDamme/MUFFIN --output results_dir --rna -profile local,docker,test
+
+#test using gcloud with docker, you can change the cpus and ram in configs/containers.config
+# this test use flye instead of spades with the --assembler metaflye
+nextflow run RVanDamme/MUFFIN --output results_dir --assembler metaflye -profile gcloud,docker,test
 ```
 The subset contains also RNA data to test with transcriptomics analysis you just need to activate it using "--rna"
 The results of the different test run are available at https://osf.io/m5czv/
