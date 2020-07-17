@@ -1,15 +1,19 @@
 process flye {
     label 'flye'
-    publishDir "${params.output}/${name}/flye_assembly/", mode: 'copy', pattern: "assembly.fasta"
+    publishDir "${params.output}/${name}/assemble/assembly/flye_unpolished", mode: 'copy', pattern: "assembly.fasta"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
-    set val(name), file(ont), file(genome_size)
+    tuple val(name), path(ont), path(genome_size)
     output:
-    set val(name), file("assembly.fasta")
+    tuple val(name), path("assembly.fasta")
     shell:
     """
     size=\$(cat !{genome_size})
-    flye --nano-corr !{ont} -o flye_output -t !{task.cpus} --plasmids --meta --genome-size \$size
+    flye --nano-raw ${ont} -o flye_output -t ${task.cpus} --plasmids --meta --genome-size \$size
     mv flye_output/assembly.fasta assembly.fasta
     """
 
 }
+
+//for flye updated over 2.7 use --nano-raw

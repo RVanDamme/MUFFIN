@@ -1,10 +1,12 @@
 process fastp {
     label 'fastp'
-    publishDir "${params.output}/${name}/illumina_qc_out/", mode: 'copy', pattern: "*_R*_clean.fastq"
+    publishDir "${params.output}/${name}/assemble/quality_control/illumina/", mode: 'copy', pattern: "*_R*_clean.fastq"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
-    set val(name), file(illumina)
+    tuple val(name), path(illumina)
     output:
-    set val(name), file("*_R?_clean.fastq")
+    tuple val(name), path("*_R?_clean.fastq")
     script:
     """
     fastp -i ${illumina[0]} -I ${illumina[1]} -o ${name}_R1_clean.fastq -O ${name}_R2_clean.fastq
@@ -13,11 +15,13 @@ process fastp {
 
 process fastp_rna {
     label 'fastp'
-    publishDir "${params.output}/${name}/rna_qc_out/", mode: 'copy', pattern: "*_R*_clean.fastq"
+    publishDir "${params.output}/${name}/annotate/rna_quality_control/", mode: 'copy', pattern: "*_R*_clean.fastq"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
-    set val(name), file(illumina)
+    tuple val(name), path(illumina)
     output:
-    set val(name), file("*_R?_clean.fastq")
+    tuple val(name), path("*_R?_clean.fastq")
     script:
     """
     fastp -i ${illumina[0]} -I ${illumina[1]} -o ${name}_R1_clean.fastq -O ${name}_R2_clean.fastq

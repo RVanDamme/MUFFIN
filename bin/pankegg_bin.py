@@ -72,7 +72,7 @@ def bin_parse(bins,
 def write_html_sample(dictgeneral, dict_global_sample, output,
                       globalpathwaylist, binnamelist):
 
-    out = output+"/MAFIN_sample_result.html"
+    out = output+"/MUFFIN_sample_result.html"
     outfile = open(out, "w")
 
     outfile.write("""
@@ -80,7 +80,7 @@ def write_html_sample(dictgeneral, dict_global_sample, output,
     <html lang="en-US">
     <head>
         <meta charset="utf-8">
-        <title>MAFIN Sample result</title>
+        <title>MUFFIN Sample result</title>
         <meta name="author" content="Renaud Van Damme">
     </head>"""
                   )
@@ -96,7 +96,7 @@ def write_html_sample(dictgeneral, dict_global_sample, output,
         <li>Total number of bins: {num_bins}</li>
         <li>Total number of unique pathways in bins: {num_path}</li>
         <li>This file contains only the eggNOG annotation that have a kegg pathway id, for further research please look at the annotations.tsv files</li>
-        <li>This result file was produced by <a href="https://github.com/RVanDamme/MAFIN">MAFIN</a> </li>
+        <li>This result file was produced by <a href="https://github.com/RVanDamme/MUFFIN">MUFFIN</a> </li>
     </ul>
     </h2>
     </div>
@@ -231,12 +231,18 @@ def write_html_sample(dictgeneral, dict_global_sample, output,
             <li> Figure detail
             <ul>
                 <li>The Figures in the links: <ul> 
-                    <li>The orthologs present in the bins are in green</li>
+                    <li>The orthologs present in the bins are in <font color="#e7bcd4">▉▉</font></li>
             <li>Troubleshooting
             <ul>
                 <li>When the link of the pathway is not loading or not showing anything, it means that there is too much orthologs to show on the figure.
             Try to strip everything after "https://www.kegg.jp/kegg-bin/show_pathway?PATWAY_ENTRY_NUMBER/" to still see the pathway</li>
             </ul></li>
+            <li> Troubleshooting
+                <ul>
+                <li> When in the table an error message like this "ko00000 unknow by the KEGG DATABASE" appears it means that the ID given by the annotation software (eggNOG)
+                is not know by the KEGG database, this error is potentially due to version conflict between eggNOG and the KEGG database. 
+                </li></ul>
+            </li>
         </ol>
         </p></div>
         </div>
@@ -296,7 +302,7 @@ def write_html_sample(dictgeneral, dict_global_sample, output,
                 set_html= set()
                 for gene in set_total_gene:
                     set_html.add(gene)
-                list_html = "".join(set_html)
+                list_html = "/".join(set_html)
             except KeyError:
                 list_html = ""
             outfile.write(f"""
@@ -339,7 +345,7 @@ def write_html_sample(dictgeneral, dict_global_sample, output,
 def write_html_bins(dictgeneral, dict_global_bin, output,
                     globalpathwaylist):
     for bin_html in dict_global_bin.keys():
-        out = output+"/MAFIN_"+bin_html+"_result.html"
+        out = output+"/MUFFIN_"+bin_html+"_result.html"
         outfile = open(out, "w")
 
         outfile.write(f"""
@@ -347,10 +353,11 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
         <html lang="en-US">
         <head>
             <meta charset="utf-8">
-            <title>MAFIN {bin_html} result</title>
+            <title>MUFFIN {bin_html} result</title>
             <meta name="author" content="Renaud Van Damme">
         </head>"""
                       )
+
 
         num_path_bin = len(dict_global_bin[bin_html])
         num_path = len(globalpathwaylist)
@@ -363,7 +370,7 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
             <li>Total number of unique pathway in this bin: {num_path_bin}</li>
             <li>Total number of unique pathways in all bins: {num_path}</li>
             <li>This file contains only the eggNOG annotation that have a kegg pathway id, for further research please look at the annotations.tsv files</li>
-            <li>This result file was produced by <a href="https://github.com/RVanDamme/MAFIN">MAFIN</a> </li>
+            <li>This result file was produced by <a href="https://github.com/RVanDamme/MUFFIN">MUFFIN</a> </li>
         </ul>
         </h2>
         </div>
@@ -521,7 +528,7 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
                         <th class="header">All orthologs</th>
                     </tr>
                     <tr>
-                        <li><font color="#e7bcd4">▉▉</font>Represent the orthologs of the Bin</th>
+                        <th class="header"><font color="#e7bcd4">▉▉</font>Represent the orthologs of the Bin</th>
                         <th class="header">List of the orthologs of the bin</th>
                         <th class="header">List of the orthologs of all bins</th>
 
@@ -542,7 +549,7 @@ def write_html_bins(dictgeneral, dict_global_bin, output,
                     set_html = set()
                     for gene in set_gene:
                         set_html.add(gene)
-                    list_html = "".join(set_html)
+                    list_html = "/".join(set_html)
                 outfile.write(f"""
                     <tr>
                     <td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html}/default%3d%23e7bcd4">{pathway_name}</a></td>

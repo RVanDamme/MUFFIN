@@ -1,10 +1,10 @@
 process sourmash_genome_size {
     label 'sourmash' 
     input:
-    set val(name), file(ont)
-    file(json)
+    tuple val(name), path(ont)
+    path(json)
     output:
-    set val(name), file(ont), file('genome_size.txt')
+    tuple val(name), path(ont), path('genome_size.txt')
     shell:
     """
     echo "100M" >genome_size.txt
@@ -23,16 +23,18 @@ process sourmash_genome_size {
 
 process sourmash_bins {
     label 'sourmash' 
-    publishDir "${params.output}/${name}/sourmash/", mode: 'copy', pattern: "*.txt"
+    publishDir "${params.output}/${name}/classify/sourmash/", mode: 'copy', pattern: "*.txt"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
-    set val(name), file(bins)
-    file(json)
+    tuple val(name), path(bins)
+    path(json)
     output:
-    file('*.txt')
+    path('*.txt')
     shell:
     """
-    bin_id=\$(basename !{bins} | sed -r "s/\\.\\w+//2")
-    sourmash compute -p !{task.cpus} --scaled 10000 -k 31 !{bins} -o !{bins}.sig
-    sourmash lca classify --query !{bins}.sig --db !{json} > \$bin_id.txt   
+    bin_id=\$(basename ${bins} | sed -r "s/\\.\\w+//2")
+    sourmash compute -p ${task.cpus} --scaled 10000 -k 31 ${bins} -o ${bins}.sig
+    sourmash lca classify --query ${bins}.sig --db ${json} > \$bin_id.txt   
     """
 }

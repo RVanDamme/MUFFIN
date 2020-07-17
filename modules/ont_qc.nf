@@ -1,9 +1,9 @@
 process discard_short {
     label 'ubuntu'
     input:
-    set val(name) , file(part)
+    tuple val(name) , path(part)
     output:
-    set val(name), file("filtered_${part}")
+    tuple val(name), path("filtered_${part}")
     shell:
     """
         cat !{part} | paste - - - - | awk -F"\\t" 'length(\$2)  >= ${params.short_qc}' | sed 's/\\t/\\n/g' > "filtered_${part}"
@@ -15,10 +15,12 @@ process discard_short {
 
 process filtlong {
     label 'filtlong'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
-    set val(name) , file(filtered)
+    tuple val(name) , path(filtered)
     output:
-    set val(name) , file("clean_${filtered}")
+    tuple val(name) , path("clean_${filtered}")
     script:
     """
     filtlong --min_length ${params.short_qc} --keep_percent 90 --target_bases 500000000 ${filtered} > clean_${filtered}
@@ -28,11 +30,11 @@ process filtlong {
 
 process merge {
     label 'ubuntu'
-    publishDir "${params.output}/${name}/nanopore_qc_out/", mode: 'copy', pattern: "*_all.fastq" 
+    publishDir "${params.output}/${name}/assemble/quality_control/nanopore/", mode: 'copy', pattern: "*_all.fastq" 
     input:
-    set val(name) , file(filtered)
+    tuple val(name) , path(filtered)
     output:
-    set val(name), file("${name}_all.fastq")
+    tuple val(name), path("${name}_all.fastq")
     script:
     """
     cat *.fastq > ${name}_all.fastq

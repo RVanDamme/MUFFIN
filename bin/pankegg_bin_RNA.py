@@ -178,7 +178,7 @@ def write_html_sample(dict_global_sample, output,
                       globalpathwaylist, binnamelist, rna_pathway_list,
                       dictrna):
 
-    out = output+"/MAFIN_sample_result.html"
+    out = output+"/MUFFIN_sample_result.html"
     outfile = open(out, "w")
 
     outfile.write("""
@@ -186,7 +186,7 @@ def write_html_sample(dict_global_sample, output,
     <html lang="en-US">
     <head>
         <meta charset="utf-8">
-        <title>MAFIN Sample result</title>
+        <title>MUFFIN Sample result</title>
         <meta name="author" content="Renaud Van Damme">
     </head>"""
                   )
@@ -204,7 +204,7 @@ def write_html_sample(dict_global_sample, output,
         <li>Total number of unique pathways in bins: {num_path}</li>
         <li>Total number of unique pathways in RNA: {num_path_rna}</li>
         <li>This file contains only the eggNOG annotation that have a kegg pathway id, for further research please look at the annotations.tsv files</li>
-        <li>This result file was produced by <a href="https://github.com/RVanDamme/MAFIN">MAFIN</a> </li>
+        <li>This result file was produced by <a href="https://github.com/RVanDamme/MUFFIN">MUFFIN</a> </li>
     </ul>
     </h2>
     </div>
@@ -341,11 +341,10 @@ def write_html_sample(dict_global_sample, output,
               <li> Figure detail
               <ul>
                   <li>The Figures in the links: <ul>
-                      <li>The orthologs in both RNA-seq and in the bins are in green</li>
-                      <li>The orthologs present in the bins but that are not in the RNA-seq are in orange</li>
-                      <li>The orthologs present in the RNA-seq are in purple</li>
-                      <li>The orthologs present in the bins are in red</li>
-                      <li>The orthologs absent from the samples are in blue</li></ul></li></ul></li>
+                      <li>The orthologs in both RNA-seq and in the bins are in <font color="#e7bcd4">▉▉</font></li>
+                      <li>The orthologs present in the bins but that are not in the RNA-seq are in <font color="#7f5b6c">▉▉</font></li>
+                      <li>The orthologs present in the RNA-seq are in <font color="#3bbc9a">▉▉</font></li>
+                      <li>The orthologs present in the bins are in <font color="#f3c98b">▉▉</font></li>
               <li>Troubleshooting
               <ul>
                   <li>When the link of the pathway is not loading or not showing anything, it means that there is too much orthologs to show on the figure.
@@ -419,8 +418,8 @@ def write_html_sample(dict_global_sample, output,
                 set_html_rnagene = set()
                 for gene in set_activgene:
                     set_html_rnagene.add(gene)
-                list_html_active_gene = "".join(set_html_activgene)
-                list_html_rnagene = "".join(set_html_rnagene)
+                list_html_active_gene = "/".join(set_html_activgene)
+                list_html_rnagene = "/".join(set_html_rnagene)
             except KeyError:
                 list_active_gene = ""
                 n_rnaseq_gene = ""
@@ -436,12 +435,12 @@ def write_html_sample(dict_global_sample, output,
             list_html_inactive_gene_coded = "".join([
                 inactiv+"%09%237f5b6c,black/" for inactiv in list_inactive_gene])            
             list_html_inactive_gene = "".join([
-                inactiv for inactiv in list_inactive_gene])
+                inactiv+"/" for inactiv in list_inactive_gene])
             list_html_all_gene = "".join([
-                gene for gene in list(set_gene)])
+                gene+"/" for gene in list(set_gene)])
             outfile.write(f"""
 			<tr>
-			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene_with_code}/{list_html_active_gene}/default%3d%23e7bcd4">{pathway_name}
+			<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_inactive_gene_coded}/{list_html_active_gene}/default%3d%23e7bcd4">{pathway_name}
             <font color="#e7bcd4">▉▉</font>from bins and in RNA-seq and <font color="#7f5b6c">▉▉</font>from bins and not in RNA-seq</a></td>
 			"""
 						  )
@@ -500,7 +499,7 @@ def write_html_bins(dict_global_bin, output,
                     globalpathwaylist, rna_pathway_list,
                     dictrna):
     for bin_html in dict_global_bin.keys():
-        out = output+"/MAFIN_"+bin_html+"_result.html"
+        out = output+"/MUFFIN_"+bin_html+"_result.html"
         outfile = open(out, "w")
 
         outfile.write(f"""
@@ -508,7 +507,7 @@ def write_html_bins(dict_global_bin, output,
         <html lang="en-US">
         <head>
             <meta charset="utf-8">
-            <title>MAFIN {bin_html} result</title>
+            <title>MUFFIN {bin_html} result</title>
             <meta name="author" content="Renaud Van Damme">
         </head>"""
                       )
@@ -526,12 +525,13 @@ def write_html_bins(dict_global_bin, output,
             <li>Total number of unique pathways in all bins: {num_path}</li>
             <li>Total number of unique pathways in RNA: {num_path_rna}</li>
             <li>This file contains only the eggNOG annotation that have a kegg pathway id, for further research please look at the annotations.tsv files</li>
-            <li>This result file was produced by <a href="https://github.com/RVanDamme/MAFIN">MAFIN</a> </li>
+            <li>This result file was produced by <a href="https://github.com/RVanDamme/MUFFIN">MUFFIN</a> </li>
         </ul>
         </h2>
         </div>
         """
         )
+
 
         outfile.write("""
                   <style type="text/css">
@@ -666,9 +666,8 @@ def write_html_bins(dict_global_bin, output,
             <li> Figure detail
             <ul>
                 <li>The Figures in the links: <ul> 
-                    <li>The orthologs expressed by RNA are in green</li>
-                    <li>The orthologs present in the bins but that are not in the RNA are in orange</li>
-                    <li>The orthologs absent from the samples are in blue</li></ul></li></ul></li>
+                    <li>The orthologs from the bins expressed by RNA are in <font color="#e7bcd4">▉▉</font></li>
+                    <li>The orthologs present in the bins but that are not in the RNA are in <font color="#7f5b6c">▉▉</font></li>
             <li>Troubleshooting
             <ul>
                 <li>When the link of the pathway is not loading or not showing anything, it means that there is too much orthologs to show on the figure.
@@ -676,6 +675,12 @@ def write_html_bins(dict_global_bin, output,
                 <li>In the figure you can have Green case that also contains orange.
             If the case is composed of multiple orthologs and some are in RNA and some only in the bins the case will be highlighted in green even tough it should be green and orange</li>
             </ul></li>
+            <li> Troubleshooting
+                <ul>
+                <li> When in the table an error message like this "ko00000 unknow by the KEGG DATABASE" appears it means that the ID given by the annotation software (eggNOG)
+                is not know by the KEGG database, this error is potentially due to version conflict between eggNOG and the KEGG database. 
+                </li></ul>
+            </li>
         </ol>
         </p></div>
         </div>
@@ -719,7 +724,7 @@ def write_html_bins(dict_global_bin, output,
                         <th class="header2"><font color="#7f5b6c">▉▉</font>Orthologs present in bins but not in RNA-seq annotation</th>
                         <th class="header2"><font color="#f3c98b">▉▉</font>Orthologs based on bins annotation</th>
                         <th class="header2"><font color="#e7bcd4">▉▉</font>list of orthologs of the bin present in RNAseq</th>
-                        <th class="header2"><font color="#e7bcd4">▉▉</font>list of orthologs of the bin absent in RNAseq</th>
+                        <th class="header2"><font color="#7f5b6c">▉▉</font>list of orthologs of the bin absent in RNAseq</th>
 
                     </tr>
         """)
@@ -742,10 +747,10 @@ def write_html_bins(dict_global_bin, output,
                     for gene in dict_global_bin[bin_html][pathway][1]:
                         set_gene.add(gene)
                     list_html_all_gene = "".join([
-                        gene for gene in list(set_gene)])
+                        gene+"/" for gene in list(set_gene)])
                     list_inactive_gene=[]
                     if dict_global_bin[bin_html][pathway][3] != "":
-                        list_html_active_gene = "".join(set_html_active_gene)
+                        list_html_active_gene = "/".join(set_html_active_gene)
                         list_active_gene = list(set_active_gene)
                         for elem in list(set_gene):
                             if elem not in list_active_gene:
@@ -753,16 +758,16 @@ def write_html_bins(dict_global_bin, output,
                         list_html_inactive_gene_coded = "".join([
                             inactiv+"%09%237f5b6c,black/" for inactiv in list_inactive_gene])
                         list_html_inactive_gene = "".join([
-                            inactiv for inactiv in list_inactive_gene])
+                            inactiv+"/" for inactiv in list_inactive_gene])
                     else:
                         list_html_active_gene = ""
                         list_html_inactive_gene = ""
                         list_active_gene = ""
-                        list_inactive_gene = list(set_gene)
+                        list_inactive_gene = "/".join(set_gene)
                     set_html_all_gene = set()
                     for gene in dict_global_bin[bin_html][pathway][1]:
                         set_html_all_gene.add(gene)
-                    list_html_all_gene = "".join(set_html_all_gene)
+                    list_html_all_gene = "/".join(set_html_all_gene)
                     outfile.write(f"""
 					<tr>
 					<td class="pathway_gene"><a href="https://www.kegg.jp/kegg-bin/show_pathway?{pathway}/{list_html_active_gene}/{list_html_inactive_gene_coded}/default%3d%23e7bcd4">{pathway_name}

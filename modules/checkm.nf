@@ -1,15 +1,17 @@
 process checkm {
     maxForks 1
     label 'checkm'
-    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "summary.txt"
-    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "taxonomy.txt"
-    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "*_checkm"
-    publishDir "${params.output}/${name}/checkm_bins/", mode: 'copy', pattern: "*_checkm_plot"
+    publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "summary.txt"
+    publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "taxonomy.txt"
+    publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "*_checkm"
+    publishDir "${params.output}/${name}/classify/checkm/", mode: 'copy', pattern: "*_checkm_plot"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
-    set val(name), file(bins_assemblies)
+    tuple val(name), path(bins_assemblies)
     output:
-    set val(name), file("summary.txt")
-    set file("${name}_checkm"), file("${name}_checkm_plot"), file("taxonomy.txt")
+    tuple val(name), path("summary.txt")
+    tuple path("${name}_checkm"), path("${name}_checkm_plot"), path("taxonomy.txt")
     
     script:
     """

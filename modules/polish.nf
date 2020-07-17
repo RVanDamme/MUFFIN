@@ -1,9 +1,11 @@
 process racon {
     label 'racon'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
-        set val(name), file(read), file(assembly), file(mapping) 
+        tuple val(name), path(read), path(assembly), path(mapping) 
     output:
-        set val(name), file(read), file("${name}_consensus.fasta") 
+        tuple val(name), path(read), path("${name}_consensus.fasta") 
     shell:
         """
         racon -t ${task.cpus} ${read} ${mapping} ${assembly} > ${name}_consensus.fasta
@@ -12,10 +14,12 @@ process racon {
 
 process medaka {
     label 'medaka'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
-        set val(name), file(read), file(consensus) 
+        tuple val(name), path(read), path(consensus) 
     output:
-        set val(name), file("${name}_polished.fasta") 
+        tuple val(name), path("${name}_polished.fasta") 
     script:
         """
         medaka_consensus -i ${read} -d ${consensus} -o polished -t ${task.cpus} -m ${params.model}
@@ -25,25 +29,28 @@ process medaka {
 
 process pilon {
     label 'pilon'
-    publishDir "${params.output}/${name}/flye_assembly/", mode: 'copy', pattern: "polished_assembly.fasta" 
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
+    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "polished_assembly.fasta" 
     input:
-        set val(name), file(assembly), file(ill_read)
+        tuple val(name), path(assembly), path(ill_read)
         val(iteration)
     output:
-        set val(name) , file("polished_assembly.fasta")
+        tuple val(name) , path("polished_assembly.fasta")
     shell:
     """
-    mem=\$(echo !{task.memory} | sed 's/ GB//g')
-    assemb="!{assembly}"
-    for ite in {1..!{iteration}}
+    mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g')
+    partial_mem=\$((\$mem*40/100))
+    assemb="${assembly}"
+    for ite in {1..${iteration}}
     do
         bwa index \$assemb
-        bwa mem \$assemb !{ill_read} | samtools view -bS - | samtools sort -@ !{task.cpus} - > \$ite.bam
-        samtools index -@ !{task.cpus} \$ite.bam
-        pilon -Xmx\$mem"g" --threads !{task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
+        bwa mem \$assemb ${ill_read[0]} ${ill_read[1]} | samtools view -bS - | samtools sort -@ ${task.cpus} - > \$ite.bam
+        samtools index -@ ${task.cpus} \$ite.bam
+        pilon -Xmx\$partial_mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
         assemb=\$ite"_polished_assembly.fasta"
     done
-    mv !{iteration}"_polished_assembly.fasta" polished_assembly.fasta
+    mv ${iteration}"_polished_assembly.fasta" polished_assembly.fasta
     """
 
 }

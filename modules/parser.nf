@@ -1,23 +1,27 @@
 process parser_bin_RNA {
-    label 'python38'
-    publishDir "${params.output}/${name}/", mode: 'copy', pattern: "parser_result/*"
+    label 'ubuntu'
+    publishDir "${params.output}/${name}/annotate/", mode: 'copy', pattern: "parser_result/*"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
-        set val(name), file(rna_annot), file(quant)
-        set val(name), file(bins_annot)
+        tuple val(name), path(rna_annot), path(quant)
+        tuple val(name), path(bins_annot)
     output:
-        file("parser_result/*") 
+        path("parser_result/*") 
     script:
         """
         pankegg_bin_RNA.py -b ${bins_annot} -r ${rna_annot} -l ${quant} -o parser_result 
         """
     }
 process parser_bin {
-    label 'python38'
-    publishDir "${params.output}/${name}/", mode: 'copy', pattern: "parser_result/*"
+    label 'ubuntu'
+    publishDir "${params.output}/${name}/annotate/", mode: 'copy', pattern: "parser_result/*"
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     input:
-        set val(name), file(bins_annot)
+        tuple val(name), path(bins_annot)
     output:
-        file("parser_result/*") 
+        path("parser_result/*") 
     script:
         """
         pankegg_bin.py -b ${bins_annot} -o parser_result 

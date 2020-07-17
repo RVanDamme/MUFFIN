@@ -1,14 +1,19 @@
 process spades {
     label 'spades'
-    publishDir "${params.output}/${name}/spades_assembly/", mode: 'copy', pattern: "assembly.fasta" 
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
+    publishDir "${params.output}/${name}/assemble/assembly/spades/", mode: 'copy', pattern: "assembly.fasta" 
     input:
-    set val(name), file(illumina), file(ont)
+    tuple val(name), path(illumina), path(ont)
     output:
-    set val(name), file("assembly.fasta")
+    tuple val(name), path("assembly.fasta")
     
     script:
     """
-    spades.py -1 ${illumina[0]} -2 ${illumina[1]}  --meta --nanopore ${ont} -o spades_output -t ${task.cpus}
+    mem=\$(echo ${task.memory} |sed 's/ GB//g' | sed 's/g//g')
+    cpus=\$(echo ${task.cpus})
+    echo \$cpus \$mem
+    spades.py -1 ${illumina[0]} -2 ${illumina[1]}  --meta --nanopore ${ont} -o spades_output -t \$cpus -m \$mem
     mv spades_output/contigs.fasta  assembly.fasta
     """
 

@@ -1,11 +1,13 @@
 process minimap2 {
     label 'minimap2'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
-    set val(name), file(assembly), file(ont)
+    tuple val(name), path(assembly), path(ont)
     output:
-    set val(name) , file("ont_sorted.bam")
+    tuple val(name) , path("ont_sorted.bam")
     script:
     """
     minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
@@ -17,26 +19,30 @@ process minimap2 {
 
 process minimap_polish {
     label 'minimap2'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
-    set val(name), file(assembly), file(ont)
+    tuple val(name), path(assembly), path(ont)
     output:
-    set val(name) , file("ont.sam")
+    tuple val(name) , path("ont.paf")
     script:
     """
-    minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
+    minimap2 -x map-ont ${assembly} ${ont} > ont.paf
     """
 }
 
 process extra_minimap2 {
     label 'minimap2'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
-    set val(name), file(assembly), file(ont)
+    tuple val(name), path(assembly), path(ont)
     output:
-    set val(name) , file("*_sorted.bam")
+    tuple val(name) , path("*_sorted.bam")
     script:
     """
     minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
@@ -49,12 +55,14 @@ process extra_minimap2 {
 
 process minimap2_bin {
     label 'minimap2'
+    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
+    maxRetries 3 
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
-    set val(name), file(assembly), file(ont)
+    tuple val(name), path(assembly), path(ont)
     output:
-    set val(name) , file("ont_sorted.bam")
+    tuple val(name) , path("ont_sorted.bam")
     script:
     """
     minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
