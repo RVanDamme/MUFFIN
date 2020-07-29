@@ -1,7 +1,7 @@
 process eggnog_download_db {
         
-        if (workflow.profile == 'conda') { storeDir 'nextflow-autodownload-databases/eggnog' }
-        else if (workflow.profile == 'gcloud') {publishDir 'gs://nf-muffin20/databases-nextflow/eggnog', mode: 'copy', pattern: "eggnog-db"}
+        if (workflow.profile.contains('conda')) { storeDir 'nextflow-autodownload-databases/eggnog' }
+        else if (workflow.profile.contains('gcloud')) {publishDir 'gs://gcloud_storage/databases-nextflow/eggnog', mode: 'copy', pattern: "eggnog-db"}
         else { publishDir 'nextflow-autodownload-databases/eggnog', mode: 'copy', pattern: "eggnog-db" }
         label 'eggnog' 
       output:
