@@ -12,6 +12,7 @@ A preprint is available here https://www.biorxiv.org/content/10.1101/2020.02.08.
 3. [Installation](#installation) :
     - [base installation](#base-installation)
     - [conda usage](#for-conda-usage)
+    - [gcloud usage](#for-gcloud-usage)
     - [containers usage](#for-containers-usage)
     - [software installe locally](#for-usage-of-software-installed-locally)
 4. [Test the pipeline](#test-the-pipeline)
@@ -109,6 +110,37 @@ conda deactivate
 
 #edit MAFIN/modules/metawrap_refine_bin.nf to use the env of metawrap
 #you need to change the line 3 and 25 to the path of your env (/path/to/install/metawrap-env)
+```
+
+### For gcloud usage
+If you use the google lifescience ressources you first need to setup a few parameters.
+
+In the nextflow.config you need to change the parameters of gcloud to correspond to your project (line 67 to 78).
+```sh
+    gcloud {  
+        //workDir = "/tmp/nextflow-docker_pipelines-$USER"
+        process.executor = 'google-lifesciences'
+        process.memory = params.memory
+        bucketDir = 'gs://bucket/work-dir' // change this to your bucket where you want the workfile to be stored
+        google { project = 'project-name-111111'; zone = 'europe-north1-a' } // insert your project ID as well as the zone(s) you want to use
+        // you can also use {region = 'europe-north1'} instead of zone
+        google.lifeSciences.copyImage = 'google/cloud-sdk:latest'
+        google.lifeSciences.preemptible = true
+        google.lifeSciences.bootDiskSize = "10GB"
+        google.lifeSciences.debug = true
+        //includeConfig 'configs/preemptible.config'
+    }
+```
+You will also have to change the bucket to store the different database in:
+    /modules/checkmgetdatabases.nf ; /modules/eggnog_get_databases.nf ; /modules/sourmashgetdatabase.nf
+
+To do so just edit the line using your bucket. keep the structure for more clarity (e.g. keep the "/databases-nextflow/sourmash" part).
+
+Example:
+```sh
+if (workflow.profile.contains('gcloud')) {publishDir 'gs://gcloud_storage/databases-nextflow/sourmash', mode: 'copy', pattern: "genbank-k31.lca.json.gz" }
+#becomes
+if (workflow.profile.contains('gcloud')) {publishDir 'gs://MY_STORAGE/databases-nextflow/sourmash', mode: 'copy', pattern: "genbank-k31.lca.json.gz" }
 ```
 
 ### For containers usage
