@@ -142,6 +142,8 @@ if (workflow.profile.contains('gcloud')) {publishDir 'gs://gcloud_storage/databa
 #becomes
 if (workflow.profile.contains('gcloud')) {publishDir 'gs://MY_STORAGE/databases-nextflow/sourmash', mode: 'copy', pattern: "genbank-k31.lca.json.gz" }
 ```
+If you desire run on gcloud without the preemptible parameter activated just edit the line 74 of nextflow.config to false.
+
 
 ### For containers usage
 If you use containers either docker or singularity, you don't need extra installations
