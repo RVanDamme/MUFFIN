@@ -1,7 +1,7 @@
 process spades {
     label 'spades'
-    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-    maxRetries 3 
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     publishDir "${params.output}/${name}/assemble/assembly/spades/", mode: 'copy', pattern: "assembly.fasta" 
     input:
     tuple val(name), path(illumina), path(ont)

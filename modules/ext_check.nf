@@ -1,5 +1,7 @@
 process fasta_check { 
-        label 'ubuntu'
+    label 'ubuntu'
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
       input:
        tuple val(sample), val(bin_id), path(file)
       output:

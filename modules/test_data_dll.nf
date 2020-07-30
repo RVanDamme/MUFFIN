@@ -1,5 +1,7 @@
 process test {
     label 'ubuntu'
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
     output:
     tuple val("subset"), path("ill/*")

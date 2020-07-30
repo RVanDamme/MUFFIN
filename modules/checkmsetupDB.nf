@@ -1,5 +1,7 @@
 process checkm_setup_db {
     label 'checkm'
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
     val(db)
     val(untar)

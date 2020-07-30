@@ -1,8 +1,8 @@
 process eggnog_bin { 
   label 'eggnog' 
   publishDir "${params.output}/${name}/annotate/bin_annotation/", mode: 'copy', pattern: "*.tsv"
-  errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-  maxRetries 3 
+  errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+  maxRetries = 5
   input:
     tuple val(name), path(bin), path(db)
   output:
@@ -20,8 +20,8 @@ process eggnog_bin {
 process eggnog_rna { 
   label 'eggnog' 
   publishDir "${params.output}/${name}/annotate/rna_annotation/", mode: 'copy', pattern: "*.tsv"
-  errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-  maxRetries 3 
+  errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+  maxRetries = 5
   input:
     tuple val(name), path(transcript), path(quant), path(db)
   output:

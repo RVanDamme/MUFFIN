@@ -1,5 +1,7 @@
 process sourmash_genome_size {
     label 'sourmash' 
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
     tuple val(name), path(ont)
     path(json)
@@ -24,8 +26,8 @@ process sourmash_genome_size {
 process sourmash_bins {
     label 'sourmash' 
     publishDir "${params.output}/${name}/classify/sourmash/", mode: 'copy', pattern: "*.txt"
-    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-    maxRetries 3 
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
     tuple val(name), path(bins)
     path(json)

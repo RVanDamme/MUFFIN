@@ -1,5 +1,6 @@
 process refine2 {
-    
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5   
     if (workflow.profile.contains('conda')) {conda '/path/to/miniconda3/envs/metawrap-env'}
     else {label 'metawrap'}
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins/*" 
