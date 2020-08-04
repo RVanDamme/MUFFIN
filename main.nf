@@ -1,5 +1,5 @@
 #!/usr/bin/env nextflow
-nextflow.preview.dsl=2
+nextflow.enable.dsl=2
 
 start_var = """
 *********Start running MUFFIN*********
@@ -16,7 +16,7 @@ Van Damme R., Hölzer M., Viehweger H., Müller B., Bongcam-Rudloff E., Brandt C
 doi: https://doi.org/10.1101/2020.02.08.939843 
 **************************************
 """
-println start_var
+view{start_var}
 
 if (params.help) { exit 0, helpMSG() }
 
@@ -98,7 +98,7 @@ def helpMSG() {
 }
 
 if( !nextflow.version.matches('20.+') ) {
-    println "This workflow requires Nextflow version 19.07 or greater and under version 20 -- You are running version $nextflow.version"
+    view{"This workflow requires Nextflow version 19.07 or greater and under version 20 -- You are running version $nextflow.version"}
     exit 1
 }
 
@@ -131,61 +131,61 @@ workflow { //start of the workflow
 
     //module for assemble
     if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem-class" | params.modular=="assem-annot") {
-        include sourmash_download_db from './modules/sourmashgetdatabase'
-        include checkm_setup_db from './modules/checkmsetupDB'
-        include checkm_download_db from './modules/checkmgetdatabases'
-        include discard_short from './modules/ont_qc' params(short_qc : params.short_qc)
-        include filtlong from './modules/ont_qc' params(short_qc : params.short_qc)
-        include merge from './modules/ont_qc' params(output : params.output)
-        include fastp from './modules/fastp' params(output : params.output) // simple QC done by fastp
-        include spades from './modules/spades' params(output : params.output)
-        include sourmash_genome_size from './modules/sourmash'
-        include flye from './modules/flye' params(output : params.output)
-        include minimap_polish from'./modules/minimap2'
-        include racon from './modules/polish'
-        include medaka from './modules/polish' params(model : params.model)
-        include pilon from './modules/polish' params(output : params.output)
-        include minimap2 from './modules/minimap2' //mapping for the binning 
-        include extra_minimap2 from './modules/minimap2'
-        include bwa from './modules/bwa' //mapping for the binning
-        include extra_bwa from './modules/bwa'
-        include metabat2_extra from './modules/metabat2' params(output : params.output)    
-        include metabat2 from './modules/metabat2' params(output : params.output)
-        include maxbin2 from './modules/maxbin2' params(output : params.output)
-        include concoct_extra from './modules/concoct' params(output : params.output)
-        include concoct from './modules/concoct' params(output : params.output)
-        include refine2 from './modules/metawrap_refine_bin' params(output : params.output)
-        include refine3 from './modules/metawrap_refine_bin' params(output : params.output)
-        include contig_list from './modules/list_ids'
-        include cat_all_bins from './modules/cat_all_bins'
-        include bwa_bin from './modules/bwa'  
-        include minimap2_bin from './modules/minimap2'
-        include reads_retrieval from './modules/seqtk_retrieve_reads' params(output : params.output)
-        include unmapped_retrieve from './modules/seqtk_retrieve_reads' params(output : params.output)
+        include {sourmash_download_db} from './modules/sourmashgetdatabase'
+        include {checkm_setup_db} from './modules/checkmsetupDB'
+        include {checkm_download_db} from './modules/checkmgetdatabases'
+        include {discard_short} from './modules/ont_qc' params(short_qc : params.short_qc)
+        include {filtlong} from './modules/ont_qc' params(short_qc : params.short_qc)
+        include {merge} from './modules/ont_qc' params(output : params.output)
+        include {fastp} from './modules/fastp' params(output : params.output) // simple QC done by fastp
+        include {spades} from './modules/spades' params(output : params.output)
+        include {sourmash_genome_size} from './modules/sourmash'
+        include {flye} from './modules/flye' params(output : params.output)
+        include {minimap_polish} from'./modules/minimap2'
+        include {racon} from './modules/polish'
+        include {medaka} from './modules/polish' params(model : params.model)
+        include {pilon} from './modules/polish' params(output : params.output)
+        include {minimap2} from './modules/minimap2' //mapping for the binning 
+        include {extra_minimap2} from './modules/minimap2'
+        include {bwa} from './modules/bwa' //mapping for the binning
+        include {extra_bwa} from './modules/bwa'
+        include {metabat2_extra} from './modules/metabat2' params(output : params.output)    
+        include {metabat2} from './modules/metabat2' params(output : params.output)
+        include {maxbin2} from './modules/maxbin2' params(output : params.output)
+        include {concoct_extra} from './modules/concoct' params(output : params.output)
+        include {concoct} from './modules/concoct' params(output : params.output)
+        include {refine2} from './modules/metawrap_refine_bin' params(output : params.output)
+        include {refine3} from './modules/metawrap_refine_bin' params(output : params.output)
+        include {contig_list} from './modules/list_ids'
+        include {cat_all_bins} from './modules/cat_all_bins'
+        include {bwa_bin} from './modules/bwa'  
+        include {minimap2_bin} from './modules/minimap2'
+        include {reads_retrieval} from './modules/seqtk_retrieve_reads' params(output : params.output)
+        include {unmapped_retrieve} from './modules/seqtk_retrieve_reads' params(output : params.output)
         //include unicycler './modules/unicycler_reassemble_from_bin' params(output : params.output)
     }
     //module for classify
     if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot") {
-        include checkm from './modules/checkm'params(output : params.output)
-        include sourmash_bins from './modules/sourmash'params(output : params.output)
-        include sourmash_checkm_parser from './modules/checkm_sourmash_parser'params(output: params.output)
+        include {checkm} from './modules/checkm'params(output : params.output)
+        include {sourmash_bins} from './modules/sourmash'params(output : params.output)
+        include {sourmash_checkm_parser} from './modules/checkm_sourmash_parser'params(output: params.output)
     }
     if (params.modular=="classify" | params.modular=="class-annot") {
-        include sourmash_download_db from './modules/sourmashgetdatabase'
-        include checkm_setup_db from './modules/checkmsetupDB'
-        include checkm_download_db from './modules/checkmgetdatabases'
+        include {sourmash_download_db} from './modules/sourmashgetdatabase'
+        include {checkm_setup_db} from './modules/checkmsetupDB'
+        include {checkm_download_db} from './modules/checkmgetdatabases'
     }
     //module for annotate
     if (params.modular=="full" | params.modular=="annotate" | params.modular=="assem-annot" | params.modular=="class-annot") {
-        include eggnog_download_db from './modules/eggnog_get_databases'
-        include eggnog_bin from './modules/eggnog'params(output : params.output)
-        include fastp_rna from './modules/fastp'params(output : params.output)
-        include de_novo_transcript_and_quant from './modules/trinity_and_salmon'params(output : params.output)
-        include eggnog_rna from './modules/eggnog'params(output : params.output)
-        include parser_bin_RNA from './modules/parser'params(output: params.output)
-        include parser_bin from './modules/parser'params(output: params.output)
+        include {eggnog_download_db} from './modules/eggnog_get_databases'
+        include {eggnog_bin} from './modules/eggnog'params(output : params.output)
+        include {fastp_rna} from './modules/fastp'params(output : params.output)
+        include {de_novo_transcript_and_quant} from './modules/trinity_and_salmon'params(output : params.output)
+        include {eggnog_rna} from './modules/eggnog'params(output : params.output)
+        include {parser_bin_RNA} from './modules/parser'params(output: params.output)
+        include {parser_bin} from './modules/parser'params(output: params.output)
     }
-    include readme_output from './modules/readme_output'params(output: params.output)
+    include {readme_output} from './modules/readme_output'params(output: params.output)
 
     //*************************************************
     // STEP 1 Assemble using hybrid method
@@ -199,7 +199,7 @@ workflow { //start of the workflow
 
         // DATA INPUT TEST
         if (workflow.profile.contains('test')) {
-            include test from './modules/test_data_dll'
+            include {test} from './modules/test_data_dll'
             test()
             illumina_input_ch = test.out[0]
             ont_input_ch = test.out[1]

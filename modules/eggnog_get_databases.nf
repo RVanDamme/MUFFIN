@@ -7,7 +7,7 @@ process eggnog_download_db {
   errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
   maxRetries = 5
   output:
-        path("eggnog-db")
+    path("eggnog-db")
   script:
   """
   mkdir eggnog-db
