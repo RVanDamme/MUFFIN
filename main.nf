@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-start_var = """
+start_var = Channel.from("""
 *********Start running MUFFIN*********
 MUFFIN is a hybrid assembly and differential binning workflow for metagenomics, transcriptomics and pathway analysis.
 
@@ -15,8 +15,8 @@ Van Damme R., Hölzer M., Viehweger H., Müller B., Bongcam-Rudloff E., Brandt C
 "Metagenomics workflow for hybrid assembly, differential coverage binning, transcriptomics and pathway analysis (MUFFIN)",
 doi: https://doi.org/10.1101/2020.02.08.939843 
 **************************************
-"""
-view{start_var}
+""")
+start_var.view()
 
 if (params.help) { exit 0, helpMSG() }
 
@@ -98,7 +98,7 @@ def helpMSG() {
 }
 
 if( !nextflow.version.matches('20.+') ) {
-    view{"This workflow requires Nextflow version 19.07 or greater and under version 20 -- You are running version $nextflow.version"}
+    ch_ver=Channel.from("This workflow requires Nextflow version 19.07 or greater and under version 20 -- You are running version $nextflow.version").view()
     exit 1
 }
 
