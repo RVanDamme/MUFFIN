@@ -6,7 +6,7 @@ process reads_retrieval {
     input:
     tuple val(name), path(contig_list), path(ill_bam), path(ont_bam), path(ill_reads), path(ont_reads)
     output:
-    tuple val(name), val(path(path(path(contig_list).baseName).baseName).baseName), path("*_illumina_R{1,2}.fastq"), path("*_ont.fastq")
+    tuple val(name), val(file(file(file(contig_list).baseName).baseName).baseName), path("*_illumina_R{1,2}.fastq"), path("*_ont.fastq")
     shell:
     // first I extract the reads that NEED TO REDO IT WITH FRESH MIND (include BWA.nf)
     """
