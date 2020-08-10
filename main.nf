@@ -139,7 +139,7 @@ workflow { //start of the workflow
         include {merge} from './modules/ont_qc' params(output : params.output)
         include {fastp} from './modules/fastp' params(output : params.output) // simple QC done by fastp
         include {spades} from './modules/spades' params(output : params.output)
-        include {sourmash_genome_size} from './modules/sourmash'
+        //include {sourmash_genome_size} from './modules/sourmash' deprecated by flye 2.8
         include {flye} from './modules/flye' params(output : params.output)
         include {minimap_polish} from'./modules/minimap2'
         include {racon} from './modules/polish'
@@ -304,7 +304,7 @@ workflow { //start of the workflow
 
         if (params.assembler=="metaflye") { // metagenomic assembly by flye + hybrid polishing (combo racon; medaka; pilon with short reads)
             // FLYE + Pilon 
-            flye(sourmash_genome_size(ont_input_ch,database_sourmash))
+            flye(ont_input_ch)
             flye_to_map = flye.out.join(ont_input_ch)
             minimap_polish(flye_to_map)
             map_to_racon = ont_input_ch.join(flye.out).join(minimap_polish.out)

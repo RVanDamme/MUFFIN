@@ -1,4 +1,4 @@
-process sourmash_genome_size {
+process sourmash_genome_size { //deprecated since flye 2.8 update
     label 'sourmash' 
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
