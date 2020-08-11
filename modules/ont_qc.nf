@@ -1,5 +1,7 @@
 process discard_short {
     label 'ubuntu'
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
     tuple val(name) , path(part)
     output:
@@ -15,8 +17,8 @@ process discard_short {
 
 process filtlong {
     label 'filtlong'
-    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-    maxRetries 3 
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
     tuple val(name) , path(filtered)
     output:
@@ -30,6 +32,8 @@ process filtlong {
 
 process merge {
     label 'ubuntu'
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     publishDir "${params.output}/${name}/assemble/quality_control/nanopore/", mode: 'copy', pattern: "*_all.fastq" 
     input:
     tuple val(name) , path(filtered)

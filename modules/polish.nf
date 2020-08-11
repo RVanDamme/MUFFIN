@@ -1,7 +1,7 @@
 process racon {
     label 'racon'
-    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-    maxRetries 3 
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
         tuple val(name), path(read), path(assembly), path(mapping) 
     output:
@@ -14,8 +14,8 @@ process racon {
 
 process medaka {
     label 'medaka'
-    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-    maxRetries 3 
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
         tuple val(name), path(read), path(consensus) 
     output:
@@ -29,8 +29,8 @@ process medaka {
 
 process pilon {
     label 'pilon'
-    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-    maxRetries 3 
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "polished_assembly.fasta" 
     input:
         tuple val(name), path(assembly), path(ill_read)

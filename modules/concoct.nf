@@ -2,12 +2,12 @@ process concoct {
     maxForks 1
     label 'concoct'
     publishDir "${params.output}/${name}/assemble/binning/concoct_bins/", mode: 'copy', pattern: "fasta_bins"
-    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-    maxRetries 3 
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
-    tuple val(name), file(assembly), file(ont_bam), file(illumina_bam)
+    tuple val(name), path(assembly), path(ont_bam), path(illumina_bam)
     output:
-    tuple val(name), file("fasta_bins")
+    tuple val(name), path("fasta_bins")
     script:
     """
     mkdir concoct_out
@@ -28,8 +28,8 @@ process concoct_extra {
     maxForks 1
     label 'concoct'
     publishDir "${params.output}/${name}/assemble/binning/concoct/", mode: 'copy', pattern: "fasta_bins"
-    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-    maxRetries 3 
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
     tuple val(name), path(assembly), path(ont_bam), path(illumina_bam)
     path(extra_bam)

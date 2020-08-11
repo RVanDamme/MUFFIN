@@ -1,5 +1,7 @@
 process readme_output {
     label 'ubuntu'
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     publishDir "${params.output}/", mode: 'copy', pattern: "README_output.txt"
     input:
     output:

@@ -2,6 +2,8 @@ process sourmash_checkm_parser {
     //label 'python38'
     label 'ubuntu'
     publishDir "${params.output}/${name}/classify/", mode: 'copy', pattern: "classify_step_summary.csv"
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
     tuple val(name), path(checkm)
     path(sourmash)

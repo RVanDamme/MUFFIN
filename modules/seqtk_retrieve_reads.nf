@@ -1,8 +1,8 @@
 process reads_retrieval {
     label 'seqtk'
     publishDir "${params.output}/${name}/assembled/reassembly/mapped_reads/", mode: 'copy', pattern: "*.fastq"
-    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-    maxRetries 3 
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
     tuple val(name), path(contig_list), path(ill_bam), path(ont_bam), path(ill_reads), path(ont_reads)
     output:
@@ -45,8 +45,8 @@ process reads_retrieval {
 
 process unmapped_retrieve {
     label 'seqtk'
-    errorStrategy { task.exitStatus in 14..14 ? 'retry' : 'finish'}
-    maxRetries 3 
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     publishDir "${params.output}/${name}/assembled/reassembly/unmapped_reads/", mode: 'copy', pattern: "*unmapped_*.fastq"
     input:
     tuple val(name), path(ill_bam), path(ont_bam), path(ill_reads), path(ont_reads)

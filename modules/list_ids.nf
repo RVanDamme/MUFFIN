@@ -1,5 +1,7 @@
 process contig_list {
     label 'ubuntu'
+        errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
     input:
     tuple val(name), path(bins)
     output:
