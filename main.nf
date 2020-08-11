@@ -98,7 +98,7 @@ def helpMSG() {
 }
 
 if( !nextflow.version.matches('20.+') ) {
-    ch_ver=Channel.from("This workflow requires Nextflow version 19.07 or greater and under version 20 -- You are running version $nextflow.version").view()
+    ch_ver=Channel.from("This workflow requires Nextflow version 20.07 or greater -- You are running version $nextflow.version").view()
     exit 1
 }
 
