@@ -1,8 +1,10 @@
 process refine2 {
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5   
-    if (workflow.profile.contains('conda')) {conda '/path/to/miniconda3/envs/metawrap-env'}
-    else {label 'metawrap'}
+    // uncomment the if else if you encounter issue using conda with metawrap
+    //if (workflow.profile.contains('conda')) {conda '/path/to/miniconda3/envs/metawrap-env'}
+    //else {label 'metawrap'}
+    label 'metawrap'
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins/*" 
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
     input:
@@ -27,8 +29,10 @@ process refine2 {
 }
 
 process refine3 {
-    if (workflow.profile.contains('conda')) {conda '/path/to/miniconda3/envs/metawrap-env'}
-    else {label 'metawrap'}
+    // uncomment the if else if you encounter issue using conda with metawrap
+    //if (workflow.profile.contains('conda')) {conda '/path/to/miniconda3/envs/metawrap-env'}
+    //else {label 'metawrap'}
+    label 'metawrap'
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins/*" 
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
     errorStrategy { task.exitStatus in 1..1 ? 'retry' : 'finish'}
