@@ -9,7 +9,6 @@ process flye {
     tuple val(name), path("assembly.fasta")
     shell:
     """
-    size=\$(cat !{genome_size})
     flye --nano-raw ${ont} -o flye_output -t ${task.cpus} --plasmids --meta
     mv flye_output/assembly.fasta assembly.fasta
     """
