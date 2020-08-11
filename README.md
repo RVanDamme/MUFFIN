@@ -94,23 +94,8 @@ nextflow run  RVanDamme/MUFFIN --parameters.....
 ```
 
 ### For conda usage
-If you use conda you need to install Metawrap in an environment you create yourself, this is due to a known issue that will be fixed soon.
-
-```sh
-
-#create an env and install metawrap
-conda create -y -p /path/to/install/metawrap-env python=2.7
-conda activate /path/to/install/metawrap-env
-conda config --add channels defaults
-conda config --add channels conda-forge
-conda config --add channels bioconda
-conda config --add channels ursky
-conda install -y -c ursky metawrap-mg
-conda deactivate
-
-#edit MAFIN/modules/metawrap_refine_bin.nf to use the env of metawrap
-#you need to change the line 3 and 25 to the path of your env (/path/to/install/metawrap-env)
-```
+If you use conda, you don't need extra installations.
+An error might occur with the installation of metawrap, if so please consult [Troubleshooting](#troubleshooting).
 
 ### For gcloud usage
 If you use the google lifescience ressources you first need to setup a few parameters.
@@ -146,10 +131,10 @@ If you desire run on gcloud without the preemptible parameter activated just edi
 
 
 ### For containers usage
-If you use containers either docker or singularity, you don't need extra installations
+If you use containers either docker or singularity, you don't need extra installations.
 
 ### For usage of software installed locally
-You just need to have all the software used in the pipeline (see table above) installed and in your $PATH
+You just need to have all the software used in the pipeline (see table above) installed and in your $PATH.
 
 ## Test the pipeline
 To test the pipeline we have a subset of 5 bins available at https://osf.io/9xmh4/
@@ -228,7 +213,25 @@ If you run "annotate" without "classify" use "--bin_annotate"
 
 
 ## Troubleshooting
-* If metawrap fail using conda check that you installed metawrap in a conda environment and put the path in "modules/metawrap_refine_bin.nf"
+* If metawrap installation fail while using conda. A known fix is to install metawrap in a conda environment and put the path in "modules/metawrap_refine_bin.nf"
+  To do so run the following command:
+  
+```sh
+
+#create an env and install metawrap
+conda create -y -p /path/to/install/metawrap-env python=2.7
+conda activate /path/to/install/metawrap-env
+conda config --add channels defaults
+conda config --add channels conda-forge
+conda config --add channels bioconda
+conda config --add channels ursky
+conda install -y -c ursky metawrap-mg
+conda deactivate
+
+#edit MAFIN/modules/metawrap_refine_bin.nf to use the env of metawrap
+#you need to change the line 3 and 25 to the path of your env (/path/to/install/metawrap-env)
+```
+
 
 * If you run the pipeline with google life sciences and get error code 14
   It means the process was killed by google, you just need to run the pipeline again don't forget to add "-resume"
