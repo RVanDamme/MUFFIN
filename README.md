@@ -76,7 +76,7 @@ MUFFIN uses the following software
 ## Installation
 
 ### base installation
-You need to install nextflow Version 20.01+ ( https://www.nextflow.io/ )
+You need to install nextflow Version 20.07+ ( https://www.nextflow.io/ )
 ```sh
 # verify Java version (at least version 8+)
 java -version 
@@ -85,7 +85,7 @@ java -version
 curl -s https://get.nextflow.io | bash
 
 # If you want the pipeline installed locally use the following
-git clone https://github.com/RVanDamme/MAFIN.git
+git clone https://github.com/RVanDamme/MUFFIN.git
 
 # If you want to not install the pipeline use the following when running nextflow
 
