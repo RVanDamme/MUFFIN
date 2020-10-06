@@ -8,10 +8,10 @@ process refine2 {
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins/*" 
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
     input:
-    tuple val(name1), path(bins1), path(bins2)
+    tuple val(name), path(bins1), path(bins2)
     path(path)
     output:
-    tuple val(name1), path("metawrap_bins/*.fa")
+    tuple val(name), path("metawrap_bins/*.fa")
     path("${name}_binning_stats.txt")
     shell:
     """
