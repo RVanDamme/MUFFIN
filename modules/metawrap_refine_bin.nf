@@ -18,9 +18,9 @@ process refine2 {
     mem=\$(echo ${task.memory} | sed 's/g//g')
     path_db=\$(cat ${path})
     echo \$path_db
-    echo -e "cat << EOF\\n\$path_db\\nEOF\\n" | checkm data setRoot
+    echo \$path_db | checkm data setRoot
     echo "checkm done"
-    metawrap bin_refinement -t ${task.cpus} -m \$mem -o refined_bins -A ${bins1} -B ${bins2} -o refined_bins
+    metawrap bin_refinement -o refined_bins -A ${bins1} -B ${bins2} -o refined_bins -t ${task.cpus} -m \$mem 
     mkdir metawrap_bins/
     mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
     mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
@@ -49,7 +49,7 @@ process refine3 {
     mem=\$(echo ${task.memory} | sed 's/g//g')
     path_db=\$(cat ${path})
     echo \$path_db
-    echo -e "cat << EOF\\n\$path_db\\nEOF\\n" | checkm data setRoot
+    checkm data setRoot \$path_db
     echo "checkm done"
     metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins3} -C ${bins1} -t ${task.cpus} -m \$mem 
     mkdir metawrap_bins/
@@ -61,7 +61,7 @@ process refine3 {
     mem=\$(echo ${task.memory} | sed 's/g//g')
     path_db=\$(cat ${path})
     echo \$path_db
-    echo -e "\$path_db" | checkm data setRoot
+    checkm data setRoot \$path_db
     echo "checkm done"
     metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins1} -t ${task.cpus} -m \$mem 
     mkdir metawrap_bins/
@@ -75,4 +75,15 @@ process refine3 {
     // cp -r /home/renaud/mafin_modul/metawrap/metawrap_bins .
     // cp /home/renaud/mafin_modul/metawrap/S_41_17_Cf_binning_stats.txt .
 
-     
+process norefine {     
+    label 'ubuntu'
+    input:
+    tuple val(name), path(bins)
+    output:
+    tuple val(name), path("norefine/*.fa")
+    shell:\
+    """
+    mkdir norefine
+    cp ${bins}/* norefine/
+    """
+}
