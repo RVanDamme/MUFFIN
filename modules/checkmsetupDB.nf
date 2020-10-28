@@ -20,7 +20,7 @@ process checkm_setup_db {
                     path_db=\$(dirname !{db});
                     mkdir -p \$path_db/db/;
                     tar -xvf ${db} -C \$path_db/db/;
-                    echo -e "cat << EOF\\n\$path_db/db\\nEOF\\n" | checkm data setRoot   
+                    checkm data setRoot \$path_db/db/ ;
                     echo \$path_db/db > path_db.txt;
         fi
         """
