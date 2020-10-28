@@ -389,8 +389,8 @@ workflow { //start of the workflow
         // Bin refine
 
         if (params.skip_metabat2==true) {
-            if (  params.skip_maxbin2==true && params.skip_concoct==false) {metawrap_out_ch = norefine(concoct_out)} // no refine if 1 or less binning method used
-            else if ( params.skip_concoct==true && params.skip_maxbin2==false ) {metawrap_out_ch = norefine(maxbin2_out)}
+            if (  params.skip_maxbin2==true && params.skip_concoct==false) {metawrap_out_ch = norefine(concoct_out).transpose()} // no refine if 1 or less binning method used
+            else if ( params.skip_concoct==true && params.skip_maxbin2==false ) {metawrap_out_ch = norefine(maxbin2_out).transpose()}
             else {
                 refine2_ch = maxbin2_out.join(concoct_out)
                 refine2(refine2_ch, checkm_db_path) // use 2 binning method to refine
@@ -402,8 +402,8 @@ workflow { //start of the workflow
         }
 
         else if (params.skip_maxbin2==true) {
-            if (  params.skip_metabat2==true && params.skip_concoct==false) {metawrap_out_ch = norefine(concoct_out)} // no refine if 1 or less binning method used
-            else if ( params.skip_concoct==true && params.skip_metabat2==false ) {metawrap_out_ch = norefine(metabat2_out)}
+            if (  params.skip_metabat2==true && params.skip_concoct==false) {metawrap_out_ch = norefine(concoct_out).transpose()} // no refine if 1 or less binning method used
+            else if ( params.skip_concoct==true && params.skip_metabat2==false ) {metawrap_out_ch = norefine(metabat2_out).transpose()}
             else {
                 refine2_ch = metabat2_out.join(concoct_out)
                 refine2(refine2_ch, checkm_db_path) // use 2 binning method to refine
@@ -415,8 +415,8 @@ workflow { //start of the workflow
         }
 
         else if (params.skip_concoct==true) {
-            if (  params.skip_metabat2==true && params.skip_maxbin2==false) {metawrap_out_ch = norefine(maxbin2_out)} // no refine if 1 or less binning method used
-            else if ( params.skip_maxbin2==true && params.skip_metabat2==false ) {metawrap_out_ch = norefine(metabat2_out)}
+            if (  params.skip_metabat2==true && params.skip_maxbin2==false) {metawrap_out_ch = norefine(maxbin2_out).transpose()} // no refine if 1 or less binning method used
+            else if ( params.skip_maxbin2==true && params.skip_metabat2==false ) {metawrap_out_ch = norefine(metabat2_out).transpose()}
             else {
                 refine2_ch = metabat2_out.join(maxbin2_out)
                 refine2(refine2_ch, checkm_db_path) // use 2 binning method to refine
