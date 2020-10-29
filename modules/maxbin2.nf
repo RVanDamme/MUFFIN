@@ -10,8 +10,11 @@ process maxbin2 {
     tuple val(name), path("maxbin_bin")
     shell:
     """
-    path=\$(which run_Maxbin.pl |  xargs dirname | xargs dirname )
-    export PERL5LIB=\$path/lib/perl5/site_perl/5.22.0/
+    which run_MaxBin.pl > path.txt
+    path=\$(cat path.txt )
+    path_strip1=\$(dirname \$path)
+    path_strip2=\$(dirname \$path_strip1)
+    export PERL5LIB=\$path_strip2/lib/perl5/site_perl/5.22.0/
     run_MaxBin.pl -contig ${assembly}  -reads ${illumina[0]} -reads2 ${illumina[1]} -reads3 ${ont}  -out maxbin2 -thread ${task.cpus}
     mkdir maxbin_bin
     mv maxbin2.*.fasta maxbin_bin/
