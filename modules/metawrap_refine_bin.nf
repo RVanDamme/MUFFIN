@@ -80,7 +80,7 @@ process norefine {
     input:
     tuple val(name), path(bins)
     output:
-    tuple val(name), path("norefine/*.fa")
+    tuple val(name), path("${bins}/*.fa")
     shell:\
     """
     mkdir norefine
