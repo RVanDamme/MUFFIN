@@ -18,7 +18,7 @@ process refine2 {
     mem=\$(echo ${task.memory} | sed 's/g//g')
     path_db=\$(cat ${path})
     echo \$path_db
-    echo \$path_db | checkm data setRoot
+    checkm data setRoot \$path_db
     echo "checkm done"
     metawrap bin_refinement -o refined_bins -A ${bins1} -B ${bins2} -o refined_bins -t ${task.cpus} -m \$mem 
     mkdir metawrap_bins/
