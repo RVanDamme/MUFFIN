@@ -35,8 +35,8 @@ process refine3 {
     label 'metawrap'
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins/*" 
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
-    errorStrategy { task.exitStatus in 1..1 ? 'retry' : 'finish'}
-    maxRetries 2
+    //errorStrategy { task.exitStatus in 1..1 ? 'retry' : 'finish'}
+    //maxRetries 2
     input:
         tuple val(name), path(bins1), path(bins2), path(bins3)
         path(path)
