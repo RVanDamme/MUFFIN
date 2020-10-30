@@ -35,8 +35,8 @@ process refine3 {
     label 'metawrap'
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "metawrap_bins/*" 
     publishDir "${params.output}/${name}/assemble/binning/metawrap_refined_bins/", mode: 'copy', pattern: "${name}_binning_stats.txt" 
-    //errorStrategy { task.exitStatus in 1..1 ? 'retry' : 'finish'}
-    //maxRetries 2
+    errorStrategy { task.exitStatus in 1..1 ? 'retry' : 'finish'}
+    maxRetries 1
     input:
         tuple val(name), path(bins1), path(bins2), path(bins3)
         path(path)
@@ -61,7 +61,7 @@ process refine3 {
     mem=\$(echo ${task.memory} | sed 's/g//g')
     path_db=\$(cat ${path})
     echo \$path_db
-    checkm data setRoot \$path_db
+    echo -e "cat << EOF\\n\$path\\nEOF\\n" | checkm data setRoot 
     echo "checkm done"
     metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins1} -t ${task.cpus} -m \$mem 
     mkdir metawrap_bins/
