@@ -44,32 +44,90 @@ process refine3 {
     tuple val(name), path("metawrap_bins/*.fa")
     path("${name}_binning_stats.txt")
     shell:
-    if (task.attempt == 1)
-    """
-    mem=\$(echo ${task.memory} | sed 's/g//g')
-    path_db=\$(cat ${path})
-    echo \$path_db
-    checkm data setRoot \$path_db
-    echo "checkm done"
-    metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins3} -C ${bins1} -t ${task.cpus} -m \$mem 
-    mkdir metawrap_bins/
-    mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
-    mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
-    """
-    else if (task.attempt == 2)
-    """
-    mem=\$(echo ${task.memory} | sed 's/g//g')
-    path_db=\$(cat ${path})
-    echo \$path_db
-    echo -e "cat << EOF\\n\$path\\nEOF\\n" | checkm data setRoot 
-    echo "checkm done"
-    metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins1} -t ${task.cpus} -m \$mem 
-    mkdir metawrap_bins/
-    mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
-    mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
-    """
-    else 
-    error "please pick the bins you want and submit them in the classification step then select the bins for the annotation step"
+    if (workflow.profile.contains('conda')){
+        if (task.attempt == 1)
+        """
+        mem=\$(echo ${task.memory} | sed 's/g//g')
+        path_db=\$(cat ${path})
+        echo \$path_db
+        which checkm > checkm.txt
+        path=\$(cat checkm.txt )
+        path_strip1=\$(dirname \$path)
+        path_strip2=\$(dirname \$path_strip1)
+        sed -i 's#/srv/whitlam/bio/db/checkm_data/1.0.0#'"\$path_db"'#' \$path_strip2/lib/python2.7/site-packages/checkm/DATA_CONFIG
+        echo "checkm done"
+        metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins3} -C ${bins1} -t ${task.cpus} -m \$mem 
+        mkdir metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
+        """
+        else if (task.attempt == 2)
+        """
+        mem=\$(echo ${task.memory} | sed 's/g//g')
+        path_db=\$(cat ${path})
+        echo \$path_db
+        which checkm > checkm.txt
+        path=\$(cat checkm.txt )
+        path_strip1=\$(dirname \$path)
+        path_strip2=\$(dirname \$path_strip1)
+        sed -i 's#/srv/whitlam/bio/db/checkm_data/1.0.0#'"\$path_db"'#' \$path_strip2/lib/python2.7/site-packages/checkm/DATA_CONFIG
+        echo "checkm done"
+        metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins1} -t ${task.cpus} -m \$mem 
+        mkdir metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
+        """
+        else 
+        error "please pick the bins you want and submit them in the classification step then select the bins for the annotation step"
+        }
+    else if (workflow.profile.contains(' local_engine')){
+        if (task.attempt == 1)
+        """
+        mem=\$(echo ${task.memory} | sed 's/g//g')
+        path_db=\$(cat ${path})
+        echo \$path_db
+        checkm data setRoot \$path_db
+        echo "checkm done"
+        metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins3} -C ${bins1} -t ${task.cpus} -m \$mem 
+        mkdir metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
+        """
+        else if (task.attempt == 2)
+        """
+        mem=\$(echo ${task.memory} | sed 's/g//g')
+        path_db=\$(cat ${path})
+        echo \$path_db
+        echo -e "cat << EOF\\n\$path\\nEOF\\n" | checkm data setRoot 
+        echo "checkm done"
+        metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins1} -t ${task.cpus} -m \$mem 
+        mkdir metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
+        """
+        else 
+        error "please pick the bins you want and submit them in the classification step then select the bins for the annotation step"
+        }
+    else {
+        if (task.attempt == 1)
+        """
+        mem=\$(echo ${task.memory} | sed 's/g//g')
+        metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins3} -C ${bins1} -t ${task.cpus} -m \$mem 
+        mkdir metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
+        """
+        else if (task.attempt == 2)
+        """
+        mem=\$(echo ${task.memory} | sed 's/g//g')
+        metawrap bin_refinement -o refined_bins -A ${bins2} -B ${bins1} -t ${task.cpus} -m \$mem 
+        mkdir metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins/*.fa metawrap_bins/
+        mv refined_bins/metawrap_70_10_bins.stats ${name}_binning_stats.txt
+        """
+        else 
+        error "please pick the bins you want and submit them in the classification step then select the bins for the annotation step"
+        }
 }
 
     // cp -r /home/renaud/mafin_modul/metawrap/metawrap_bins .
