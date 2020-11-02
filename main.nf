@@ -11,7 +11,7 @@ https://www.biorxiv.org/content/10.1101/2020.02.08.939843v1
 
 or
 
-Van Damme R., Hölzer M., Viehweger H., Müller B., Bongcam-Rudloff E., Brandt C., 2020
+Van Damme R., Hölzer M., Viehweger A., Müller B., Bongcam-Rudloff E., Brandt C., 2020
 "Metagenomics workflow for hybrid assembly, differential coverage binning, transcriptomics and pathway analysis (MUFFIN)",
 doi: https://doi.org/10.1101/2020.02.08.939843 
 **************************************
