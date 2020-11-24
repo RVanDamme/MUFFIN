@@ -12,7 +12,7 @@ process sourmash_checkm_parser {
     shell:
     """
     grep -v "] INFO: " !{checkm} | grep -v "\\-\\-\\-\\-\\-\\-\\-" | grep -v "Bin Id" | sed -e 's/^[ \\t]*//'|sed 's/[ \\t]*\$//' |sed -r 's/ +/,/g'|sed '/^\$/d' >checkm.csv
-    for file in ${sourmash}; do tail -n 1 \$file | sed -e 's/.fa//' >>sourmash.csv; done
+    for file in \$(ls bin*.txt); do tail -n 1 \$file | sed -e 's/.fa//' >>sourmash.csv; done
     checkm_sourmash_parser.py -c checkm.csv -s sourmash.csv
     """
 }
