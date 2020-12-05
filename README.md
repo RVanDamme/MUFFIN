@@ -193,14 +193,9 @@ path/to/nextflow run $MUFFIN_pipeline --output results_dir --assembler $assemble
   - "metaspades" for hybrid assembly
   - "metaflye" for long-read assembly with short-reads polishing
 
-Which one should I choose?
-Both approaches should be chosen based on the experimental set up of the user. 
-E.g. if the main sequencing throughput was generated via short reads meta-spades should be chosen. 
-If lots of long read data is available, e.g. > 15 Gigabases (corresponds to MinION or GridION flowcell) flye should be used as the assembly approach.
-If they are roughly the same we recommend flye but when in doubt execute both options and compare.
-To test both option you can select only the specific step (assembly or assembly+classification), you can see how to (here)[#advanced-usage]. 
-Check your bins and then resume (-resume) the pipeline changing the --modular to full or submit the bins manually selected for the last step (either classification or annotation or both).
-You can also more simply run the entire pipeline with both assembler.
+**What assembly approach should i use? (metaspades vs flye)**
+
+Chose your assembly approach based on the amount of data (in Gigabases). If you have more short reads go for meta-spades, more long-reads? Go for flye. However, if you have over 15 Gigabases of long read data, flye might always be the better option regardless of Illumina throughput as you get good complete genome drafts.  As the each sample influences the outcome heavily we recommend in trying both if you are unsure.
 
  $profile_executor can be:
   - "local" to run on your computer
