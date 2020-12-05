@@ -173,13 +173,11 @@ ont         : "fastq_ont/"
 cpus        : 16
 memory      : "64g"
 modular     : "full"
-profile     : "local,conda,test"
-
 ```
 
 MUFFIN comand:
 ```
-path/to/nextflow run $MUFFIN_pipeline -params-file MUFFIN_params.yml
+path/to/nextflow run $MUFFIN_pipeline -params-file MUFFIN_params.yml -profile local,conda,test
 ```
 $MUFFIN_pipeline is either "path/to/MUFFIN/main.nf" or "RVanDamme/MUFFIN"
 
