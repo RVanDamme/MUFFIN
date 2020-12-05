@@ -18,7 +18,7 @@ The documentation is available here https://rvandamme.github.io/MUFFIN_Documenta
     - [software installe locally](#for-usage-of-software-installed-locally)
 4. [Test the pipeline](#test-the-pipeline)
 5. [Usage](#usage) :
-    - [Automated usage](#automated_usage)
+    - [Automated usage](#automated-usage)
     - [Basic usage](#basic-usage)
     - [Advanced usage](#advanced-usage)
 6. [Troubleshooting](#troubleshooting)
@@ -161,6 +161,7 @@ The results of the different test run are available at https://osf.io/m5czv/
 
 ### Automated usage 
 To avoid writing all the parameter in the CLI you can use the additional "-params-file" and provide a .yml file that contains all the parameters available for MUFFIN and described below.
+You can find the MUFFIN_params.yml file in the base of MUFFIN directory.
 
 Exemple:
 MUFFIN_params.yml
