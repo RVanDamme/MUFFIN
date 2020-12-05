@@ -18,6 +18,7 @@ The documentation is available here https://rvandamme.github.io/MUFFIN_Documenta
     - [software installe locally](#for-usage-of-software-installed-locally)
 4. [Test the pipeline](#test-the-pipeline)
 5. [Usage](#usage) :
+    - [Automated usage](#automated_usage)
     - [Basic usage](#basic-usage)
     - [Advanced usage](#advanced-usage)
 6. [Troubleshooting](#troubleshooting)
@@ -157,6 +158,30 @@ The subset contains also RNA data to test with transcriptomics analysis you just
 The results of the different test run are available at https://osf.io/m5czv/
 
 ## Usage
+
+### Automated usage 
+To avoid writing all the parameter in the CLI you can use the additional "-params-file" and provide a .yml file that contains all the parameters available for MUFFIN and described below.
+
+Exemple:
+MUFFIN_params.yml
+```
+assembler   : "metaspades"
+ouptut      : "path/to/resultdir"
+illumina    : "fastq_ill/"
+ont         : "fastq_ont/"
+cpus        : 16
+memory      : "64g"
+modular     : "full"
+profile     : "local,conda,test"
+
+```
+
+MUFFIN comand:
+```
+path/to/nextflow run $MUFFIN_pipeline -params-file MUFFIN_params.yml
+```
+$MUFFIN_pipeline is either "path/to/MUFFIN/main.nf" or "RVanDamme/MUFFIN"
+
 
 ### Basic usage
 
