@@ -1,0 +1,11 @@
+assembler   : "metaspades"
+ouptut      : "path/to/resultdir"
+illumina    : "fastq_ill/"
+ont         : "fastq_ont/"
+cpus        : 16
+memory      : "64g"
+modular     : "full"
+profile     : "local,conda,test"
+rna         : false
+bin_classify: false
+bin_annotate: false
