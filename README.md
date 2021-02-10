@@ -1,7 +1,7 @@
 # MUFFIN <img src=".figure/Logo_MUFFIN_cropped.png" width="240" height="160" />
 MUFFIN is a hybrid assembly and differential binning workflow for metagenomics, transcriptomics and pathway analysis.
 
-A preprint is available here https://www.biorxiv.org/content/10.1101/2020.02.08.939843v1
+If you use MUFFIN in your research, please cite [our paper](https://doi.org/10.1371/journal.pcbi.1008716)
 
 The documentation is available here https://rvandamme.github.io/MUFFIN_Documentation/#introduction
 ## INDEX
