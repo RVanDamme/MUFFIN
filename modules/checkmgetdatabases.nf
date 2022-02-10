@@ -9,6 +9,6 @@ process checkm_download_db {
     path("checkm_data_2015_01_16.tar.gz")
   script:
   """
-  wget https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01_16.tar.gz
+  wget --no-check-certificate https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01_16.tar.gz
   """
 }

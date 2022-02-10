@@ -8,7 +8,7 @@ process readme_output {
         path("README_output.txt") 
     script:
         """
-        wget https://osf.io/a6hru/download -O README_output.txt
+        wget --no-check-certificate https://osf.io/a6hru/download -O README_output.txt
         """
 
 }

@@ -9,7 +9,7 @@ process test {
     tuple val("subset"), path("rna/*")
     shell:
     """
-    wget https://osf.io/9xmh4/download -O subset_data.tar.gz
+    wget --no-check-certificate https://osf.io/9xmh4/download -O subset_data.tar.gz
     tar -xzvf subset_data.tar.gz
     mkdir ill
     mv ./subset/subset_ill/* ill/
