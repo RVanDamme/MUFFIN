@@ -110,7 +110,7 @@ println "\033[0;33mporeCov requires at least Nextflow version " + XX + "." + YY 
 exit 1
 }
 
-workflow { //start of the workflow
+
     //*************************************************
     // STEP 0 Loading modules and workflow profile error handling
     //*************************************************
@@ -195,11 +195,13 @@ workflow { //start of the workflow
         include {parser_bin} from './modules/parser'params(output: params.output)
     }
     include {readme_output} from './modules/readme_output'params(output: params.output)
+    include {test} from './modules/test_data_dll'
 
     //*************************************************
     // STEP 1 Assemble using hybrid method
     //*************************************************
 
+workflow { //start of the workflow
     if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem-class" | params.modular=="assem-annot") { //only do the step one if called
         if (params.assembler!='metaflye' && params.assembler!='metaspades') { //check if the assembler parameter is correct
             exit 1, "--assembler: ${params.assembler}. Should be 'metaflye' or 'metaspades' (default: metaflye)"}
@@ -208,7 +210,7 @@ workflow { //start of the workflow
 
         // DATA INPUT TEST
         if (workflow.profile.contains('test')) {
-            include {test} from './modules/test_data_dll'
+
             test()
             illumina_input_ch = test.out[0]
             ont_input_ch = test.out[1]
