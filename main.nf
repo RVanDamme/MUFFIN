@@ -142,12 +142,17 @@ exit 1
         include {sourmash_download_db} from './modules/sourmashgetdatabase'
         include {checkm_setup_db} from './modules/checkmsetupDB'
         include {checkm_download_db} from './modules/checkmgetdatabases'
-        include {discard_short} from './modules/ont_qc' params(short_qc : params.short_qc)
-        include {filtlong} from './modules/ont_qc' params(short_qc : params.short_qc)
+
+        // gate1
+        //include {discard_short} from './modules/ont_qc' params(short_qc : params.short_qc)
+        //include {filtlong} from './modules/ont_qc' params(short_qc : params.short_qc)
+        include {chopper} from './module/ont_qc' param(output : params.short_qc)
         include {merge} from './modules/ont_qc' params(output : params.output)
         include {fastp} from './modules/fastp' params(output : params.output) // simple QC done by fastp
+
+        // gate2
         include {spades} from './modules/spades' params(output : params.output)
-        //include {sourmash_genome_size} from './modules/sourmash' deprecated by flye 2.8
+        include {spades_short} from './modules/spades' param(output : params.output)
         include {flye} from './modules/flye' params(output : params.output)
         include {minimap_polish} from'./modules/minimap2'
         include {racon} from './modules/polish'
@@ -157,24 +162,21 @@ exit 1
         include {extra_minimap2} from './modules/minimap2'
         include {bwa} from './modules/bwa' //mapping for the binning
         include {extra_bwa} from './modules/bwa'
+
+        //gate3
         include {metabat2_extra} from './modules/metabat2' params(output : params.output)    
         include {metabat2} from './modules/metabat2' params(output : params.output)
-        include {maxbin2} from './modules/maxbin2' params(output : params.output)
-        include {concoct_extra} from './modules/concoct' params(output : params.output)
-        include {concoct} from './modules/concoct' params(output : params.output)
-        include {refine2} from './modules/metawrap_refine_bin' params(output : params.output)
-        include {refine3} from './modules/metawrap_refine_bin' params(output : params.output)
-        include {norefine} from './modules/metawrap_refine_bin' params(output : params.output) 
         include {contig_list} from './modules/list_ids'
         include {cat_all_bins} from './modules/cat_all_bins'
         include {bwa_bin} from './modules/bwa'  
         include {minimap2_bin} from './modules/minimap2'
         include {reads_retrieval} from './modules/seqtk_retrieve_reads' params(output : params.output)
         include {unmapped_retrieve} from './modules/seqtk_retrieve_reads' params(output : params.output)
-        //include unicycler './modules/unicycler_reassemble_from_bin' params(output : params.output)
     }
     //module for classify
     if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot") {
+
+        //module for Bin quality control & classify
         include {checkm} from './modules/checkm'params(output : params.output)
         include {sourmash_bins} from './modules/sourmash'params(output : params.output)
         include {sourmash_checkm_parser} from './modules/checkm_sourmash_parser'params(output: params.output)
@@ -186,11 +188,16 @@ exit 1
     }
     //module for annotate
     if (params.modular=="full" | params.modular=="annotate" | params.modular=="assem-annot" | params.modular=="class-annot") {
+        //modules for annotate
         include {eggnog_download_db} from './modules/eggnog_get_databases'
         include {eggnog_bin} from './modules/eggnog'params(output : params.output)
+
+        // modules (optionnal for RNA-Seq)
         include {fastp_rna} from './modules/fastp'params(output : params.output)
         include {de_novo_transcript_and_quant} from './modules/trinity_and_salmon'params(output : params.output)
         include {eggnog_rna} from './modules/eggnog'params(output : params.output)
+
+        // module for outputs
         include {parser_bin_RNA} from './modules/parser'params(output: params.output)
         include {parser_bin} from './modules/parser'params(output: params.output)
     }
@@ -218,30 +225,76 @@ workflow { //start of the workflow
         }
 
         else {
-            // DATA INPUT ILLUMINA
-            illumina_input_ch = Channel
-                    .fromFilePairs( "${params.illumina}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
-                    .view() 
+            if (workflow.profile.contains('long')){
+                // DATA INPUT Oxforf nanopore technologies
+                //************
+                // ONT reads
+                //************
+                ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}",checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
 
-            // illumina_input_ch = Channel.fromFilePairs(reads_illumina).ifEmpty { error "Cannot find any Illumina reads in the directory: ${params.illumina} \n Delfault is ./illumina \n ${reads_illumina}" }.view()
-
-            // extra ill reads
-            if (params.extra_ill != false) {
-            extra_ill_ch=Channel.fromPath(params.extra_ill).splitCsv().map { row ->
-                        def path = file("${row[0]}")
-                        return path
-                    }
+                // QC check ONT
+                //if (params.skip_ont_qc == true) {}
+                if (params.skip_ont_qc == true) {}
+                else {
+                    split_ont_ch = ont_input_ch.splitFastq(by:100000, file:true) //split the fastq to speed up the process
+                    //discard_short(split_ont_ch) // simply discard the reads under a threshold
+                    chopper(split_ont_ch)
+                    merging_ch = chopper.out.groupTuple()
+                    merge(merging_ch) // merge the splitted fastq
+                    ont_input_ch = merge.out
+                }
             }
+            else if(workflow.profile.contains('short')){
+                // DATA INPUT ILLUMINA
+                //***************
+                // Illumina reads
+                //***************
+                illumina_input_ch = Channel
+                        .fromFilePairs( "${params.illumina}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
+                        .view() 
 
-            // DATA INPUT ONT
-            ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}",checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
+                // QC check Illumina
+                //if (params.skip_ill_qc==true) {}
+                if (params.skip_ill_qc) {}
+                else {
+                    fastp(input_ch)
+                    illumina_input_ch = fastp.out
+                }
+            }
+            else {
+                //hybrid method
+                // DATA INPUT Oxforf nanopore technologies
+                //************
+                // ONT reads
+                //************
+                ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}",checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
 
-            // extra ont reads
-            if (params.extra_ont != false) {
-            extra_ont_ch=Channel.fromPath(params.extra_ont).splitCsv().map { row ->
-                        def path = file("${row[0]}")
-                        return path
-                    }
+                // QC check ONT
+                //if (params.skip_ont_qc == true) {}
+                if (params.skip_ont_qc == true) {}
+                else {
+                    split_ont_ch = ont_input_ch.splitFastq(by:100000, file:true) //split the fastq to speed up the process
+                    //discard_short(split_ont_ch) // simply discard the reads under a threshold
+                    chopper(split_ont_ch)
+                    merging_ch = chopper.out.groupTuple()
+                    merge(merging_ch) // merge the splitted fastq
+                    ont_input_ch = merge.out
+                }
+                // DATA INPUT ILLUMINA
+                //***************
+                // Illumina reads
+                //***************
+                illumina_input_ch = Channel
+                        .fromFilePairs( "${params.illumina}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
+                        .view() 
+
+                // QC check Illumina
+                //if (params.skip_ill_qc==true) {}
+                if (params.skip_ill_qc) {}
+                else {
+                    fastp(input_ch)
+                    illumina_input_ch = fastp.out
+                }
             }
 
         }
@@ -275,80 +328,103 @@ workflow { //start of the workflow
         }
         else { checkm_db_path = Channel.from("/checkm_database").collectFile() { item -> [ "path.txt", item ]  } } // Docker way to setup the db
 
-        //************
-        // QC OF READS
-        //************
-            // QC check ONT
-        if (params.skip_ont_qc == true) {}
-        else if (params.skip_ont_qc==false) {
-            split_ont_ch = ont_input_ch.splitFastq(by:100000, file:true) //split the fastq to speed up the process
-            discard_short(split_ont_ch) // simply discard the reads under a threshold
-            if (params.filtlong==true) { // not necessary at all but can be run if wanted
-                filtlong(discard_short.out)
-                merging_ch = filtlong.out.groupTuple() 
-            }
-            else {
-                merging_ch = discard_short.out.groupTuple() 
-            }
-            merge(merging_ch)  // merge the splitted fastq
-            ont_input_ch = merge.out
-        }
-            // QC check Illumina
-        if (params.skip_ill_qc==true) {}
-        else if (params.skip_ill_qc==false) {
-            fastp(illumina_input_ch)
-            illumina_input_ch = fastp.out
-        }
+        
+
+        
 
         //**********
         // Assembly 
         //**********
-            // Meta-SPADES
-
-        if (params.assembler=="metaspades") { // hybrid and metagenomic assembly by spades
-            spades_ch= illumina_input_ch.join(ont_input_ch)
+        if(workflow.profile.contains('long')){
+            //spades not for long reads
+            // FLYE + Pilon 
+            flye(ont_input_ch)
+            assembly_ch = flye.out
+        }
+        else if (workflow.profile.contains('short')){
+            //fly not for long reads
+            //spades_short
+            spades_ch = illumina_input_ch
             spades(spades_ch)
             assembly_ch = spades.out
         }
+        else{
+            // Meta-SPADES
 
-            // Meta-FLYE
+            if (params.assembler=="metaspades") { // hybrid and metagenomic assembly by spades
+                spades_ch= illumina_input_ch.join(ont_input_ch)
+                spades(spades_ch)
+                assembly_ch = spades.out
+            }
 
-        if (params.assembler=="metaflye") { // metagenomic assembly by flye + hybrid polishing (combo racon; medaka; pilon with short reads)
-            // FLYE + Pilon 
-            flye(ont_input_ch)
-            flye_to_map = flye.out.join(ont_input_ch)
-            minimap_polish(flye_to_map)
-            map_to_racon = ont_input_ch.join(flye.out).join(minimap_polish.out)
-            medaka(racon(map_to_racon))
-            medaka_to_pilon = medaka.out.join(illumina_input_ch)
-            pilon(medaka_to_pilon, params.polish_iteration)
-            assembly_ch = pilon.out
+                // Meta-FLYE
+
+            if (params.assembler=="metaflye") { // metagenomic assembly by flye + hybrid polishing (combo racon; medaka; pilon with short reads)
+                // FLYE + Pilon 
+                flye(ont_input_ch)
+                flye_to_map = flye.out.join(ont_input_ch)
+                minimap_polish(flye_to_map)
+                map_to_racon = ont_input_ch.join(flye.out).join(minimap_polish.out)
+                medaka(racon(map_to_racon))
+                medaka_to_pilon = medaka.out.join(illumina_input_ch)
+                pilon(medaka_to_pilon, params.polish_iteration)
+                assembly_ch = pilon.out
+            }
         }
+
+            
 
         //*********
         // Mapping
         //*********
 
+        if(workflow.profile.contains('long')){
             // ONT mapping
-        minimap2_ch = assembly_ch.join(ont_input_ch)
-        minimap2(minimap2_ch)
-        ont_bam_ch = minimap2.out
+            minimap2_ch = assembly_ch.join(ont_input_ch)
+            minimap2(minimap2_ch)
+            ont_bam_ch = minimap2.out
 
-        if (params.extra_ont != false) { //mapping of the "additionnal reads" to the assembly for use in the differential coverage binning
-            minimap_extra = assembly_ch.join(extra_ont_ch)
-            extra_minimap2(minimap_extra)
-            ont_extra_bam = extra_minimap2.out.collect()
+            if (params.extra_ont != false) { //mapping of the "additionnal reads" to the assembly for use in the differential coverage binning
+                minimap_extra = assembly_ch.join(extra_ont_ch)
+                extra_minimap2(minimap_extra)
+                ont_extra_bam = extra_minimap2.out.collect()
+            }
         }
+        else if(workflow.profile.contains('short')){
+            // Illumina mapping
+            bwa_ch = assembly_ch.join(illumina_input_ch)
+            bwa(bwa_ch)
+            illumina_bam_ch = bwa.out
+
+            if (params.extra_ill != false) { //mapping of the "additionnal reads" to the assembly for use in the differential coverage binning
+                bwa_extra = assembly_ch.join(extra_ill_ch)
+                extra_bwa(bwa_extra)
+                illumina_extra_bam = extra_bwa.out.collect()
+            }
+        }
+        else{
+
+            // ONT mapping
+            minimap2_ch = assembly_ch.join(ont_input_ch)
+            minimap2(minimap2_ch)
+            ont_bam_ch = minimap2.out
+
+            if (params.extra_ont != false) { //mapping of the "additionnal reads" to the assembly for use in the differential coverage binning
+                minimap_extra = assembly_ch.join(extra_ont_ch)
+                extra_minimap2(minimap_extra)
+                ont_extra_bam = extra_minimap2.out.collect()
+            }
 
             // Illumina mapping
-        bwa_ch = assembly_ch.join(illumina_input_ch)
-        bwa(bwa_ch)
-        illumina_bam_ch = bwa.out
+            bwa_ch = assembly_ch.join(illumina_input_ch)
+            bwa(bwa_ch)
+            illumina_bam_ch = bwa.out
 
-        if (params.extra_ill != false) { //mapping of the "additionnal reads" to the assembly for use in the differential coverage binning
-            bwa_extra = assembly_ch.join(extra_ill_ch)
-            extra_bwa(bwa_extra)
-            illumina_extra_bam = extra_bwa.out.collect()
+            if (params.extra_ill != false) { //mapping of the "additionnal reads" to the assembly for use in the differential coverage binning
+                bwa_extra = assembly_ch.join(extra_ill_ch)
+                extra_bwa(bwa_extra)
+                illumina_extra_bam = extra_bwa.out.collect()
+            }
         }
 
         //***************************************************

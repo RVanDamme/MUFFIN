@@ -55,7 +55,33 @@ process pilon {
 
 }
 
+//use minimap instead of bwa
+process pilong {
+    label 'pilon'
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
+    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "polished_assembly.fasta" 
+    input:
+        tuple val(name), path(assembly), path(ont_read)
+        val(iteration)
+    output:
+        tuple val(name) , path("polished_assembly.fasta")
+    shell:
+    """
+    mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g')
+    partial_mem=\$((\$mem*40/100))
+    assemb="${assembly}"
+    for ite in {1..${iteration}}
+    do
+        minimap2 -ax map-ont \$assemb ${ont_read} | samtools view -bS - | samtools sort -@ ${task.cpus} - > \$ite.bam
+        samtools index -@ ${task.cpus} \$ite.bam
+        pilon -Xmx\$partial_mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
+        assemb=\$ite"_polished_assembly.fasta"
+    done
+    mv ${iteration}"_polished_assembly.fasta" polished_assembly.fasta
+    """
 
+}
 
 //*********************************
 // if polish with long on pilon add
