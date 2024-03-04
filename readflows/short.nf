@@ -75,41 +75,6 @@ workflow [short_read_workflow]{
     // Binning
     //***************************************************
 
-    // MetaBat2 Binning
-    // if (!params.skip_metabat2) {
-    //     if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible
-    //         metabat2_ch = illumina_bam_ch.join(extra_bam)
-    //         bam_merger(metabat2_ch)
-    //         metabat2_extra(assembly_ch, bam_merger.out)
-    //         metabat2_out = metabat2_extra.out
-    //     }
-    //     else {
-    //         metabat2_ch = assembly_ch.join(illumina_bam_ch)
-    //         metabat2(metabat2_ch)
-    //         metabat2_out = metabat2.out
-    //     }
-    // }
-
-    // // Semibin2 Binning
-    // if (!params.skip_semibin2) {
-    //     //Channel semibin2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
-    //     Channel semibin2_ch = assembly_ch.join(illumina_bam_ch)
-    //     semibin2(semibin2_ch)
-    //     Channel semibin2_out = semibin2.out
-    // }
-
-    // // COMEBin Binning
-    // if (!params.skip_comebin) {
-    //     // Assuming the input for COMEBin would be similar to MetaBat2
-    //     Channel comebin_ch = assembly_ch.join(illumina_bam_ch)
-    //     comebin(comebin_ch)
-    //     Channel comebin_out = comebin.out
-
-    //     //-------------------------------
-    //     //end of part1 -> DROP BIN REFINE
-    //     //-------------------------------
-    // }
-
     switch (params.bintool) {
         case 'metabat2':
             if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible

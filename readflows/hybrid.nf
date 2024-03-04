@@ -160,6 +160,7 @@ workflow [hybrid_workflow]{
             break
 
         case 'semibin2':
+        //possiblité de merger les extra reads
             Channel semibin2_ch = assembly_ch.join(merged_bam_out)
             semibin2(semibin2_ch)
             semibin2_out = semibin2.out

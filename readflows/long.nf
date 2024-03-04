@@ -49,7 +49,7 @@ workflow [long_read_workflow]{
         }.flatMap { racon_out ->
             medaka(racon_out)
         }.flatMap { medaka_out ->
-            pilong(medaka_out)
+            pilong(medaka_out, ont_input_ch, params.polish_iteration)
         }.set { assembly_ch }
         //ajouter pilon
 

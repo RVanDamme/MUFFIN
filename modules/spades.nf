@@ -24,7 +24,7 @@ process spades_short {
     maxRetries = 5
     publishDir "${params.output}/${name}/assemble/assembly/spades/", mode: 'copy', pattern: "assembly.fasta" 
     input:
-    tuple val(name), path(illumina), path(ont)
+    tuple val(name), path(illumina)
     output:
     tuple val(name), path("assembly.fasta")
     
