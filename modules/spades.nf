@@ -19,7 +19,7 @@ process spades {
 
 }
 process spades_short {
-    label 'spades_short'
+    label 'spades'
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     publishDir "${params.output}/${name}/assemble/assembly/spades/", mode: 'copy', pattern: "assembly.fasta" 

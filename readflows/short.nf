@@ -1,31 +1,23 @@
 workflow [short_read_workflow]{
     // Initialisation des variables pour les chemins des bases de données
-    Channel<String> database_sourmash
-    Channel<String> checkm_db_path
+    Channel database_sourmash
 
     // Configuration de la base de données Sourmash
-    database_sourmash = params.sourmash_db ?
-                        Channel.value(file(params.sourmash_db).toString()) :
-                        sourmash_download_db().map { it.toString() }
+    if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
+    else {
+        sourmash_download_db() 
+        database_sourmash = sourmash_download_db.out
+    }   
+    if (!params.checkm2db){
+        // Vérification de l'existence du dossier et du fichier
+        path_exists = file(params.db_path).exists() && file("${params.db_path}/${params.db_file}").exists()
 
-    // Configuration de la base de données CheckM
-    if (workflow.profile.contains('conda')) {
-        // Utilisation de Conda, nécessite une configuration spécifique
-        if (params.checkm_db) {
-            // Chemin vers la base de données CheckM fourni
-            checkm_db_path = checkm_setup_db(params.checkm_db, true).map { it.toString() }
-        } else if (params.checkm_tar_db) {
-            // Chemin vers l'archive tar de la base de données CheckM fourni
-            checkm_db_path = checkm_setup_db(params.checkm_tar_db, false).map { it.toString() }
+        // Si le chemin n'existe pas ou si le fichier n'est pas trouvé.
+        if( !path_exists | params.checkm2db_force_update) {
+            checkm_download_db()
         } else {
-            // Téléchargement et configuration de la base de données CheckM
-            checkm_db_path = checkm_download_db()
-                             .flatMap { checkm_setup_db(it, false) }
-                             .map { it.toString() }
+            println "Le dossier et le fichier spécifié existent déjà."
         }
-    } else {
-        // Utilisation d'un autre profil (ex. Docker), configuration par défaut
-        checkm_db_path = Channel.value("/checkm_database/path.txt")
     }
 
 
@@ -116,4 +108,57 @@ workflow [short_read_workflow]{
                 metabat2_out = metabat2.out
             }
     }
+
+    if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot") {
+
+        //**************
+        // File handling
+        //**************
+
+        //bins (list with id (run id not bin) coma path/to/file)
+        if (params.bin_classify) { 
+            classify_ch = Channel
+                .fromPath( params.bin_classify, checkIfExists: true )
+                .splitCsv()
+                .map { row -> ["${row[0]}", file("${row[1]}", checkIfExists: true)]  }
+                .view()
+                }
+
+
+        //merge every bining tool result
+        else {classify_ch= metabat2_out_ch.join(semibin2_out_ch).join(comebin_out_ch)}
+
+        // if (params.modular=="classify" | params.modular=="class-annot") {
+        //     // sourmash_db
+        //     if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
+        //     else {
+        //         sourmash_download_db() 
+        //         database_sourmash = sourmash_download_db.out
+        //     }   
+        //     if (!params.checkm2db){
+        //         // Vérification de l'existence du dossier et du fichier
+        //         path_exists = file(params.db_path).exists() && file("${params.db_path}/${params.db_file}").exists()
+
+        //         // Si le chemin n'existe pas ou si le fichier n'est pas trouvé.
+        //         if( !path_exists | params.checkm2db_force_update) {
+        //             checkm_download_db()
+        //         } else {
+        //             println "Le dossier et le fichier spécifié existent déjà."
+        //         }
+        //     }
+        // }
+    }
+    //*************************
+    // Bins classify workflow
+    //*************************
+
+    //checkm of the final assemblies
+    //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
+    checkm2(classify_ch)
+    Channel checkm2_out_ch = checkm2.out 
+
+    //sourmash classification using gtdb database
+    sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
+    sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
+    
 }

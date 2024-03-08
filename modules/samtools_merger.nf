@@ -1,5 +1,5 @@
 process bam_merger {
-    label 'samtools_merger'
+    label 'samtools'
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
 

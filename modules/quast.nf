@@ -1,6 +1,6 @@
 process metaquast {
     maxForks 1
-    label 'metaquast'
+    label 'QUAST'
     publishDir "\${params.output}/\${name}/assemble/metaquast", mode: 'copy', pattern: "quality_dir"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
