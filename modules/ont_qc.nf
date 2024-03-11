@@ -1,5 +1,8 @@
 process chopper {
     label 'chopper'
+
+    conda 'bioconda::chopper=0.7.0'
+
     errorStrategy = { task.exitStatus in [14, -1] ? 'retry' : 'terminate' }
     maxRetries = 5
     publishDir "${params.output}/${name}/assemble/quality_control/nanopore/", mode: 'copy', pattern: "*_cleaned.fastq" 

@@ -1,5 +1,8 @@
 process eggnog_bin { 
   label 'eggnog' 
+
+  conda 'bioconda::diamond anaconda::biopython bioconda::eggnog-mapper=2.0.1 '
+
   publishDir "${params.output}/${name}/annotate/bin_annotation/", mode: 'copy', pattern: "*.tsv"
   errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
   maxRetries = 5
@@ -19,6 +22,9 @@ process eggnog_bin {
 
 process eggnog_rna { 
   label 'eggnog' 
+
+  conda 'bioconda::diamond anaconda::biopython bioconda::eggnog-mapper=2.0.1 '
+
   publishDir "${params.output}/${name}/annotate/rna_annotation/", mode: 'copy', pattern: "*.tsv"
   errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
   maxRetries = 5

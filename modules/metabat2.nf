@@ -37,6 +37,9 @@
 process metabat2 {
     maxForks 1
     label 'metabat2'
+
+    conda 'bioconda::metabat2=2.13'
+
     publishDir "\${params.output}/\${name}/assemble/binning/metabat2/", mode: 'copy', pattern: "bins_dir"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5

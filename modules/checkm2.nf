@@ -1,6 +1,9 @@
 process checkm2 {
     maxForks 1
     label 'checkm2'
+
+    conda 'bioconda::checkm2=1.0.1'
+    
     publishDir "${params.output}/${name}/classify/checkm2/", mode: 'copy', pattern: "checkm2_dir"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5

@@ -4,6 +4,9 @@ process eggnog_download_db {
   else if (workflow.profile.contains('gcloud')) {publishDir 'gs://gcloud_storage/databases-nextflow/eggnog', mode: 'copy', pattern: "eggnog-db"}
   else { publishDir 'nextflow-autodownload-databases/eggnog', mode: 'copy', pattern: "eggnog-db" }
   label 'eggnog' 
+
+  conda 'bioconda::diamond anaconda::biopython bioconda::eggnog-mapper=2.0.1 '
+  
   errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
   maxRetries = 5
   output:

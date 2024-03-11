@@ -1,5 +1,7 @@
 process bwa {
     label 'bwa'
+
+    conda "bioconda::bwa=0.7.17 bioconda::samtools=1.9"
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "illumina.bam"  
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
@@ -20,6 +22,8 @@ process bwa {
 
 process extra_bwa {
     label 'bwa'
+
+    conda "bioconda::bwa=0.7.17 bioconda::samtools=1.9"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "illumina.bam"  
@@ -40,6 +44,8 @@ process extra_bwa {
 
 process bwa_bin {
     label 'bwa'
+
+    conda "bioconda::bwa=0.7.17 bioconda::samtools=1.9"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "illumina.bam"  

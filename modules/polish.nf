@@ -1,5 +1,8 @@
 process racon {
     label 'racon'
+
+    conda 'bioconda::racon=1.4.13 '
+
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
@@ -14,6 +17,9 @@ process racon {
 
 process medaka {
     label 'medaka'
+
+    conda 'bioconda::medaka=1.0.3 '
+
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
@@ -29,6 +35,9 @@ process medaka {
 
 process pilon {
     label 'pilon'
+
+    conda  'bioconda::pilon=1.23 bioconda::bwa=0.7.17 bioconda::samtools=1.9'
+    
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "polished_assembly.fasta" 
@@ -58,6 +67,9 @@ process pilon {
 //use minimap instead of bwa
 process pilong {
     label 'pilon'
+
+    conda 'bioconda::pilon=1.23 bioconda::bwa=0.7.17 bioconda::samtools=1.9'
+
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "polished_assembly.fasta" 
