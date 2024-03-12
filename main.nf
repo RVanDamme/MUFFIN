@@ -308,9 +308,10 @@ workflow {
             hybrid_workflow()
             break
         default:
-            error "Invalid analysis mode : ${params.mode}. Please use -mode with a valid mode: \n
-            \"-mode short\" for Illumina reads \n \"-mode long\" for nanopore reads \n \"-mode
-            hybrid\" for both Illumina and nanopore"
+            error """Invalid analysis mode: ${params.mode}. Please use -mode with a valid mode: 
+            "-mode short" for Illumina reads 
+            "-mode long" for Nanopore reads 
+            "-mode hybrid" for both Illumina and Nanopore"""
     }
 
 }
