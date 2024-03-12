@@ -208,7 +208,7 @@ workflow hybrid_workflow{
             }
             else {
                 //metabat2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
-                metabat2(assembly_ch, merged_bam_out)
+                metabat2(assembly_ch.join(merged_bam_out))
                 metabat2_out_ch = metabat2.out
             }
             break
