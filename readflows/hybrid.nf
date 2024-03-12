@@ -76,11 +76,15 @@ workflow hybrid_workflow{
     }
     
 
-    Channel illumina_input_ch, ont_input_ch
+    //Channel illumina_input_ch, ont_input_ch
 
     if (!params.ont || !params.illumina) error "Both ONT and Illumina reads paths must be specified for 'hybride' read type."
-    ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}", checkIfExists: true).map { file -> tuple(file.baseName, file) }
+
+    //ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}", checkIfExists: true).map { file -> tuple(file.baseName, file) }
+    ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}", checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
+
     illumina_input_ch = Channel.fromFilePairs("${params.illumina}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
+
     if (!params.skip_ont_qc) {
         ont_input_ch = ont_input_ch.flatMap { chopper(it) }
     }
