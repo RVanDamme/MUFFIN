@@ -1,4 +1,7 @@
-workflow [hybrid_workflow]{
+#!/usr/bin/env nextflow
+nextflow.enable.dsl=2
+
+workflow hybrid_workflow{
     // Initialisation des variables pour les chemins des bases de données
     Channel database_sourmash
 
