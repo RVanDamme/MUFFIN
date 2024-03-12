@@ -93,7 +93,7 @@ workflow hybrid_workflow{
     }
 
 
-    Channel assembly_ch
+    //Channel assembly_ch
 
     switch (params.assembler) {
         case "metaspades":
@@ -182,9 +182,9 @@ workflow hybrid_workflow{
     bam_merger_ch = ont_bam_ch.join(illumina_bam_ch)
     //bam_merger(bam_merger_ch)
     merged_bam_out = bam_merger(bam_merger_ch)
-    Channel metabat2_out_ch
-    Channel semibin2_out_ch
-    Channel comebin_out_ch
+    //Channel metabat2_out_ch
+    //Channel semibin2_out_ch
+    //Channel comebin_out_ch
     // Logique de sélection de l'outil de binning
     switch (params.bintool) {
         // case 'metabat2':
