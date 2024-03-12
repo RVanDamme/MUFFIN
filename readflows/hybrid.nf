@@ -90,7 +90,8 @@ workflow hybrid_workflow{
         //ont_input_ch = ont_input_ch.flatMap { chopper(it) }
     }
     if (!params.skip_ill_qc) {
-        illumina_input_ch = illumina_input_ch.flatMap { fastp(it) }
+        //illumina_input_ch = illumina_input_ch.flatMap { fastp(it) }
+        ont_input_ch = fastp(illumina_input_ch)
     }
 
 
