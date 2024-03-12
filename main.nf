@@ -112,10 +112,10 @@ if (!workflow.profile.matches(/^(?:local|sge|slurm|gcloud|ebi|lsf|git_action),(?
 
 //new version
 if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem-class" | params.modular=="assem-annot") {
-    include {chopper} from './module/ont_qc' param(output: params.short_qc)
+    include {chopper} from './module/ont_qc' params(output: params.short_qc)
     include {fastp} from './modules/fastp' params(output: params.output)
     include {spades} from './modules/spades' params(output: params.output)
-    include {spades_short} from './modules/spades' param(output: params.output)
+    include {spades_short} from './modules/spades' params(output: params.output)
     include {flye} from './modules/flye' params(output : params.output)
     include {minimap_polish} from'./modules/minimap2'
     include {racon} from './modules/polish'
