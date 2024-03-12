@@ -290,10 +290,15 @@ workflow hybrid_workflow{
 
     //checkm of the final assemblies
     //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
-    checkm2(classify_ch)
-    checkm2_out_ch = checkm2.out 
+    if (classify_ch != null) {
+        checkm2(classify_ch)
+        checkm2_out_ch = checkm2.out 
 
-    //sourmash classification using gtdb database
-    sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
-    sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
+        //sourmash classification using gtdb database
+        sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
+        sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
+    } else {
+        println("classify_ch n'est pas initialisé.")
+    }
+    
 }
