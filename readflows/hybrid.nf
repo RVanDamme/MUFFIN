@@ -41,7 +41,7 @@ workflow hybrid_workflow{
 
     switch (params.assembler) {
         case "metaspades":
-            Channel spades_ch = illumina_input_ch.join(ont_input_ch)
+            spades_ch = illumina_input_ch.join(ont_input_ch)
 
             // Run spades process with mixed reads
             spades(spades_ch)
@@ -123,9 +123,9 @@ workflow hybrid_workflow{
     }
 
     // Définition des channels de base
-    Channel bam_merger_ch = ont_bam_ch.join(illumina_bam_ch)
-    bam_merger(bam_merger_ch)
-    Channel merged_bam_out = bam_merger.out
+    bam_merger_ch = ont_bam_ch.join(illumina_bam_ch)
+    //bam_merger(bam_merger_ch)
+    merged_bam_out = bam_merger(bam_merger_ch)
     Channel metabat2_out_ch
     Channel semibin2_out_ch
     Channel comebin_out_ch
@@ -159,13 +159,13 @@ workflow hybrid_workflow{
 
         case 'semibin2':
         //possiblité de merger les extra reads
-            Channel semibin2_ch = assembly_ch.join(merged_bam_out)
+            semibin2_ch = assembly_ch.join(merged_bam_out)
             semibin2(semibin2_ch)
             semibin2_out_ch = semibin2.out
             break
 
         case 'comebin':
-            Channel comebin_ch = assembly_ch.join(merged_bam_out)
+            comebin_ch = assembly_ch.join(merged_bam_out)
             comebin(comebin_ch)
             comebin_out_ch = comebin.out
             break
@@ -235,7 +235,7 @@ workflow hybrid_workflow{
     //checkm of the final assemblies
     //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
     checkm2(classify_ch)
-    Channel checkm2_out_ch = checkm2.out 
+    checkm2_out_ch = checkm2.out 
 
     //sourmash classification using gtdb database
     sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
