@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-include { modules_to_include } from './modules/modules_inclusion.nf'
+include { modules_to_include } from '../modules/modules_inclusion.nf'
 
 workflow hybrid_workflow{
     // Initialisation des variables pour les chemins des bases de données
