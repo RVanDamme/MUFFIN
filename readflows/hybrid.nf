@@ -53,26 +53,28 @@ params.db_file = 'uniref100.KO.1.dmnd'
 
 workflow hybrid_workflow{
     // Initialisation des variables pour les chemins des bases de données
-    Channel database_sourmash
+    if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot"){
+        Channel database_sourmash
 
-    // Configuration de la base de données Sourmash
-    if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
-    else {
-        sourmash_download_db() 
-        database_sourmash = sourmash_download_db.out
-    }   
-    if (!params.checkm2db){
-        // Vérification de l'existence du dossier et du fichier
-        path_exists = file(params.db_path).exists() && file("${params.db_path}/${params.db_file}").exists()
+        // Configuration de la base de données Sourmash
+        if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
+        else {
+            sourmash_download_db() 
+            database_sourmash = sourmash_download_db.out
+        }   
+        if (!params.checkm2db){
+            // Vérification de l'existence du dossier et du fichier
+            path_exists = file(params.db_path).exists() && file("${params.db_path}/${params.db_file}").exists()
 
-        // Si le chemin n'existe pas ou si le fichier n'est pas trouvé.
-        if( !path_exists | params.checkm2db_force_update) {
-            checkm_download_db()
-        } else {
-            println "Le dossier et le fichier spécifié existent déjà."
+            // Si le chemin n'existe pas ou si le fichier n'est pas trouvé.
+            if( !path_exists | params.checkm2db_force_update) {
+                checkm_download_db()
+            } else {
+                println "Le dossier et le fichier spécifié existent déjà."
+            }
         }
     }
-
+    
 
     Channel illumina_input_ch, ont_input_ch
 
