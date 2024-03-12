@@ -126,7 +126,7 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {extra_minimap2} from './modules/minimap2'
     include {bwa} from './modules/bwa' //mapping for the binning
     include {extra_bwa} from './modules/bwa'
-    include {metabat2_extra} from './modules/metabat2' params(output : params.output)    
+    //include {metabat2_extra} from './modules/metabat2' params(output : params.output)    
     include {metabat2} from './modules/metabat2' params(output : params.output)
     include {semibin2} from './modules/semibin2' params(output : params.output)
     include {comebin} from './modules/comebin' params(output : params.output)
