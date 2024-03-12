@@ -1,7 +1,7 @@
 process fastp {
     label 'fastp'
 
-    conda 'bioconda::fastp=0.23.4'
+    conda 'bioconda::fastp=0.20.0'
 
     publishDir "${params.output}/${name}/assemble/quality_control/illumina/", mode: 'copy', pattern: "*_R*_clean.fastq"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
@@ -19,7 +19,7 @@ process fastp {
 process fastp_rna {
     label 'fastp'
 
-    conda 'bioconda::fastp=0.23.4'
+    conda 'bioconda::fastp=0.20.0'
 
     publishDir "${params.output}/${name}/annotate/rna_quality_control/", mode: 'copy', pattern: "*_R*_clean.fastq"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
