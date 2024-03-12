@@ -74,28 +74,28 @@ workflow hybrid_workflow{
     //*********
     
     // Mapping with Minimap2 for ONT reads
-    Channel ont_bam_ch = assembly_ch
+    ont_bam_ch = assembly_ch
         .join(ont_input_ch)
         .map { assembly, reads -> [assembly, reads] }
         .flatMap { minimap2(it) }
 
     // Mapping additional ONT reads if specified
     if (params.extra_ont) {
-        Channel ont_extra_bam_ch = assembly_ch
+        ont_extra_bam_ch = assembly_ch
             .join(Channel.fromPath(params.extra_ont))
             .map { assembly, extraReads -> [assembly, extraReads] }
             .flatMap { extra_minimap2(it) }
     }
 
     // Mapping with BWA for Illumina reads
-    Channel illumina_bam_ch = assembly_ch
+    illumina_bam_ch = assembly_ch
         .join(illumina_input_ch)
         .map { assembly, reads -> [assembly, reads] }
         .flatMap { bwa(it) }
 
     // Mapping additional Illumina reads if specified
     if (params.extra_ill) {
-        Channel illumina_extra_bam_ch = assembly_ch
+        illumina_extra_bam_ch = assembly_ch
             .join(Channel.fromPath(params.extra_ill))
             .map { assembly, extraReads -> [assembly, extraReads] }
             .flatMap { extra_bwa(it) }
@@ -107,9 +107,10 @@ workflow hybrid_workflow{
     //***************************************************
     if (params.reference) {
         //Channel ref_ch = params.reference
-        Channel ref_ch = Channel.fromPath(params.reference)
-        metaquast(assembly_ch, ref_ch)
-        Channel metaquast_out_ch = metaquast.out
+        ref_ch = Channel.fromPath(params.reference)
+        // metaquast(assembly_ch, ref_ch)
+        // metaquast_out_ch = metaquast.out
+        metaquast_out_ch = metaquast(assembly_ch, ref_ch)
     }
 
     //***************************************************
