@@ -86,7 +86,8 @@ workflow hybrid_workflow{
     illumina_input_ch = Channel.fromFilePairs("${params.illumina}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
 
     if (!params.skip_ont_qc) {
-        ont_input_ch = ont_input_ch.flatMap { chopper(it) }
+        ont_input_ch = chopper(ont_input_ch)
+        //ont_input_ch = ont_input_ch.flatMap { chopper(it) }
     }
     if (!params.skip_ill_qc) {
         illumina_input_ch = illumina_input_ch.flatMap { fastp(it) }
