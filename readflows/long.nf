@@ -55,7 +55,6 @@ params.db_file = 'uniref100.KO.1.dmnd'
 workflow long_read_workflow{
     // Initialisation des variables pour les chemins des bases de données
     if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot"){
-        Channel database_sourmash
 
         // Configuration de la base de données Sourmash
         if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
@@ -80,40 +79,53 @@ workflow long_read_workflow{
     if (!params.ont) error "ONT reads path must be specified for 'long' read type."
     ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}", checkIfExists: true).map { file -> tuple(file.baseName, file) }
     if (!params.skip_ont_qc) {
-        ont_input_ch = ont_input_ch.flatMap { chopper(it) }
+        ont_input_ch = chopper(ont_input_ch)
     }
 
     // Assemblage avec des reads longs (ONT) utilisant Flye
     flye(ont_input_ch)
-    assembly_ch = flye.out
+    //assembly_ch = flye.out
 
-    assembly_ch.flatMap { contigs ->
-        minimap_polish(contigs, ont_input_ch)
-        }.flatMap { polished ->
-            racon(polished)
-        }.flatMap { racon_out ->
-            medaka(racon_out)
-        }.flatMap { medaka_out ->
-            pilong(medaka_out.join(ont_input_ch), params.polish_iteration)
-        }.set { assembly_ch }
-        //ajouter pilon
+    minimap_polish_ch = minimap_polish(flye.out.join(ont_input_ch))
+    racon_ch = racon(ont_input_ch.join(flye.out).join(minimap_polish_ch))
+    medaka_ch = medaka(racon_ch)
+    assembly_ch = pilong(medaka_out.join(ont_input_ch), params.polish_iteration)
+
+    // assembly_ch.flatMap { contigs ->
+    //     minimap_polish(contigs, ont_input_ch)
+    //     }.flatMap { polished ->
+    //         racon(polished)
+    //     }.flatMap { racon_out ->
+    //         medaka(racon_out)
+    //     }.flatMap { medaka_out ->
+    //         pilong(medaka_out.join(ont_input_ch), params.polish_iteration)
+    //     }.set { assembly_ch }
+    //     //ajouter pilon
 
     //*********
     // Mapping
     //*********
     
     // Mapping with Minimap2 for ONT reads
-    Channel ont_bam_ch = assembly_ch
-        .join(ont_input_ch)
-        .map { assembly, reads -> [assembly, reads] }
-        .flatMap { minimap2(it) }
+    // ont_bam_ch = assembly_ch
+    //     .join(ont_input_ch)
+    //     .map { assembly, reads -> [assembly, reads] }
+    //     .flatMap { minimap2(it) }
+
+    // // Mapping additional ONT reads if specified
+    // if (params.extra_ont) {
+    //     ont_extra_bam_ch = assembly_ch
+    //         .join(Channel.fromPath(params.extra_ont))
+    //         .map { assembly, extraReads -> [assembly, extraReads] }
+    //         .flatMap { extra_minimap2(it) }
+    // }
+
+    // Mapping with Minimap2 for ONT reads
+    ont_bam_ch = minimap2(assembly_ch.join(ont_input_ch))
 
     // Mapping additional ONT reads if specified
     if (params.extra_ont) {
-        Channel ont_extra_bam_ch = assembly_ch
-            .join(Channel.fromPath(params.extra_ont))
-            .map { assembly, extraReads -> [assembly, extraReads] }
-            .flatMap { extra_minimap2(it) }
+        ont_extra_bam_ch = minimap2(assembly_ch.join(extra_ont_ch))
     }
 
     //***************************************************
@@ -121,14 +133,19 @@ workflow long_read_workflow{
     //***************************************************
     if (params.reference) {
         //Channel ref_ch = params.reference
-        Channel ref_ch = Channel.fromPath(params.reference)
-        metaquast(assembly_ch, ref_ch)
-        Channel metaquast_out_ch = metaquast.out
+        ref_ch = Channel.fromPath(params.reference)
+        metaquast(assembly_ch.join(ref_ch))
+        metaquast_out_ch = metaquast.out
     }
 
     //***************************************************
     // Binning
     //***************************************************
+    if (params.bintool) {
+    println "Outil de binning sélectionné: ${params.bintool}"
+    } else {
+        println "Aucun outil de binning spécifié, utilisation de l'outil par défaut: metabat2"
+    }
 
     switch (params.bintool) {
         case 'metabat2':
@@ -146,15 +163,15 @@ workflow long_read_workflow{
             break
 
         case 'semibin2':
-            Channel semibin2_ch = assembly_ch.join(ont_bam_ch)
+            semibin2_ch = assembly_ch.join(ont_bam_ch)
             semibin2(semibin2_ch)
-            Channel semibin2_out = semibin2.out
+            semibin2_out = semibin2.out
             break
 
         case 'comebin':
-            Channel comebin_ch = assembly_ch.join(ont_bam_ch)
+            comebin_ch = assembly_ch.join(ont_bam_ch)
             comebin(comebin_ch)
-            Channel comebin_out = comebin.out
+            comebin_out = comebin.out
             break
 
         default:
@@ -174,6 +191,9 @@ workflow long_read_workflow{
     }
 
 
+    //*************************************************
+    // STEP 2 classify taxa
+    //*************************************************
     if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot") {
 
         //**************
@@ -212,20 +232,20 @@ workflow long_read_workflow{
         //         }
         //     }
         // }
-    }
-    //*************************
-    // Bins classify workflow
-    //*************************
-
-    //checkm of the final assemblies
-    //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
-    checkm2(classify_ch)
-    Channel checkm2_out_ch = checkm2.out 
-
-    //sourmash classification using gtdb database
-    sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
-    sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
     
+        //*************************
+        // Bins classify workflow
+        //*************************
+
+        //checkm of the final assemblies
+        //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
+        checkm2(classify_ch)
+        checkm2_out_ch = checkm2.out 
+
+        //sourmash classification using gtdb database
+        sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
+        sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
+    }
 }
 
 

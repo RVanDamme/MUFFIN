@@ -54,7 +54,6 @@ params.db_file = 'uniref100.KO.1.dmnd'
 workflow hybrid_workflow{
     // Initialisation des variables pour les chemins des bases de données
     if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot"){
-        Channel database_sourmash
 
         // Configuration de la base de données Sourmash
         if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
@@ -109,10 +108,10 @@ workflow hybrid_workflow{
         case "metaflye":
             // MetaFlye suivi d'un polissage hybride
             flye(ont_input_ch)
-            assembly_ch = flye.out
+            //assembly_ch = flye.out
             // Chaîne de polissage simplifiée
-            minimap_polish_ch = minimap_polish(assembly_ch.join(ont_input_ch))
-            racon_ch = racon(minimap_polish_ch)
+            minimap_polish_ch = minimap_polish(flye.out.join(ont_input_ch))
+            racon_ch = racon(ont_input_ch.join(flye.out).join(minimap_polish_ch))
             medaka_ch = medaka(racon_ch)
             assembly_ch = pilon(medaka_ch.join(illumina_input_ch), params.polish_iteration)
 
@@ -137,31 +136,19 @@ workflow hybrid_workflow{
     //*********
     
     // Mapping with Minimap2 for ONT reads
-    ont_bam_ch = assembly_ch
-        .join(ont_input_ch)
-        .map { assembly, reads -> [assembly, reads] }
-        .flatMap { minimap2(it) }
+    ont_bam_ch = minimap2(assembly_ch.join(ont_input_ch))
 
     // Mapping additional ONT reads if specified
     if (params.extra_ont) {
-        ont_extra_bam_ch = assembly_ch
-            .join(Channel.fromPath(params.extra_ont))
-            .map { assembly, extraReads -> [assembly, extraReads] }
-            .flatMap { extra_minimap2(it) }
+        ont_extra_bam_ch = minimap2(assembly_ch.join(extra_ont_ch))
     }
 
     // Mapping with BWA for Illumina reads
-    illumina_bam_ch = assembly_ch
-        .join(illumina_input_ch)
-        .map { assembly, reads -> [assembly, reads] }
-        .flatMap { bwa(it) }
+    illumina_bam_ch = bwa(assembly_ch.join(illumina_input_ch))
 
     // Mapping additional Illumina reads if specified
     if (params.extra_ill) {
-        illumina_extra_bam_ch = assembly_ch
-            .join(Channel.fromPath(params.extra_ill))
-            .map { assembly, extraReads -> [assembly, extraReads] }
-            .flatMap { extra_bwa(it) }
+        illumina_extra_bam_ch = bwa(assembly_ch.join(params.extra_ill))
     }
 
 
@@ -173,7 +160,7 @@ workflow hybrid_workflow{
         ref_ch = Channel.fromPath(params.reference)
         // metaquast(assembly_ch, ref_ch)
         // metaquast_out_ch = metaquast.out
-        metaquast_out_ch = metaquast(assembly_ch, ref_ch)
+        metaquast_out_ch = metaquast(assembly_ch.join(ref_ch))
     }
 
     //***************************************************
@@ -187,25 +174,9 @@ workflow hybrid_workflow{
 
     // Définition des channels de base
     bam_merger_ch = ont_bam_ch.join(illumina_bam_ch)
-    //bam_merger(bam_merger_ch)
     merged_bam_out = bam_merger(bam_merger_ch)
-    //Channel metabat2_out_ch
-    //Channel semibin2_out_ch
-    //Channel comebin_out_ch
     // Logique de sélection de l'outil de binning
     switch (params.bintool) {
-        // case 'metabat2':
-        //     if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible
-        //         metabat2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
-        //         metabat2_extra(metabat2_ch, extra_bam)
-        //         metabat2_out = metabat2_extra.out
-        //     }
-        //     else {
-        //         metabat2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
-        //         metabat2(metabat2_ch)
-        //         metabat2_out = metabat2.out
-        //     }
-        //     break
         case 'metabat2':
             if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible
                 metabat2_tmp_ch = merged_bam_out.join(extra_bam)
