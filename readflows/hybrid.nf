@@ -111,15 +111,20 @@ workflow hybrid_workflow{
             flye(ont_input_ch)
             assembly_ch = flye.out
             // Chaîne de polissage simplifiée
-            assembly_ch.flatMap { contigs ->
-                minimap_polish(contigs, ont_input_ch)
-            }.flatMap { polished ->
-                racon(polished)
-            }.flatMap { racon_out ->
-                medaka(racon_out)
-            }.flatMap { medaka_out ->
-                pilon(medaka_out, illumina_input_ch, params.polish_iteration)
-            }.set { assembly_ch }
+            minimap_polish_ch = minimap_polish(assembly_ch, ont_input_ch)
+            racon_ch = racon(minimap_polish_ch)
+            medaka_ch = medaka(racon_ch)
+            assembly_ch = pilon(medaka_ch, illumina_input_ch, params.polish_iteration)
+
+            // assembly_ch.flatMap { contigs ->
+            //     minimap_polish(contigs, ont_input_ch)
+            // }.flatMap { polished ->
+            //     racon(polished)
+            // }.flatMap { racon_out ->
+            //     medaka(racon_out)
+            // }.flatMap { medaka_out ->
+            //     pilon(medaka_out, illumina_input_ch, params.polish_iteration)
+            // }.set { assembly_ch }
             break
 
         default:
