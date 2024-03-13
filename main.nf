@@ -293,8 +293,8 @@ params.db_file = 'uniref100.KO.1.dmnd'
 workflow {
 
     // Validate assembler parameter
-    if (!['metaflye', 'metaspades'].contains(params.assembler)) {
-        error "--assembler: ${params.assembler} is invalid. Should be 'metaflye' or 'metaspades'."
+    if (!['metaflye', 'metaspades'].contains(params.assembler) &&  params.mode == "hybrid") {
+        error "--assembler: ${params.assembler} is invalid. Should be 'metaflye' or 'metaspades' in hybrid mode."
     }
     
     switch (params.mode) {
