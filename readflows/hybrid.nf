@@ -111,10 +111,10 @@ workflow hybrid_workflow{
             flye(ont_input_ch)
             assembly_ch = flye.out
             // Chaîne de polissage simplifiée
-            minimap_polish_ch = minimap_polish(assembly_ch, ont_input_ch)
+            minimap_polish_ch = minimap_polish(assembly_ch.join(ont_input_ch))
             racon_ch = racon(minimap_polish_ch)
             medaka_ch = medaka(racon_ch)
-            assembly_ch = pilon(medaka_ch, illumina_input_ch, params.polish_iteration)
+            assembly_ch = pilon(medaka_ch.join(illumina_input_ch), params.polish_iteration)
 
             // assembly_ch.flatMap { contigs ->
             //     minimap_polish(contigs, ont_input_ch)
