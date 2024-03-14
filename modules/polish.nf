@@ -18,7 +18,7 @@ process racon {
 process medaka {
     label 'medaka'
     //python3.6 main::python=3.6
-    conda 'bioconda::medaka'
+    conda 'bioconda::ont-fast5-api bioconda::medaka'
 
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
