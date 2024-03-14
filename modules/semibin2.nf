@@ -16,13 +16,13 @@ process semibin2 {
     """
     # Définition des options en fonction du choix du modèle
     model_option=""
-    if ("${params.model}" == "pre-trained") {
+    if ("${params.bining_model}" == "pre-trained") {
         model_option="--environment ${params.environment}"
         echo "Running SemiBin2 with the pre-trained model: ${params.environment}"
-    } else if ("${params.model}" == "self-supervised") {
+    } else if ("${params.bining_model}" == "self-supervised") {
         model_option="--self-supervised"
         echo "Running SemiBin2 with the self-supervised model. This process may take some time and requires disk space."
-    } else if ("${params.model}" == "semi-supervised") {
+    } else if ("${params.bining_model}" == "semi-supervised") {
         model_option="--semi-supervised"
         echo "Warning: Running SemiBin2 with the semi-supervised model is not recommended due to the long execution time and high memory requirement (~40GB). Consider using the self-supervised model instead."
     } else {
