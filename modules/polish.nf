@@ -28,6 +28,7 @@ process medaka {
         tuple val(name), path("${name}_polished.fasta") 
     script:
         """
+        medaka --version
         medaka_consensus -i ${read} -d ${consensus} -o polished -t ${task.cpus} -m ${params.model}
         mv polished/consensus.fasta ${name}_polished.fasta
         """
