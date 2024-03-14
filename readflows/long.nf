@@ -89,7 +89,7 @@ workflow long_read_workflow{
     minimap_polish_ch = minimap_polish(flye.out.join(ont_input_ch))
     racon_ch = racon(ont_input_ch.join(flye.out).join(minimap_polish_ch))
     medaka_ch = medaka(racon_ch)
-    assembly_ch = pilong(medaka_out.join(ont_input_ch), params.polish_iteration)
+    assembly_ch = pilong(medaka_ch.join(ont_input_ch), params.polish_iteration)
 
     // assembly_ch.flatMap { contigs ->
     //     minimap_polish(contigs, ont_input_ch)
