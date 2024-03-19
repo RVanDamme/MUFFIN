@@ -1,7 +1,7 @@
 process spades {
     label 'spades'
 
-    conda 'bioconda::spades=3.15.4'
+    //conda 'bioconda::spades=3.15.4'
 
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
