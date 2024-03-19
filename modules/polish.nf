@@ -29,7 +29,7 @@ process medaka {
     script:
         """
         medaka --version
-        medaka_consensus -i ${read} -d ${consensus} -o polished -t ${task.cpus} -m ${params.model}
+        medaka_consensus -i ${read} -d ${consensus} -o polished -t 1 -m ${params.model}
         mv polished/consensus.fasta ${name}_polished.fasta
         """
   }
