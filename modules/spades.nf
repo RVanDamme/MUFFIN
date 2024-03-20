@@ -13,7 +13,7 @@ process spades {
     
     script:
     """
-    mem=\$(echo ${task.memory.toGiga()} | awk '{print int(\$1)}')
+    mem=\$(echo ${task.memory} |sed 's/ GB//g' | sed 's/g//g' | sed 's/ B//g')
     cpus=\$(echo ${task.cpus})
     echo \$cpus \$mem
     spades.py -1 ${illumina[0]} -2 ${illumina[1]}  --meta --nanopore ${ont} -o spades_output -t \$cpus -m \$mem
@@ -21,9 +21,6 @@ process spades {
     """
 
 }
-
-//mem=\$(echo ${task.memory} |sed 's/ GB//g' | sed 's/g//g')
-
 process spades_short {
     label 'spades'
 
