@@ -36,7 +36,7 @@ exit 1
 
 
 include { helpMSG } from './modules/help.nf'
-include { long_read_workflow } from './readflows/long.nf'
+//include { long_read_workflow } from './readflows/long.nf'
 //include { short_read_workflow } from './readflows/short.nf'
 include { hybrid_workflow } from './readflows/hybrid.nf'
 
@@ -131,7 +131,7 @@ workflow {
             //short_read_workflow()
             break
         case "long":
-            long_read_workflow()
+            //long_read_workflow()
             break
         case "hybrid":
             hybrid_workflow()
