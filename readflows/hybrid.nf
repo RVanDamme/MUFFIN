@@ -240,8 +240,27 @@ workflow hybrid_workflow{
 
 
         //merge every bining tool result
-        else {classify_ch = metabat2_out_ch.join(semibin2_out_ch).join(comebin_out_ch)}
+        //else {classify_ch = metabat2_out_ch.join(semibin2_out_ch).join(comebin_out_ch)}
+        else{
+            switch (params.bintool) {
+                case 'metabat2':
+                    bin_ch = metabat2.out
+                    break
 
+                case 'semibin2':
+                    bin_ch = semibin2.out
+                    break
+
+                case 'comebin':
+                    bin_ch = comebin.out
+                    break
+
+                default:
+                    bin_ch = metabat2.out
+
+            }
+            classify_ch = bin_ch
+        }
 
 
         // Configuration de la base de données Sourmash
