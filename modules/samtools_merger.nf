@@ -10,7 +10,7 @@ process bam_merger {
     tuple val(name), path(bam1), path(bam2)
 
     output:
-    tuple val(name) , path("merged.bam")
+    tuple val(name) , path("*merged.bam")
 
     script:
     """
