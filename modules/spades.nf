@@ -36,7 +36,7 @@ process spades_short {
     
     script:
     """
-    mem=\$(echo ${task.memory} |sed 's/ GB//g' | sed 's/g//g')
+    mem=\$(echo ${task.memory} |sed 's/ GB//g' | sed 's/g//g' | sed 's/ B//g')
     cpus=\$(echo ${task.cpus})
     echo \$cpus \$mem
     spades.py -1 ${illumina[0]} -2 ${illumina[1]} -o spades_output -t \$cpus -m \$mem
