@@ -14,6 +14,6 @@ process bam_merger {
 
     script:
     """
-    samtools merge -@ ${task.cpus} -O ${name}_merged.bam ${bam1} ${bam2} 
+    samtools merge -@ ${task.cpus} ${name}_merged.bam ${bam1} ${bam2} 
     """
 }
