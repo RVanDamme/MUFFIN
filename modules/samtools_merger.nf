@@ -10,10 +10,10 @@ process bam_merger {
     tuple val(name), path(bam1), path(bam2)
 
     output:
-    tuple val(name) , path("merged_bam.bam")
+    tuple val(name) , path("merged.bam")
 
     script:
     """
-    samtools merge -@ \${task.cpus} -o \${name}_merged.bam \${bam1} \${bam2} 
+    samtools merge -@ ${task.cpus} -o ${name}_merged.bam ${bam1} ${bam2} 
     """
 }
