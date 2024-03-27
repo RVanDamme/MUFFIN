@@ -9,6 +9,7 @@ process checkm2 {
     maxRetries = 5
     input:
     tuple val(name), path(bins_assemblies)
+    val(bool)
     output:
     tuple val(name), path("checkm2_dir")
     

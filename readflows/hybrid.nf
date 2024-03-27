@@ -272,8 +272,8 @@ workflow hybrid_workflow{
         if (!params.checkm2db){
             // Vérification de l'existence du dossier et du fichier
             path_exists = file(params.db_path).exists() && file("${params.db_path}/${params.db_file}").exists()
-            println "checkm2 db install process"
-            println path_exists
+            //println "checkm2 db install process"
+            //println path_exists
             // Si le chemin n'existe pas ou si le fichier n'est pas trouvé.
             if( !path_exists | params.checkm2db_force_update) {
                 checkm_download_db()
@@ -282,26 +282,6 @@ workflow hybrid_workflow{
             }
         }
 
-
-        // if (params.modular=="classify" | params.modular=="class-annot") {
-        //     // sourmash_db
-        //     if (params.sourmash_db) { database_sourmash = file(params.sourmash_db) }
-        //     else {
-        //         sourmash_download_db() 
-        //         database_sourmash = sourmash_download_db.out
-        //     }   
-        //     if (!params.checkm2db){
-        //         // Vérification de l'existence du dossier et du fichier
-        //         path_exists = file(params.db_path).exists() && file("${params.db_path}/${params.db_file}").exists()
-
-        //         // Si le chemin n'existe pas ou si le fichier n'est pas trouvé.
-        //         if( !path_exists | params.checkm2db_force_update) {
-        //             checkm_download_db()
-        //         } else {
-        //             println "Le dossier et le fichier spécifié existent déjà."
-        //         }
-        //     }
-        // }
     
         //*************************
         // Bins classify workflow
@@ -309,7 +289,7 @@ workflow hybrid_workflow{
 
         //checkm of the final assemblies
         //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
-        checkm2(classify_ch)
+        checkm2(classify_ch, checkm_download_db.out)
         checkm2_out_ch = checkm2.out 
 
         //sourmash classification using gtdb database

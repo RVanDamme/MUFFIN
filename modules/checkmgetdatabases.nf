@@ -9,7 +9,7 @@ process checkm_download_db {
   errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
   maxRetries = 5
   output:
-    path("checkm2_database")
+    val(true)
   script:
   """
   checkm2 database --download
