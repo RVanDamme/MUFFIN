@@ -19,7 +19,8 @@ process checkm2 {
     def lowmemCmd = params.checkm2_low ? "--lowmem" : ""
     
     """
-    checkm2 predict --threads ${task.cpus} --input ${bins_assemblies}/metabat_bins.10.fa ${dbPathCmd} ${lowmemCmd} --output-directory checkm2_dir/ --database_path /home/nestpasici
+    checkm2 testrun --threads ${task.cpus}
+    checkm2 predict --threads ${task.cpus} --input ${bins_assemblies}/metabat_bins.10.fa ${dbPathCmd} ${lowmemCmd} --output-directory checkm2_dir/ 
     """
 }
 
