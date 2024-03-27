@@ -272,7 +272,8 @@ workflow hybrid_workflow{
         if (!params.checkm2db){
             // Vérification de l'existence du dossier et du fichier
             path_exists = file(params.db_path).exists() && file("${params.db_path}/${params.db_file}").exists()
-
+            println "checkm2 db install process"
+            println path_exists
             // Si le chemin n'existe pas ou si le fichier n'est pas trouvé.
             if( !path_exists | params.checkm2db_force_update) {
                 checkm_download_db()
