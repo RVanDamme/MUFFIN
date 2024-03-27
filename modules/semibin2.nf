@@ -30,6 +30,6 @@ process semibin2 {
         model_option="--environment ${params.environment}"
     }
 
-    SemiBin2 single_easy_bin -i \${assembly} -b *.bam -o bins_dir/semibin2_bins -t \${task.cpus} \${model_option}
+    SemiBin2 single_easy_bin -i ${assembly} -b *.bam -o bins_dir/semibin2_bins -t ${task.cpus} ${model_option}
     """
 }
