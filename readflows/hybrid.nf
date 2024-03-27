@@ -289,8 +289,8 @@ workflow hybrid_workflow{
 
         //checkm of the final assemblies
         //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
-        checkm2(classify_ch, checkm_download_db.out)
-        checkm2_out_ch = checkm2.out 
+        //checkm2(classify_ch, checkm_download_db.out)
+        //checkm2_out_ch = checkm2.out 
 
         //sourmash classification using gtdb database
         //sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
