@@ -116,7 +116,7 @@ process comebin {
     # Definir la température dans la fonction de perte en fonction du N50
     loss_temp=\$(awk -v n50=\$N50 'BEGIN{print (n50 > 10000) ? 0.07 : 0.15}')
     echo "loss temp"
-    echo loss_temp
+    echo \$loss_temp
     
     """
 }
