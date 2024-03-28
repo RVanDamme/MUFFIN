@@ -119,7 +119,13 @@ process comebin {
     echo "loss temp"
     echo \$loss_temp
     
-    run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/ -l \$loss_temp -p ${bam_files}
+    temp_bam_dir="./temp_bam_dir"
+    mkdir -p \$temp_bam_dir
+
+    # Copie du fichier BAM dans le répertoire temporaire
+    cp ${bam_files} \$temp_bam_dir
+
+    run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/ -l \$loss_temp -p \$temp_bam_dir/
     
     """
 }
