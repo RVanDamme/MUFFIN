@@ -103,7 +103,7 @@ process comebin {
     done
 
     # Etape 3: Trouver le N50
-    half_total=$((total_length / 2))
+    half_total=\$((total_length / 2))
     cumulative_length=0
     N50=0
     for length in "\${lengths[@]}"; do
