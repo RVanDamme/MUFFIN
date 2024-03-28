@@ -81,7 +81,7 @@ process comebin {
 
     conda 'bioconda::COMEBin=1.0.3'
 
-    publishDir "${params.output}/${name}/assemble/binning/semibin2/", mode: 'copy', pattern: "bins_dir"
+    publishDir "${params.output}/${name}/assemble/binning/comebin/", mode: 'copy', pattern: "bins_dir"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
@@ -119,8 +119,7 @@ process comebin {
     echo "loss temp"
     echo \$loss_temp
     
-    mkdir bins_dir/comebin_bins
-    run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/comebin_bins -l \$loss_temp -p *.bam
+    run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/ -l \$loss_temp -p *.bam
     
     """
 }
