@@ -293,7 +293,7 @@ workflow hybrid_workflow{
         //checkm2_out_ch = checkm2.out 
 
         //sourmash classification using gtdb database
-        //sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
+        sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
         //sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
     }
 }
