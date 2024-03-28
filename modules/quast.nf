@@ -4,7 +4,7 @@ process metaquast {
 
     conda 'bioconda::QUAST=5.2.0'
 
-    publishDir "\${params.output}/\${name}/assemble/metaquast", mode: 'copy', pattern: "quality_dir"
+    publishDir "\${params.output}/\${name}/assemble/metaquast", mode: 'copy', pattern: "metaquast"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     publishDir "${params.outdir}/metaquast_results", mode: 'copy'
@@ -13,7 +13,7 @@ process metaquast {
     tuple val(name), path(assembly), path(reference_files)
 
     output:
-    tuple val(name), path("quality_dir")
+    tuple val(name), path("metaquast")
 
     script:
     """
