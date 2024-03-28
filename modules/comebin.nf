@@ -118,6 +118,8 @@ process comebin {
     loss_temp=\$(awk -v n50=\$N50 'BEGIN{print (n50 > 10000) ? 0.07 : 0.15}')
     echo "loss temp"
     echo \$loss_temp
+
+    run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/comebin_bins -l \$loss_temp -p *.bam
     
     """
 }

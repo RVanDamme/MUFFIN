@@ -17,7 +17,7 @@ process metaquast {
 
     script:
     """
-    metaquast.py \\
+    metaquast \\
         -o ${name}_metaquast_report \\
         -t \${task.cpus} \\
         -m \${params.min_contig} \\
