@@ -81,7 +81,7 @@ process comebin {
 
     conda 'bioconda::COMEBin=1.0.3'
 
-    publishDir "\${params.output}/\${name}/assemble/binning/semibin2/", mode: 'copy', pattern: "bins_dir"
+    publishDir "${params.output}/${name}/assemble/binning/semibin2/", mode: 'copy', pattern: "bins_dir"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
@@ -93,7 +93,7 @@ process comebin {
     script:
     """
     #!/bin/bash
-    assembly="\${assembly}"
+    assembly="${assembly}"
 
     # Calculer les longueurs de contigs et trier en ordre décroissant
     contig_lengths=\$(awk '!/^>/ { printf "%s", \$0; next } /^>/ { if(NR > 1) print n; n=0 } { n += length(\$0) } END { print n }' \$assembly | sort -nr)
@@ -116,6 +116,6 @@ process comebin {
     # Définir la température dans la fonction de perte en fonction du N50
     loss_temp=\$(awk -v n50=\$N50 'BEGIN{print (n50 > 10000) ? 0.07 : 0.15}')
 
-    run_comebin.sh -t \${task.cpus} -a \${assembly} -o bins_dir/comebin_bins -l \$loss_temp -p \$ *.bam
+    run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/comebin_bins -l \$loss_temp -p *.bam
     """
 }

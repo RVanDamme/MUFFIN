@@ -41,7 +41,7 @@ process semibin2 {
 
     conda 'bioconda::semibin=2.0.2'
 
-    publishDir "\${params.output}/\${name}/assemble/binning/semibin2/", mode: 'copy', pattern: "bins_dir"
+    publishDir "${params.output}/${name}/assemble/binning/semibin2/", mode: 'copy', pattern: "bins_dir"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
