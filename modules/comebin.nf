@@ -119,7 +119,7 @@ process comebin {
     echo "loss temp"
     echo \$loss_temp
     
-    run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/ -l \$loss_temp -p *.bam
+    run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/ -l \$loss_temp -p ../*.bam
     
     """
 }
