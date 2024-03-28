@@ -126,7 +126,7 @@ process comebin {
     cp ${bam_files} \$temp_bam_dir
 
     run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/ -l \$loss_temp -p \$temp_bam_dir/
-    
+    rm -r \$temp_bam_dir
     """
 }
 
