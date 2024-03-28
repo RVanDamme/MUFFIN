@@ -94,7 +94,7 @@ process comebin {
     """
     #!/bin/bash
     # Etape 1: Extraire les longueurs des contigs et les trier
-    readarray -t lengths < <(awk -F'_' '/^>/ {print $4}' "${assembly}" | sort -nr)
+    readarray -t lengths < <(awk -F'_' '/^>/ {print \$4}' "${assembly}" | sort -nr)
 
     # Etape 2: Calculer la somme totale des longueurs
     total_length=0
