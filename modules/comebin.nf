@@ -93,25 +93,26 @@ process comebin {
     script:
     """
     #!/bin/bash
-    assembly="${assembly}"
+    # Etape 1: Extraire les longueurs des contigs et les trier
+    readarray -t lengths < <(awk -F'_' '/^>/ {print $4}' "${assembly}" | sort -nr)
 
-    # Calculer les longueurs de contigs et trier en ordre decroissant
-    contig_lengths=\$(awk '!/^>/ { printf "%s", \$0; next } /^>/ { if(NR > 1) print n; n=0 } { n += length(\$0) } END { print n }' \$assembly | sort -nr)
+    # Etape 2: Calculer la somme totale des longueurs
+    total_length=0
+    for length in "\${lengths[@]}"; do
+        ((total_length += length))
+    done
 
-    # Calculer la somme totale des longueurs de contigs
-    total_length=\$(echo "\$contig_lengths" | awk '{sum += \$1} END {print sum}')
-
-    # Calculer N50
+    # Etape 3: Trouver le N50
+    half_total=$((total_length / 2))
     cumulative_length=0
-    for length in \$contig_lengths; do
-        cumulative_length=\$((\$cumulative_length + \$length))
-        if [ \$cumulative_length -ge \$(echo \$total_length / 2 | bc) ]; then
+    N50=0
+    for length in "\${lengths[@]}"; do
+        ((cumulative_length += length))
+        if [[ cumulative_length -ge half_total ]]; then
             N50=\$length
             break
         fi
     done
-
-    echo "N50: \$N50"
 
     # Definir la température dans la fonction de perte en fonction du N50
     loss_temp=\$(awk -v n50=\$N50 'BEGIN{print (n50 > 10000) ? 0.07 : 0.15}')
