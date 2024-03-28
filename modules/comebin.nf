@@ -114,11 +114,12 @@ process comebin {
         fi
     done
 
-    # Definir la température dans la fonction de perte en fonction du N50
+    # Definir la temperature dans la fonction de perte en fonction du N50
     loss_temp=\$(awk -v n50=\$N50 'BEGIN{print (n50 > 10000) ? 0.07 : 0.15}')
     echo "loss temp"
     echo \$loss_temp
-
+    
+    mkdir bins_dir/comebin_bins
     run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/comebin_bins -l \$loss_temp -p *.bam
     
     """
