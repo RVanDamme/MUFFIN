@@ -125,6 +125,7 @@ process comebin {
     # Copie du fichier BAM dans le répertoire temporaire
     cp ${bam_files} \$temp_bam_dir
 
+    echo ${task.cpus}
     run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/ -l \$loss_temp -p \$temp_bam_dir/
     rm -r \$temp_bam_dir
     """
