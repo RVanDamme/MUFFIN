@@ -63,7 +63,7 @@ process sourmash_bins {
     path('*.txt')
     shell:
     """
-    sourmash compute -p ${task.cpus} --scaled 10000 -k 31 ${bins} -o sourmash.sig
+    sourmash compute -p ${task.cpus} --scaled 10000 -k 31 ${bins}/* -o sourmash.sig
     sourmash lca classify --query sourmash.sig --db ${json} > souremash_output.txt   
     """
 }
