@@ -26,28 +26,6 @@ process sourmash_genome_size { //deprecated since flye 2.8 update
 
 }
 
-process sourmash_bins {
-    label 'sourmash' 
-
-    conda 'bioconda::sourmash=2.0.1 '
-
-    publishDir "${params.output}/${name}/classify/sourmash/", mode: 'copy', pattern: "*.txt"
-    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
-    maxRetries = 5
-    input:
-    tuple val(name), path(bins)
-    path(json)
-    output:
-    path('*.txt')
-    shell:
-    """
-    bin_id=\$(basename ${bins} | sed -r "s/\\.\\w+//2")
-    sourmash compute -p ${task.cpus} --scaled 10000 -k 31 ${bins} -o ${bins}.sig
-    sourmash lca classify --query ${bins}.sig --db ${json} > \$bin_id.txt   
-    """
-}
-
-
 // process sourmash_bins {
 //     label 'sourmash' 
 
@@ -63,7 +41,29 @@ process sourmash_bins {
 //     path('*.txt')
 //     shell:
 //     """
-//     sourmash compute -p ${task.cpus} --scaled 10000 -k 31 ${bins}/* -o sourmash.sig
-//     sourmash lca classify --query sourmash.sig --db ${json} > souremash_output.txt   
+//     bin_id=\$(basename ${bins} | sed -r "s/\\.\\w+//2")
+//     sourmash compute -p ${task.cpus} --scaled 10000 -k 31 ${bins} -o ${bins}.sig
+//     sourmash lca classify --query ${bins}.sig --db ${json} > \$bin_id.txt   
 //     """
 // }
+
+
+process sourmash_bins {
+    label 'sourmash' 
+
+    conda 'bioconda::sourmash=2.0.1 '
+
+    publishDir "${params.output}/${name}/classify/sourmash/", mode: 'copy', pattern: "*.txt"
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
+    input:
+    tuple val(name), path(bins)
+    path(json)
+    output:
+    path('*.txt')
+    shell:
+    """
+    sourmash compute -p ${task.cpus} --scaled 10000 -k 31 ${bins} -o sourmash.sig
+    sourmash lca classify --query sourmash.sig --db ${json} > souremash_output.txt   
+    """
+}
