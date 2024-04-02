@@ -366,9 +366,7 @@ workflow hybrid_workflow{
         // Bins annotation workflow
         //*************************
 
-        eggnog_bin_ch = bins_input_ch.flatten().combine(eggnog_db)
-        bins_input_ch.flatten().println()
-        eggnog_bin_ch.println()
+        eggnog_bin_ch = bins_input_ch.combine(eggnog_db)
         eggnog_bin(eggnog_bin_ch) //annotate the bins
         bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
 
