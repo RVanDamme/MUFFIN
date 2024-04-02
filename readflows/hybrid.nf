@@ -369,9 +369,13 @@ workflow hybrid_workflow{
         //*************************
         // Bins annotation workflow
         //*************************
+        bins_input_ch.flatMap { name, paths ->
+            paths.collect { path -> tuple(name, path) }
+        }
+        .set { bins_input_ready_ch }
 
-        eggnog_bin_ch = bins_input_ch.combine(eggnog_db)
-        //eggnog_bin(eggnog_bin_ch) //annotate the bins
+        eggnog_bin_ch = bins_input_ready_ch.combine(eggnog_db)
+        eggnog_bin(eggnog_bin_ch) //annotate the bins
         //bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
 
         //************************
