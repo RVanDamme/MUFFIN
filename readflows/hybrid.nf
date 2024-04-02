@@ -295,7 +295,7 @@ workflow hybrid_workflow{
         //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
         //checkm2(classify_ch, checkm_download_db.out)
         //checkm2_out_ch = checkm2.out 
-
+        classify_ch.view()
         //sourmash classification using gtdb database
         sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
         //sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
@@ -367,7 +367,6 @@ workflow hybrid_workflow{
         //*************************
 
         eggnog_bin_ch = bins_input_ch.combine(eggnog_db)
-        eggnog_bin_ch.view()
         //eggnog_bin(eggnog_bin_ch) //annotate the bins
         //bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
 
