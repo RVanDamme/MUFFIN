@@ -366,9 +366,10 @@ workflow hybrid_workflow{
         // Bins annotation workflow
         //*************************
 
-        eggnog_bin_ch = bins_input_ch.flatMap().combine(eggnog_db)
-        eggnog_bin(eggnog_bin_ch) //annotate the bins
-        bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
+        eggnog_bin_ch = bins_input_ch.combine(eggnog_db)
+        eggnog_bin_ch.view()
+        //eggnog_bin(eggnog_bin_ch) //annotate the bins
+        //bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
 
         //************************
         // RNA annotation workflow
