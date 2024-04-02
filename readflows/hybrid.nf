@@ -48,6 +48,10 @@ if (params.modular=="full" | params.modular=="annotate" | params.modular=="assem
     include {parser_bin_RNA} from '../modules/parser' params(output: params.output)
     include {parser_bin} from '../modules/parser' params(output: params.output)
 }
+
+include {readme_output} from '../modules/readme_output' params(output: params.output)
+include {test} from '../modules/test_data_dll'
+
 params.db_path = '/home/user/databases'
 params.db_file = 'uniref100.KO.1.dmnd'
 
