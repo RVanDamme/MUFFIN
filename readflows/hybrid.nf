@@ -296,4 +296,117 @@ workflow hybrid_workflow{
         sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
         //sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
     }
+
+    //part 3 
+    //*************************************************
+    // STEP 3 annotation; kegg pathways + use or RNAseq
+    //*************************************************
+
+    if (params.modular=="full" | params.modular=="annotate" | params.modular=="assem-annot" | params.modular=="class-annot") {
+        //**************
+        // File handling
+        //**************
+
+        //RNAseq
+        if (params.rna) {rna_input_ch = Channel
+                .fromFilePairs( "${params.rna}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
+                .view()
+        }
+
+        //bins (list with id (run id not bin) coma path/to/file)
+        if (params.bin_annotate) {
+            bins_input_ch = Channel
+                .fromPath( params.bin_annotate, checkIfExists: true )
+                .splitCsv()
+                .map { row -> ["${row[0]}", file("${row[1]}", checkIfExists: true)]  }
+                .view() 
+                }
+        else if (params.bin_classify) {
+            bins_input_ch = Channel
+                .fromPath( params.bin_classify, checkIfExists: true )
+                .splitCsv()
+                .map { row -> ["${row[0]}", file("${row[2]}", checkIfExists: true)]  }
+                .view() 
+                }
+        else {
+            switch (params.bintool) {
+                case 'metabat2':
+                    bin_ch = metabat2.out
+                    break
+
+                case 'semibin2':
+                    bin_ch = semibin2.out
+                    break
+
+                case 'comebin':
+                    bin_ch = comebin.out
+                    break
+
+                default:
+                    bin_ch = metabat2.out
+
+            }
+            bins_input_ch = bin_ch 
+        }
+
+        //************************
+        // Databases Dll and setup
+        //************************
+        if (params.eggnog_db) {eggnog_db=Channel
+                .fromPath( params.eggnog_db, checkIfExists: true )}
+        else {
+            eggnog_download_db()
+            eggnog_db = eggnog_download_db.out
+            } 
+        //*************************
+        // Bins annotation workflow
+        //*************************
+
+        eggnog_bin_ch = bins_input_ch.combine(eggnog_db)
+        eggnog_bin(eggnog_bin_ch) //annotate the bins
+        bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
+
+        //************************
+        // RNA annotation workflow
+        //************************
+        // if (params.rna) {
+        // // QC
+        //     fastp_rna(rna_input_ch) //qc illumina RNA-seq
+        //     rna_input_ch = fastp_rna.out
+
+        // // De novo transcript
+        //     de_novo_transcript_and_quant(rna_input_ch) // de novo transcrip assembly and quantification with trinity and salmon
+        //     transcript_ch=de_novo_transcript_and_quant.out
+        // // annotations of transcript
+        //     eggnog_rna_ch= transcript_ch.combine(eggnog_db)
+        //     eggnog_rna(eggnog_rna_ch) //annotate the RNA-seq transcripts
+        //     rna_annot_ch=eggnog_rna.out[0].view()
+        // }
+
+        //******************************************************
+        // Parsing bin annot and RNA out into nice graphical out
+        //******************************************************
+
+        // if (params.rna)  {
+        //     parser_bin_RNA(rna_annot_ch,bin_annotated_ch) // parse the annotations in html summary files
+        // }
+        // else {
+        //     parser_bin(bin_annotated_ch) // parse the bins annotation in html summary files
+        // }
+        // Share pathway to put and HTML file with
+    } // end of step 3
+    
+    readme_output()
+
+   
+
+    
+
 }
+
+workflow.onComplete { 
+    log.info ( workflow.success ? "\nDone! Results are stored here --> $params.output \n The Readme file in $params.output describe the structure of the results directories. \n" : "Oops .. something went wrong" )  
+}
+//***********
+//DONE
+//***********
