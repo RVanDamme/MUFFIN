@@ -13,7 +13,7 @@ process eggnog_bin {
     path("*.seed_orthologs.tsv")
   shell:
     """
-    emapper.py --data_dir ${db} -d bact -o ${name}  -m diamond -i ${bin} --cpu ${task.cpus} --go_evidence non-electronic  --target_orthologs all --translate
+    emapper.py --data_dir ${db} -d bact -o ${name}  -m diamond -i ${bin}/* --cpu ${task.cpus} --go_evidence non-electronic  --target_orthologs all --translate
     tac ${name}.emapper.annotations | sed "1,3d" | tac |sed "1,3d" > ${name}.annotations.tsv
     cp ${name}.emapper.seed_orthologs ${name}.seed_orthologs.tsv
     """
