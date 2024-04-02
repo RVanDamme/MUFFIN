@@ -295,7 +295,7 @@ workflow hybrid_workflow{
         //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
         //checkm2(classify_ch, checkm_download_db.out)
         //checkm2_out_ch = checkm2.out 
-        bins_input_ch.flatMap { name, paths ->
+        classify_ch.flatMap { name, paths ->
             paths.collect { path -> tuple(name, path) }
         }
         .set { bins_ready_ch }
