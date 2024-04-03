@@ -19,6 +19,8 @@
 //     """
 // }
 
+
+//posibilité de spécifier le dossier en utilisant ${bintool}/
 process eggnog_bin { 
   label 'eggnog' 
 

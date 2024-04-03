@@ -376,24 +376,23 @@ workflow hybrid_workflow{
 
         eggnog_bin_ch = bins_input_ready_ch.combine(eggnog_db)
         eggnog_bin(eggnog_bin_ch) //annotate the bins
-        //bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
+        bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
 
         //************************
         // RNA annotation workflow
         //************************
-        // if (params.rna) {
-        // // QC
-        //     fastp_rna(rna_input_ch) //qc illumina RNA-seq
-        //     rna_input_ch = fastp_rna.out
+        if (params.rna) {
+        // QC   
+            rna_input_ch = fastp_rna(rna_input_ch) //qc illumina RNA-seq
 
-        // // De novo transcript
-        //     de_novo_transcript_and_quant(rna_input_ch) // de novo transcrip assembly and quantification with trinity and salmon
-        //     transcript_ch=de_novo_transcript_and_quant.out
-        // // annotations of transcript
-        //     eggnog_rna_ch= transcript_ch.combine(eggnog_db)
-        //     eggnog_rna(eggnog_rna_ch) //annotate the RNA-seq transcripts
-        //     rna_annot_ch=eggnog_rna.out[0].view()
-        // }
+        // De novo transcript
+            de_novo_transcript_and_quant(rna_input_ch) // de novo transcrip assembly and quantification with trinity and salmon
+            transcript_ch=de_novo_transcript_and_quant.out
+        // annotations of transcript
+            eggnog_rna_ch= transcript_ch.combine(eggnog_db)
+            eggnog_rna(eggnog_rna_ch) //annotate the RNA-seq transcripts
+            rna_annot_ch=eggnog_rna.out[0].view()
+        }
 
         //******************************************************
         // Parsing bin annot and RNA out into nice graphical out
