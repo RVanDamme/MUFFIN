@@ -49,7 +49,7 @@ process pilon {
         tuple val(name) , path("polished_assembly.fasta")
     shell:
     """
-    mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g')
+    mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g' | sed 's/ B//g')
     partial_mem=\$((\$mem*40/100))
     assemb="${assembly}"
     for ite in {1..${iteration}}
@@ -81,7 +81,7 @@ process pilong {
         tuple val(name) , path("polished_assembly.fasta")
     shell:
     """
-    mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g')
+    mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g' | sed 's/ B//g')
     partial_mem=\$((\$mem*40/100))
     assemb="${assembly}"
     for ite in {1..${iteration}}
