@@ -19,9 +19,7 @@ process checkm2 {
     def lowmemCmd = params.checkm2_low ? "--lowmem" : ""
     
     """
-    checkm2 database --download
-    checkm2 testrun --threads ${task.cpus}
-    checkm2 predict --threads ${task.cpus} --input ${bins_assemblies}/metabat_bins.10.fa ${dbPathCmd} ${lowmemCmd} --output-directory checkm2_dir/ 
+    checkm2 predict --threads ${task.cpus} --input ${bins_assemblies} ${dbPathCmd} ${lowmemCmd} --output-directory checkm2_dir/ 
     """
 }
 
@@ -29,3 +27,4 @@ process checkm2 {
 // If you are running CheckM2 on a device with limited RAM, you can use the 
 // --lowmem option to reduce DIAMOND RAM use by half at the expense of longer runtime.
 //--database_path /proj/cloacimonetes/NOBACKUP/Arnaud2024/spades_way/uniref100.KO.1.dmnd
+//checkm2 database --download
