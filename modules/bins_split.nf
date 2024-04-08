@@ -1,37 +1,37 @@
 process separateBins {
 
     label 'ubuntu'
-    //publishDir "${params.output}/${name}/annotate/", mode: 'copy', pattern: "parser_result/*"
+    publishDir "${params.output}/${name}/classify/sorted_bins/", mode: 'copy', pattern: "*bin_dir"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
 
     input:
     tuple val(name), path(checkm2_res_file)
-    tuple val(name), path(bins)
+    tuple val(name), path(bins_dir)
 
     output:
-    tuple val(name), path(good_bins)
-    tuple val(name), path(bad_bins)
+    tuple val(name), path("good_bin_dir/*.fa")
+    tuple val(name), path("bad_bin_dir/*.fa")
 
     script:
     """
     # Initialiser des fichiers temporaires pour stocker les chemins
-    good_bin_paths=\$(mktemp)
-    bad_bin_paths=\$(mktemp)
 
-    # Lire le fichier de données et séparer les chemins des bins
-    awk -v good=\$good_bin_paths -v bad=\$bad_bin_paths -v bin_dir="${bins}" 'NR > 1 {
-        if ((\$2 - 5*\$3) > 50)
-            print bin_dir \$1 ".fa" >> good;
-        else
-            print bin_dir \$1 ".fa" >> bad;
-    }' ${checkm2_res_file}
+    echo ${checkm2_res_file}
+    echo ${bins_dir}
 
-    # Utiliser 'cat' pour créer des listes de fichiers Nextflow à partir des chemins
-    cat \$good_bin_paths > good_bins
-    cat \$bad_bin_paths > bad_bins
+    good_bin_dir="./good_bin_dir/"
+    bad_bin_dir="./bad_bin_dir/"
 
-    # Nettoyage
-    rm -f \$good_bin_paths \$bad_bin_paths
+    mkdir -p "\$good_bin_dir"
+    mkdir -p "\$bad_bin_dir"
+
+    awk -v dir="${bins_dir}" -v good_dir="\$good_bin_dir" -v bad_dir="\$bad_bin_dir" 'NR > 1 {
+    if ((\$2 - 5*\$3) > 50)
+        system("cp " dir \$1 ".fa " good_dir);
+    else
+        system("cp " dir \$1 ".fa " bad_dir);
+    }' "${checkm2_res_file}"
+
     """
 }
