@@ -21,6 +21,7 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {metabat2} from '../modules/metabat2' params(output : params.output)
     include {semibin2} from '../modules/semibin2' params(output : params.output, bining_model : params.bining_model, environment : params.environment)
     include {comebin} from '../modules/comebin' params(output : params.output)
+    include {separateBins} from '../modules/bins_split' params(output : params.output)
     include {bam_merger} from '../modules/samtools_merger' params(output : params.output)
     //include {contig_list} from '../modules/list_ids'
     include {cat_all_bins} from '../modules/cat_all_bins'
@@ -294,6 +295,9 @@ workflow hybrid_workflow{
         //checkm of the final assemblies
         //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
         checkm2(classify_ch, checkm_download_db.out)
+        separateBins(checkm2.out ,classify_ch)
+        separateBins.out.view()
+
         //checkm2_out_ch = checkm2.out 
         classify_ch.flatMap { name, paths ->
             paths.collect { path -> tuple(name, path) }
