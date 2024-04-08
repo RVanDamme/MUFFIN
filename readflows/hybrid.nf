@@ -296,6 +296,8 @@ workflow hybrid_workflow{
         //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
         checkm2(classify_ch, checkm_download_db.out)
         separateBins(checkm2.out ,classify_ch)
+        good_bins_ch = separateBins.out
+        good_bins_ch.view()
 
         //checkm2_out_ch = checkm2.out 
         classify_ch.flatMap { name, paths ->
