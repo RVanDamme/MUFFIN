@@ -28,10 +28,17 @@ process separateBins {
 
     awk -v dir="${bins_dir}" -v good_dir="\$good_bin_dir" -v bad_dir="\$bad_bin_dir" 'NR > 1 {
     if ((\$2 - 5*\$3) > 50)
-        system("cp " dir \$1 ".fa " good_dir);
+        print \$1;
     else
-        system("cp " dir \$1 ".fa " bad_dir);
+        print \$1;;
     }' "${checkm2_res_file}"
 
     """
 }
+
+// awk -v dir="${bins_dir}" -v good_dir="\$good_bin_dir" -v bad_dir="\$bad_bin_dir" 'NR > 1 {
+//     if ((\$2 - 5*\$3) > 50)
+//         system("cp " dir \$1 ".fa " good_dir);
+//     else
+//         system("cp " dir \$1 ".fa " bad_dir);
+//     }' "${checkm2_res_file}"
