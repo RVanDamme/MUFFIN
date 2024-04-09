@@ -6,8 +6,7 @@ process separateBins {
     maxRetries = 5
 
     input:
-    tuple val(name), path(checkm2_res_file)
-    tuple val(name), path(bins_dir)
+    tuple val(name), path(checkm2_res_file), path(bins_dir)
 
     output:
     tuple val(name), path("good_bin_dir/*.fa")
