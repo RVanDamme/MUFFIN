@@ -296,20 +296,24 @@ workflow hybrid_workflow{
         //checkm(classify_ch.groupTuple(by:0)) //checkm QC of the bins
         checkm2(classify_ch, checkm_download_db.out)
         // classify_ch.view()
-        separateBins(checkm2.out.join(classify_ch))
-        good_bins_ch = separateBins.out[0]
-        bad_bins_ch = separateBins.out[1]
-        bad_bins_ch.view()
+
+        if (!params.skip_bin_sorting){
+            separateBins(checkm2.out.join(classify_ch))
+            classify_ch = separateBins.out[0]
+            bad_bins_ch = separateBins.out[1]
+            //bad_bins_ch.view()
+        }
+        
 
         //checkm2_out_ch = checkm2.out 
-        // classify_ch.flatMap { name, paths ->
-        //     paths.collect { path -> tuple(name, path) }
-        // }
-        // .set { bins_ready_ch }
+        classify_ch.flatMap { name, paths ->
+            paths.collect { path -> tuple(name, path) }
+        }
+        .set { bins_ready_ch }
         //sourmash classification using gtdb database
         //sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
         //sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
-        // sourmash_bins(bins_ready_ch,database_sourmash)
+        sourmash_bins(bins_ready_ch,database_sourmash)
     }
 
     //part 3 
