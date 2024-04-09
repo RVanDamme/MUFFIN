@@ -53,13 +53,15 @@ process bwa_bin {
     input:
     tuple val(name), path(assembly), path(illumina)
     output:
-    tuple val(name) , path("illumina_sorted.bam")
+    tuple val(name) , path("*_sorted.bam")
     script:
     """
+    bin_id=\$(basename ${assembly} | sed -r "s/\\.\\w+//2")
+
     bwa index -p illumina -a bwtsw ${assembly}
     bwa mem illumina ${illumina[0]} ${illumina[1]} -t ${task.cpus} > illumina.sam
     samtools view -bS illumina.sam > illumina.bam
-    samtools sort -@ ${task.cpus} -o illumina_sorted.bam illumina.bam
+    samtools sort -@ ${task.cpus} -o ./bin_map/illumina/\$bin_id_sorted.bam illumina.bam
     rm illumina.*
     """
 }

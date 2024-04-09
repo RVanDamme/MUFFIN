@@ -16,6 +16,7 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {minimap2} from '../modules/minimap2' //mapping for the binning 
     include {extra_minimap2} from '../modules/minimap2'
     include {bwa} from '../modules/bwa' //mapping for the binning
+    include {bwa_bin} from '../modules/bwa' //mapping for the binning
     include {extra_bwa} from '../modules/bwa'
     //include {metabat2_extra} from '../modules/metabat2' params(output : params.output)    
     include {metabat2} from '../modules/metabat2' params(output : params.output)
@@ -28,6 +29,8 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {bwa_bin} from '../modules/bwa'  
     include {minimap2_bin} from '../modules/minimap2'
     include {metaquast} from '../modules/quast' params(output : params.output)
+    include {unmapped_illumina_retrieve} from '../modules/seqtk_retrieve_reads' params(output : params.output)
+    include {unmapped_ont_retrieve} from '../modules/seqtk_retrieve_reads' params(output : params.output)
 }
 if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot"){
     include {sourmash_download_db} from '../modules/sourmashgetdatabase'
@@ -302,14 +305,20 @@ workflow hybrid_workflow{
             classify_ch = separateBins.out[0]
             bad_bins_ch = separateBins.out[1]
             //bad_bins_ch.view()
+            
         }
         
-
         //checkm2_out_ch = checkm2.out 
         classify_ch.flatMap { name, paths ->
             paths.collect { path -> tuple(name, path) }
         }
         .set { bins_ready_ch }
+
+        if (!params.skip_bad_reads_recovery){
+            bwa_bin(bins_ready_ch.join(illumina_input_ch))
+        }
+
+
         //sourmash classification using gtdb database
         //sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
         //sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file

@@ -13,11 +13,6 @@ process separateBins {
 
     script:
     """
-    # Initialiser des fichiers temporaires pour stocker les chemins
-
-    echo ${checkm2_res_file}
-    echo ${bins_dir}
-
     good_bin_dir="./good_bin_dir/"
     bad_bin_dir="./bad_bin_dir/"
 
