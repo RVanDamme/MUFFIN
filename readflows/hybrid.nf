@@ -299,7 +299,7 @@ workflow hybrid_workflow{
         separateBins(checkm2.out.join(classify_ch))
         good_bins_ch = separateBins.out[0]
         bad_bins_ch = separateBins.out[1]
-        good_bins_ch.view()
+        bad_bins_ch.view()
 
         //checkm2_out_ch = checkm2.out 
         // classify_ch.flatMap { name, paths ->

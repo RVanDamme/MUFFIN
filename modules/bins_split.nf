@@ -33,6 +33,9 @@ process separateBins {
         system("cp " dir \$1 ".fa " bad_dir);
     }' "${checkm2_res_file}"
 
+    cp -r \$good_bin_dir "${params.output}/${name}/classify/sorted_bins/"
+    cp -r \$bad_bin_dir "${params.output}/${name}/classify/sorted_bins/"
+
     """
 }
 
