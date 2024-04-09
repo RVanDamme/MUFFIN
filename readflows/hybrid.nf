@@ -298,14 +298,14 @@ workflow hybrid_workflow{
         separateBins(checkm2.out ,classify_ch)
 
         //checkm2_out_ch = checkm2.out 
-        classify_ch.flatMap { name, paths ->
-            paths.collect { path -> tuple(name, path) }
-        }
-        .set { bins_ready_ch }
+        // classify_ch.flatMap { name, paths ->
+        //     paths.collect { path -> tuple(name, path) }
+        // }
+        // .set { bins_ready_ch }
         //sourmash classification using gtdb database
         //sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
         //sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
-        sourmash_bins(bins_ready_ch,database_sourmash)
+        // sourmash_bins(bins_ready_ch,database_sourmash)
     }
 
     //part 3 
@@ -372,14 +372,14 @@ workflow hybrid_workflow{
         //*************************
         // Bins annotation workflow
         //*************************
-        bins_input_ch.flatMap { name, paths ->
-            paths.collect { path -> tuple(name, path) }
-        }
-        .set { bins_input_ready_ch }
+        // bins_input_ch.flatMap { name, paths ->
+        //     paths.collect { path -> tuple(name, path) }
+        // }
+        // .set { bins_input_ready_ch }
 
-        eggnog_bin_ch = bins_input_ready_ch.combine(eggnog_db)
-        eggnog_bin(eggnog_bin_ch) //annotate the bins
-        bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
+        // eggnog_bin_ch = bins_input_ready_ch.combine(eggnog_db)
+        // eggnog_bin(eggnog_bin_ch) //annotate the bins
+        // bin_annotated_ch=eggnog_bin.out[0].groupTuple(by:0).view()
 
         //************************
         // RNA annotation workflow
