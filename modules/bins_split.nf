@@ -1,7 +1,8 @@
 process separateBins {
 
     label 'ubuntu'
-    publishDir "${params.output}/${name}/classify/sorted_bins/", mode: 'copy', pattern: "*bin_dir"
+    publishDir "${params.output}/${name}/classify/sorted_bins/good", mode: 'copy', pattern: "good_*.fa"
+    publishDir "${params.output}/${name}/classify/sorted_bins/bad", mode: 'copy', pattern: "bad_*.fa"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
 
@@ -9,8 +10,7 @@ process separateBins {
     tuple val(name), path(checkm2_res_file), path(bins_dir)
 
     output:
-    tuple val(name), path("good_bin_dir/*.fa")
-    tuple val(name), path("bad_bin_dir/*.fa")
+    tuple val(name), path("good_bin_dir/*.fa"), path("bad_bin_dir/*.fa")
 
     script:
     """

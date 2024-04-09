@@ -297,6 +297,8 @@ workflow hybrid_workflow{
         checkm2(classify_ch, checkm_download_db.out)
         classify_ch.view()
         separateBins(checkm2.out.join(classify_ch))
+        bins_split_ch = separateBins.out
+        bins_input_ch.view()
 
         //checkm2_out_ch = checkm2.out 
         // classify_ch.flatMap { name, paths ->
