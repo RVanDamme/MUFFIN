@@ -35,7 +35,7 @@ if (params.modular=="full" | params.modular=="classify" | params.modular=="assem
 }
 if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot") {
     //include {reads_retrieval} from '../modules/seqtk_retrieve_reads' params(output : params.output)
-    include {checkm2} from '../modules/checkm2' params(output: params.output)
+    include {checkm2} from '../modules/checkm2' params(output: params.output, checkm2_low: params.checkm2_low, checkm2db: params.checkm2db)
     include {sourmash_bins} from '../modules/sourmash' params(output: params.output, bintool : params.bintool)
     include {sourmash_checkm_parser} from '../modules/checkm_sourmash_parser' params(output: params.output)
     //include {unmapped_retrieve} from '../modules/seqtk_retrieve_reads' params(output : params.output)
