@@ -47,7 +47,7 @@ process metabat2 {
     tuple val(name), path(assembly), path(bam)
     
     output:
-    tuple val(name), path("bins_dir/")
+    tuple val(name), path("bins_dir")
     
     script:
     """
