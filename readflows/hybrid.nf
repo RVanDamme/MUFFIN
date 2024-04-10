@@ -26,7 +26,7 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {bam_merger} from '../modules/samtools_merger' params(output : params.output)
     //include {contig_list} from '../modules/list_ids'
     include {cat_all_bins} from '../modules/cat_all_bins'
-    include {bwa_bin} from '../modules/bwa'  
+    //include {bwa_bin} from '../modules/bwa'  
     include {minimap2_bin} from '../modules/minimap2'
     include {metaquast} from '../modules/quast' params(output : params.output)
     include {unmapped_illumina_retrieve} from '../modules/seqtk_retrieve_reads' params(output : params.output)
