@@ -52,7 +52,7 @@ process bwa_bin {
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
     tuple val(name), path(assembly)
-    path(illumina)
+    tuple val(name), path(illumina)
     output:
     tuple val(name) , path("*_sorted.bam")
     script:
