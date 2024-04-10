@@ -32,6 +32,8 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {metaquast} from '../modules/quast' params(output : params.output)
     include {unmapped_illumina_retrieve} from '../modules/seqtk_retrieve_reads' params(output : params.output)
     include {unmapped_ont_retrieve} from '../modules/seqtk_retrieve_reads' params(output : params.output)
+    include {illumina_reads_retrieval} from '../modules/seqtk_retrieve_reads' params(output : params.output)
+    include {ont_reads_retrieval} from '../modules/seqtk_retrieve_reads' params(output : params.output)
 }
 if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot"){
     include {sourmash_download_db} from '../modules/sourmashgetdatabase'
@@ -306,7 +308,20 @@ workflow hybrid_workflow{
             classify_ch = separateBins.out[0]
             bad_bins_ch = separateBins.out[1]
             //bad_bins_ch.view()
-            
+            merged_bin_ch = bin_merger(classify_ch)
+
+            bwa_bin_ch = bwa(merged_bin_ch.join(illumina_input_ch))
+            minimap_bin_ch = minimap2(merged_bin_ch.join(ont_input_ch))
+
+            ont_input_ch = ont_reads_retrieval(minimap_bin_ch.join(ont_input_ch))
+            illumina_input_ch = illumina_reads_retrieval(bwa_bin_ch.join(illumina_input_ch))
+
+
+            if (!params.skip_bad_reads_recovery){
+                unmapped_illumina_retrieve(bwa_bin_ch.join(illumina_input_ch))
+                unmapped_ont_retrieve(minimap_bin_ch.join(ont_input_ch))
+                //bwa_bin(bins_ready_ch, illumina_input_ch)
+            }
         }
         
         //checkm2_out_ch = checkm2.out 
@@ -315,10 +330,7 @@ workflow hybrid_workflow{
         }
         .set { bins_ready_ch }
 
-        if (!params.skip_bad_reads_recovery){
-            bin_merger(classify_ch)
-            //bwa_bin(bins_ready_ch, illumina_input_ch)
-        }
+        
 
 
         //sourmash classification using gtdb database
