@@ -39,7 +39,7 @@ process unmapped_illumina_retrieve {
     input:
     tuple val(name), path(bam), path(reads)
     output:
-    path("unmapped_*.fastq") optionnal true
+    path("unmapped_*.fastq")
     shell:
     """
     ## illumina unmapped reads retrieval
@@ -65,7 +65,7 @@ process unmapped_ont_retrieve {
     input:
     tuple val(name), path(bam), path(reads)
     output:
-    path("unmapped_*.fastq") optionnal true
+    path("unmapped_*.fastq")
     shell:
     """
     ## ONT unmapped reads retrieval
