@@ -129,7 +129,7 @@ process illumina_reads_retrieval {
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
-    tuple val(name), path(illumina_bam), path(illumina_reads)
+    tuple val(name), path(ill_bam), path(ill_reads)
     output:
     tuple val(name), path("*_ont.fastq")
     shell:
