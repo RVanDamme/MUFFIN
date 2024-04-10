@@ -65,6 +65,59 @@ process pilon {
 
 }
 
+process pilon_tk {
+    label 'pilon'
+
+    conda  'bioconda::pilon=1.23 bioconda::bwa=0.7.17 bioconda::samtools=1.9'
+    
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
+    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "*polished_bin_assembly.fasta" 
+    input:
+        tuple val(name), path(assembly), path(ill_read)
+        val(iteration)
+    output:
+        tuple val(name) , path("polished_bin_assembly.fasta")
+    shell:
+    """
+    bin_id=\$(basename ${assembly} | sed -r "s/\\.\\w+//2")
+
+    bwa index -p illumina -a bwtsw ${assembly}
+    bwa mem illumina ${ill_read[0]} ${ill_read[1]} -t ${task.cpus} > illumina.sam
+    samtools view -bS illumina.sam > illumina.bam
+    samtools sort -@ ${task.cpus} -o illumina_sorted.bam illumina.bam
+
+    ## illumina mapped reads retrieval
+    samtools index -@ ${task.cpus} illumina_sorted.bam
+    samtools view -bh illumina_sorted.bam \$list > illumina_contigs.bam  
+    samtools view -F4 illumina_contigs.bam > illumina_mapped_contigs.sam
+    cut -f1 illumina_mapped_contigs.sam | sort | uniq > \$bin"_illumina_mapped.list"
+    seqtk subseq ${ill_reads[0]} \$bin"_illumina_mapped.list" > \$bin"_illumina_R1.fastq"
+    seqtk subseq ${ill_reads[1]} \$bin"_illumina_mapped.list" > \$bin"_illumina_R2.fastq"
+
+    #do pilon
+    mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g' | sed 's/ B//g')
+    partial_mem=\$((\$mem*40/100))
+    assemb="${assembly}"
+    for ite in {1..${iteration}}
+    do
+        bwa index \$assemb
+        bwa mem \$assemb \$bin"_illumina_R1.fastq" \$bin"_illumina_R2.fastq" | samtools view -bS - | samtools sort -@ ${task.cpus} - > \$ite.bam
+        samtools index -@ ${task.cpus} \$ite.bam
+        pilon -Xmx\$partial_mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
+        assemb=\$ite"_polished_assembly.fasta"
+    done
+    mv ${iteration}"_polished_assembly.fasta" \$bin_id"_polished_bin_assembly.fasta"
+
+    #clean phase
+    rm illumina.*
+    rm illumina_contigs.bam
+    rm illumina_mapped_contigs.sam
+    rm *.bam.bai
+    """
+
+}
+
 //use minimap instead of bwa
 process pilong {
     label 'pilon'

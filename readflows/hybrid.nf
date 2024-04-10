@@ -308,16 +308,16 @@ workflow hybrid_workflow{
             classify_ch = separateBins.out[0]
             bad_bins_ch = separateBins.out[1]
             //bad_bins_ch.view()
-            merged_bin_ch = bin_merger(classify_ch)
-
-            bwa_bin_ch = bwa_bin(merged_bin_ch.join(illumina_input_ch))
-            minimap_bin_ch = minimap2_bin(merged_bin_ch.join(ont_input_ch))
-
-            ont_input_ch = ont_reads_retrieval(minimap_bin_ch.join(ont_input_ch))
-            illumina_input_ch = illumina_reads_retrieval(bwa_bin_ch.join(illumina_input_ch))
-
-
+            
             if (!params.skip_bad_reads_recovery){
+                merged_bin_ch = bin_merger(classify_ch)
+
+                bwa_bin_ch = bwa_bin(merged_bin_ch.join(illumina_input_ch))
+                minimap_bin_ch = minimap2_bin(merged_bin_ch.join(ont_input_ch))
+
+                // ont_input_ch = ont_reads_retrieval(minimap_bin_ch.join(ont_input_ch))
+                // illumina_input_ch = illumina_reads_retrieval(bwa_bin_ch.join(illumina_input_ch))
+
                 unmapped_illumina_retrieve(bwa_bin_ch.join(illumina_input_ch))
                 unmapped_ont_retrieve(minimap_bin_ch.join(ont_input_ch))
                 //bwa_bin(bins_ready_ch, illumina_input_ch)

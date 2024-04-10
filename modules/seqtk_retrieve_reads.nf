@@ -131,7 +131,7 @@ process illumina_reads_retrieval {
     input:
     tuple val(name), path(ill_bam), path(ill_reads)
     output:
-    tuple val(name), path("*_ont.fastq")
+    tuple val(name), path("*_illumina_R{1,2}.fastq")
     shell:
     // first I extract the reads that NEED TO REDO IT WITH FRESH MIND (include BWA.nf)
     """
