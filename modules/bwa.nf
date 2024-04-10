@@ -51,12 +51,15 @@ process bwa_bin {
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "illumina.bam"  
     //SINCE THIS module is use multiple times it migh not be advise to output the same name file mutiple times
     input:
-    tuple val(name), path(assembly), path(illumina)
+    tuple val(name), path(assembly)
+    path(illumina)
     output:
     tuple val(name) , path("*_sorted.bam")
     script:
     """
     bin_id=\$(basename ${assembly} | sed -r "s/\\.\\w+//2")
+
+    mkdir -p ./bin_map/illumina
 
     bwa index -p illumina -a bwtsw ${assembly}
     bwa mem illumina ${illumina[0]} ${illumina[1]} -t ${task.cpus} > illumina.sam
