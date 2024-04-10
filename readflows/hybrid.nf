@@ -16,7 +16,7 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {minimap2} from '../modules/minimap2' //mapping for the binning 
     include {extra_minimap2} from '../modules/minimap2'
     include {bwa} from '../modules/bwa' //mapping for the binning
-    //include {bwa_bin} from '../modules/bwa' //mapping for the binning
+    include {bwa_bin} from '../modules/bwa' //mapping for the binning
     include {extra_bwa} from '../modules/bwa'
     //include {metabat2_extra} from '../modules/metabat2' params(output : params.output)    
     include {metabat2} from '../modules/metabat2' params(output : params.output)
@@ -310,8 +310,8 @@ workflow hybrid_workflow{
             //bad_bins_ch.view()
             merged_bin_ch = bin_merger(classify_ch)
 
-            bwa_bin_ch = bwa(merged_bin_ch.join(illumina_input_ch))
-            minimap_bin_ch = minimap2(merged_bin_ch.join(ont_input_ch))
+            bwa_bin_ch = bwa_bin(merged_bin_ch.join(illumina_input_ch))
+            minimap_bin_ch = minimap2_bin(merged_bin_ch.join(ont_input_ch))
 
             ont_input_ch = ont_reads_retrieval(minimap_bin_ch.join(ont_input_ch))
             illumina_input_ch = illumina_reads_retrieval(bwa_bin_ch.join(illumina_input_ch))
