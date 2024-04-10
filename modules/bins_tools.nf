@@ -31,3 +31,22 @@ process separateBins {
 
     """
 }
+
+process bin_merger {
+
+    label 'ubuntu'
+    publishDir "${params.output}/${name}/classify/sorted_bins/", mode: 'copy', pattern: "merged_bin_assembly.fa"
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate'}
+    maxRetries = 5
+
+    input:
+    tuple val(name), path(bins)
+
+    output:
+    tuple val(name), path("merged_bin_assembly.fa")
+
+    script:
+    """
+    cat ${bins} > merged_bin_assembly.fa
+    """
+}

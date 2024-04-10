@@ -16,13 +16,14 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {minimap2} from '../modules/minimap2' //mapping for the binning 
     include {extra_minimap2} from '../modules/minimap2'
     include {bwa} from '../modules/bwa' //mapping for the binning
-    include {bwa_bin} from '../modules/bwa' //mapping for the binning
+    //include {bwa_bin} from '../modules/bwa' //mapping for the binning
     include {extra_bwa} from '../modules/bwa'
     //include {metabat2_extra} from '../modules/metabat2' params(output : params.output)    
     include {metabat2} from '../modules/metabat2' params(output : params.output)
     include {semibin2} from '../modules/semibin2' params(output : params.output, bining_model : params.bining_model, environment : params.environment)
     include {comebin} from '../modules/comebin' params(output : params.output)
-    include {separateBins} from '../modules/bins_split' params(output : params.output)
+    include {separateBins} from '../modules/bins_tools' params(output : params.output)
+    include {bin_merger} from '../modules/bins_tools' params(output : params.output)
     include {bam_merger} from '../modules/samtools_merger' params(output : params.output)
     //include {contig_list} from '../modules/list_ids'
     include {cat_all_bins} from '../modules/cat_all_bins'
@@ -315,14 +316,15 @@ workflow hybrid_workflow{
         .set { bins_ready_ch }
 
         if (!params.skip_bad_reads_recovery){
-            bwa_bin(bins_ready_ch, illumina_input_ch)
+            bin_merger(classify_ch)
+            //bwa_bin(bins_ready_ch, illumina_input_ch)
         }
 
 
         //sourmash classification using gtdb database
         //sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
         //sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
-        
+
         //sourmash_bins(bins_ready_ch,database_sourmash)
     }
 
