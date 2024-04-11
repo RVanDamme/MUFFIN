@@ -23,6 +23,7 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {semibin2} from '../modules/semibin2' params(output : params.output, bining_model : params.bining_model, environment : params.environment)
     include {comebin} from '../modules/comebin' params(output : params.output)
     include {separateBins} from '../modules/bins_tools' params(output : params.output)
+    include {bin_filter} from '../modules/bins_tools' params(output : params.output)
     include {bin_merger} from '../modules/bins_tools' params(output : params.output)
     include {bam_merger} from '../modules/samtools_merger' params(output : params.output)
     //include {contig_list} from '../modules/list_ids'
@@ -305,9 +306,12 @@ workflow hybrid_workflow{
         // classify_ch.view()
 
         if (!params.skip_bin_sorting){
-            separateBins(checkm2.out.join(classify_ch))
-            classify_ch = separateBins.out[0]
-            bad_bins_ch = separateBins.out[1]
+            bin_filter(checkm2.out.join(classify_ch))
+            classify_ch = bin_filter.out()
+
+            // separateBins(checkm2.out.join(classify_ch))
+            // classify_ch = separateBins.out[0]
+            // bad_bins_ch = separateBins.out[1]
             //bad_bins_ch.view()
             
             if (!params.skip_bad_reads_recovery){
