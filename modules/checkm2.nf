@@ -11,7 +11,7 @@ process checkm2 {
     tuple val(name), path(bins_assemblies)
     val(bool)
     output:
-    tuple val(name), path("checkm2_dir/*.tsv")
+    tuple val(name), path("checkm2_dir")
     
     script:
     // Détermine si params.checkm2db est fourni et ajoute --database_path à la commande si nécessaire
