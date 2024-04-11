@@ -32,8 +32,8 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {metaquast} from '../modules/quast' params(output : params.output)
     include {unmapped_illumina_retrieve} from '../modules/seqtk_retrieve_reads' params(output : params.output)
     include {unmapped_ont_retrieve} from '../modules/seqtk_retrieve_reads' params(output : params.output)
-    include {illumina_reads_retrieval} from '../modules/seqtk_retrieve_reads' params(output : params.output)
-    include {ont_reads_retrieval} from '../modules/seqtk_retrieve_reads' params(output : params.output)
+    // include {illumina_reads_retrieval} from '../modules/seqtk_retrieve_reads' params(output : params.output)
+    // include {ont_reads_retrieval} from '../modules/seqtk_retrieve_reads' params(output : params.output)
 }
 if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot"){
     include {sourmash_download_db} from '../modules/sourmashgetdatabase'
@@ -124,7 +124,8 @@ workflow hybrid_workflow{
             minimap_polish_ch = minimap_polish(flye.out.join(ont_input_ch))
             racon_ch = racon(ont_input_ch.join(flye.out).join(minimap_polish_ch))
             medaka_ch = medaka(racon_ch)
-            assembly_ch = pilon(medaka_ch.join(illumina_input_ch), params.polish_iteration)
+            assembly_ch = medaka_ch
+            //assembly_ch = pilon(medaka_ch.join(illumina_input_ch), params.polish_iteration)
 
             // assembly_ch.flatMap { contigs ->
             //     minimap_polish(contigs, ont_input_ch)
@@ -329,6 +330,10 @@ workflow hybrid_workflow{
             paths.collect { path -> tuple(name, path) }
         }
         .set { bins_ready_ch }
+
+        if (!params.skip_pilon && params.assembler == 'metaflye'){
+            pilon(bins_ready_ch.join(illumina_input_ch))
+        }
 
         
 
