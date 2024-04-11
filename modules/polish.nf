@@ -41,14 +41,16 @@ process pilon {
     
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
-    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "polished_assembly.fasta" 
+    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "*polished_bin_assembly.fasta" 
     input:
         tuple val(name), path(assembly), path(ill_read)
         val(iteration)
     output:
-        tuple val(name) , path("polished_assembly.fasta")
+        tuple val(name) , path("polished_bin_assembly.fasta")
     shell:
     """
+    bin_id=\$(basename ${assembly} | sed -r "s/\\.\\w+//2")
+
     mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g' | sed 's/ B//g')
     partial_mem=\$((\$mem*40/100))
     assemb="${assembly}"
@@ -60,7 +62,7 @@ process pilon {
         pilon -Xmx\$partial_mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
         assemb=\$ite"_polished_assembly.fasta"
     done
-    mv ${iteration}"_polished_assembly.fasta" polished_assembly.fasta
+    mv ${iteration}"_polished_assembly.fasta" \$bin_id"_polished_bin_assembly.fasta"
     """
 
 }
