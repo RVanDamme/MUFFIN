@@ -43,7 +43,8 @@ process pilon {
     maxRetries = 5
     publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "*polished_bin_assembly.fasta" 
     input:
-        tuple val(name), path(assembly), path(ill_read)
+        tuple val(name), path(assembly)
+        tuple val(name), path(ill_read)
         val(iteration)
     output:
         tuple val(name) , path("*polished_bin_assembly.fasta")
