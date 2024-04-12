@@ -46,7 +46,7 @@ process pilon {
         tuple val(name), path(assembly), path(ill_read)
         val(iteration)
     output:
-        tuple val(name) , path("polished_bin_assembly.fasta")
+        tuple val(name) , path("*polished_bin_assembly.fasta")
     shell:
     """
     bin_id=\$(basename ${assembly} | sed -r "s/\\.\\w+//2")
