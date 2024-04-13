@@ -75,7 +75,7 @@ process pilon2 {
     
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
-    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "*polished_bin_assembly.fasta" 
+    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "pilon_res/*.fasta" 
     
     input:
         tuple val(name), path(assembly_files)
@@ -91,7 +91,7 @@ process pilon2 {
     for assembly in ${assembly_files}
     do
         bin_id=\$(basename \$assembly | sed -r "s/\\.\\w+//2")
-        mem=\$(echo \${task.memory} | sed 's/ GB//g'| sed 's/g//g' | sed 's/ B//g')
+        mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g' | sed 's/ B//g')
         partial_mem=\$((\$mem*40/100))
         assemb="\$assembly"
         for ite in {1..${iteration}}
