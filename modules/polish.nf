@@ -88,18 +88,18 @@ process pilon2 {
     script:
     """
     mkdir -p ./pilon_res
-    for assembly in \${assembly_files}
+    for assembly in ${assembly_files}
     do
         bin_id=\$(basename \$assembly | sed -r "s/\\.\\w+//2")
         mem=\$(echo \${task.memory} | sed 's/ GB//g'| sed 's/g//g' | sed 's/ B//g')
         partial_mem=\$((\$mem*40/100))
         assemb="\$assembly"
-        for ite in {1..\${iteration}}
+        for ite in {1..${iteration}}
         do
             bwa index \$assemb
-            bwa mem \$assemb \${ill_read[0]} \${ill_read[1]} | samtools view -bS - | samtools sort -@ \${task.cpus} - > \$ite.bam
-            samtools index -@ \${task.cpus} \$ite.bam
-            pilon -Xmx\$partial_mem"g" --threads \${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
+            bwa mem \$assemb ${ill_read[0]} ${ill_read[1]} | samtools view -bS - | samtools sort -@ ${task.cpus} - > \$ite.bam
+            samtools index -@ ${task.cpus} \$ite.bam
+            pilon -Xmx\$partial_mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
             assemb=\$ite"_polished_assembly.fasta"
         done
         mv \$iteration"_polished_assembly.fasta" "./pilon_res/"\$bin_id"_polished_bin_assembly.fasta"
