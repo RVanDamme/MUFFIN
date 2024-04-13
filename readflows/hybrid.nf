@@ -336,7 +336,10 @@ workflow hybrid_workflow{
         .set { bins_ready_ch }
 
         if (!params.skip_pilon && params.assembler == 'metaflye' || params.bin_classify){
-            pilon(bins_ready_ch, illumina_input_ch, params.polish_iteration)
+            //pilon(bins_ready_ch, illumina_input_ch, params.polish_iteration)
+            bins_ready_ch.each { name, path ->
+                pilon(tuple(name, path), illumina_input_ch, params.polish_iteration)
+            }
         }
 
         
