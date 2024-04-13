@@ -12,6 +12,7 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {racon} from '../modules/polish'
     include {medaka} from '../modules/polish' params(model : params.model)
     include {pilon} from '../modules/polish' params(output : params.output)
+    include {pilon2} from '../modules/polish' params(output : params.output)
     include {pilong} from '../modules/polish' params(output : params.output)
     include {minimap2} from '../modules/minimap2' //mapping for the binning 
     include {extra_minimap2} from '../modules/minimap2'
@@ -334,15 +335,18 @@ workflow hybrid_workflow{
             paths.collect { path -> tuple(name, path) }
         }
         .set { bins_ready_ch }
+
         bins_ready_ch.view()
+        classify_ch.view()
+
+
         if (!params.skip_pilon && params.assembler == 'metaflye' || params.bin_classify){
-            pilon(bins_ready_ch, illumina_input_ch, params.polish_iteration)
+            //pilon(bins_ready_ch, illumina_input_ch, params.polish_iteration)
+            pilon2(classify_ch, illumina_input_ch, params.polish_iteration)
             // bins_ready_ch.each { tuple ->
             //     pilon(tuple, illumina_input_ch, params.polish_iteration)
             // }
         }
-
-        
 
 
         //sourmash classification using gtdb database
