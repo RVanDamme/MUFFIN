@@ -102,7 +102,7 @@ process pilon2 {
             pilon -Xmx\$partial_mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
             assemb=\$ite"_polished_assembly.fasta"
         done
-        mv \$iteration"_polished_assembly.fasta" "./pilon_res/"\$bin_id"_polished_bin_assembly.fasta"
+        mv ${iteration}"_polished_assembly.fasta" "./pilon_res/"\$bin_id"_polished_bin_assembly.fasta"
     done
     """
 }
