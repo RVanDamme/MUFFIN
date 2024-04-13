@@ -78,9 +78,9 @@ process pilon2 {
     publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "*polished_bin_assembly.fasta" 
     
     input:
-        tuple val(name), path(assembly_files) from bins_ready_ch
-        tuple val(name), path(ill_read) from illumina_input_ch
-        val(iteration) from params.polish_iteration
+        tuple val(name), path(assembly_files)
+        tuple val(name), path(ill_read)
+        val(iteration)
     
     output:
         tuple val(name), path("pilon_res/*.fasta")
