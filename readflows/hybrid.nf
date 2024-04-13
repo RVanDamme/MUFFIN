@@ -334,7 +334,7 @@ workflow hybrid_workflow{
             paths.collect { path -> tuple(name, path) }
         }
         .set { bins_ready_ch }
-        bins_ready_ch.view()
+        bins_ready_ch.flatMap().view()
         if (!params.skip_pilon && params.assembler == 'metaflye' || params.bin_classify){
             pilon(bins_ready_ch, illumina_input_ch, params.polish_iteration)
         }
