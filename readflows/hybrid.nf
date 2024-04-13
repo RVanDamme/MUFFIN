@@ -337,7 +337,9 @@ workflow hybrid_workflow{
 
         if (!params.skip_pilon && params.assembler == 'metaflye' || params.bin_classify){
             //pilon(bins_ready_ch, illumina_input_ch, params.polish_iteration)
-            bins_ready_ch.each { name, path ->
+            // Appel à Pilon pour chaque bin
+            bins_ready_ch.view().set { pilon_ch }
+            pilon_ch.into { name, path ->
                 pilon(tuple(name, path), illumina_input_ch, params.polish_iteration)
             }
         }
