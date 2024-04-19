@@ -331,6 +331,15 @@ workflow hybrid_workflow{
         }
         
         //checkm2_out_ch = checkm2.out 
+        if (!params.skip_pilon && params.assembler == 'metaflye' || params.bin_classify){
+            //pilon(bins_ready_ch, illumina_input_ch, params.polish_iteration)
+            pilon2(classify_ch, illumina_input_ch, params.polish_iteration)
+            classify_ch = pilon2.out
+            // bins_ready_ch.each { tuple ->
+            //     pilon(tuple, illumina_input_ch, params.polish_iteration)
+            // }
+        }
+
         classify_ch.flatMap { name, paths ->
             paths.collect { path -> tuple(name, path) }
         }
@@ -338,17 +347,6 @@ workflow hybrid_workflow{
 
         bins_ready_ch.view()
         classify_ch.view()
-
-
-        if (!params.skip_pilon && params.assembler == 'metaflye' || params.bin_classify){
-            //pilon(bins_ready_ch, illumina_input_ch, params.polish_iteration)
-            pilon2(classify_ch, illumina_input_ch, params.polish_iteration)
-            // bins_ready_ch.each { tuple ->
-            //     pilon(tuple, illumina_input_ch, params.polish_iteration)
-            // }
-        }
-
-
         //sourmash classification using gtdb database
         //sourmash_bins(classify_ch,database_sourmash) // fast classification using sourmash with the gtdb (not the best classification but really fast and good for primarly result)
         //sourmash_checkm_parser(checkm.out[0],sourmash_bins.out.collect()) //parsing the result of sourmash and checkm in a single result file
