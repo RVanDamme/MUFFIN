@@ -26,8 +26,8 @@ process separateBins {
         system("cp " dir \$1 ".fa " bad_dir);
     }' "${checkm2_dir}/quality_report.tsv"
 
-    cp -r \$good_bin_dir "${params.output}/${name}/classify/sorted_bins/"
-    cp -r \$bad_bin_dir "${params.output}/${name}/classify/sorted_bins/"
+    cp -r \$good_bin_dir/ "${params.output}/${name}/classify/sorted_bins/"
+    cp -r \$bad_bin_dir/ "${params.output}/${name}/classify/sorted_bins/"
 
     """
 }
@@ -35,7 +35,7 @@ process separateBins {
 process bin_filter {
 
     label 'ubuntu'
-    publishDir "${params.output}/${name}/classify/sorted_bins/bin_filtered", mode: 'copy', pattern: "good_bin_dir/*.fa"
+    publishDir "${params.output}/${name}/classify/sorted_bins/", mode: 'copy', pattern: "good_bin_dir/*.fa"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
 
@@ -59,6 +59,47 @@ process bin_filter {
 
     """
 }
+
+process get_wrong_bin {
+
+    label 'ubuntu'
+    publishDir "${params.output}/${name}/classify/sorted_bins/", mode: 'copy', pattern: "bad_bin_dir/*.fa"
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
+
+    input:
+    tuple val(name), path(checkm2_dir), path(bins_dir)
+
+    output:
+    tuple val(name), path("bad_bin_dir/*.fa")
+
+    script:
+    """
+    bad_bin_dir="./bad_bin_dir/"
+
+    mkdir -p "\$bad_bin_dir"
+    
+    awk -v dir="${bins_dir}/" -v bad_dir="\$bad_bin_dir" 'NR > 1 {
+    if ! ((\$2 - 5*\$3) > 50)
+        system("cp " dir \$1 ".fa " bad_dir);
+
+    }' "${checkm2_dir}/quality_report.tsv"
+
+    """
+}
+
+process get_fasta_path {
+    label 'ubuntu'
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
+
+    input:
+    tuple val(name), path(bins_dir)
+
+    output:
+    tuple val(name), path(bins_dir"/*.fa")
+}
+
 
 process bin_merger {
 

@@ -41,13 +41,13 @@ process semibin2 {
 
     conda 'bioconda::semibin=2.0.2'
 
-    publishDir "${params.output}/${name}/assemble/binning/semibin2/", mode: 'copy', pattern: "bins_dir"
+    publishDir "${params.output}/${name}/assemble/binning/semibin2/", mode: 'copy', pattern: "bins_dir/semibin2_bins/output_bins"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
     tuple val(name), path(assembly), path(bam_files)
     output:
-    tuple val(name), path("bins_dir")
+    tuple val(name), path("bins_dir/semibin2_bins/output_bins")
     
     script:
     """
@@ -66,6 +66,6 @@ process semibin2 {
         model_option="--environment ${params.environment}"
     fi
 
-    SemiBin2 single_easy_bin -i ${assembly} -b *.bam -o bins_dir/semibin2_bins -t ${task.cpus} \${model_option}
+    SemiBin2 single_easy_bin -i ${assembly} -b *.bam -o bins_dir/semibin2_bins -t ${task.cpus} --compression none \${model_option}
     """
 }
