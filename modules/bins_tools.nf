@@ -98,11 +98,11 @@ process get_fasta_path {
     tuple val(name), path(bins_dir)
 
     output:
-    tuple val(name), path(bins_dir"/*.fa")
+    tuple val(name), path("${bins_dir}/*.fa")
 
     script:
     """
-    
+
     """
 }
 
