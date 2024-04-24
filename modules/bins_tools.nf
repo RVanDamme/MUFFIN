@@ -89,6 +89,7 @@ process get_wrong_bin {
 }
 
 process get_fasta_path {
+
     label 'ubuntu'
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
@@ -98,6 +99,11 @@ process get_fasta_path {
 
     output:
     tuple val(name), path(bins_dir"/*.fa")
+
+    script:
+    """
+    
+    """
 }
 
 
