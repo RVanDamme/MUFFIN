@@ -73,7 +73,7 @@ process comebin {
     script:
     """
     #!/bin/bash
-    N50=$(n50 ${assembly})
+    N50=\$(n50 ${assembly})
     echo "N50 calculé: \$N50"
 
     # Definir la temperature dans la fonction de perte en fonction du N50

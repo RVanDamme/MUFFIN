@@ -2,11 +2,11 @@
 from db_utils import *
 
 # Chemin de base vers la base de données
-DATABASE_PATH = "./pankegg2.db"
+DATABASE_PATH = "./pankegg.db"
 
 # Chemins des fichiers de données
-PATHWAY_FILE = '../pathway.txt'
-KO_FILE = '../ko.txt'
+PATHWAY_FILE = './pathway.txt'
+KO_FILE = './ko.txt'
 ANNOTATION_PATH = '../annotate/bin_annotation/*.annotations.tsv'
 SOURMASH_TXT_DIR = '../classify/sourmash/*.txt'
 CHECKM2_DIR = '../classify/checkm2/checkm2_dir/quality_report.tsv'

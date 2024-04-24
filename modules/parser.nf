@@ -28,6 +28,21 @@ process parser_bin {
         """
     }
 
+process pankegg_db {
+    label 'ubuntu'
+    publishDir "${params.output}/${name}/annotate/", mode: 'copy', pattern: "parser_result/*"
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
+    input:
+        tuple val(name), path(bins_annot)
+    output:
+        path("parser_result/*") 
+    script:
+        """
+        main.py -a -c -p -o parser_result 
+        """
+    }
+
     // """
     //     #!/usr/bin/python
 
