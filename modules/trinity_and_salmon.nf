@@ -14,7 +14,7 @@ process de_novo_transcript_and_quant {
     tuple val(name), path("*_transcript.fasta"), path("*_transcript_quant.sf")
     shell:
     """
-    mem=\$(echo "!{task.memory}" | sed 's/ GB/g/g' | sed 's/g/G/g')
+    mem=\$(echo "!{task.memory}" | sed 's/ GB/g/g' | sed 's/g/G/g' | sed 's/ B//g')
     echo \$mem
     Trinity --seqType fq --max_memory \$mem --CPU !{task.cpus} --left !{rna[0]} --right !{rna[1]}
     cp trinity_out_dir/Trinity.fasta !{name}_transcript.fasta

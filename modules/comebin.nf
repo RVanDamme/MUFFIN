@@ -55,20 +55,58 @@
 // }
 
 
+// process comebin {
+//     maxForks 1
+//     label 'comebin'
+
+//     conda 'bioconda::COMEBin=1.0.3 bioconda::n50'
+
+//     publishDir "${params.output}/${name}/assemble/binning/comebin/", mode: 'copy', pattern: "bins_dir/comebin_res/comebin_res_bins"
+//     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+//     maxRetries = 5
+//     input:
+//     //tuple val(name), path(assembly), path(ont_bam).optional(), path(illumina_bam).optional(), path(extra_bam).optional()
+//     tuple val(name), path(assembly), path(bam_files)
+//     output:
+//     tuple val(name), path("bins_dir/comebin_res/comebin_res_bins")
+    
+//     script:
+//     """
+//     #!/bin/bash
+//     N50=\$(n50 ${assembly})
+//     echo "N50 calculé: \$N50"
+
+//     # Definir la temperature dans la fonction de perte en fonction du N50
+//     loss_temp=\$(awk -v n50=\$N50 'BEGIN{print (n50 > 10000) ? 0.07 : 0.15}')
+//     echo "loss temp"
+//     echo \$loss_temp
+    
+//     temp_bam_dir="./temp_bam_dir"
+//     mkdir -p \$temp_bam_dir
+
+//     # Copie du fichier BAM dans le répertoire temporaire
+//     cp ${bam_files} \$temp_bam_dir
+
+//     echo ${task.cpus}
+//     run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/ -l \$loss_temp -p \$temp_bam_dir/
+//     rm -r \$temp_bam_dir
+//     """
+// }
+
 process comebin {
     maxForks 1
     label 'comebin'
 
     conda 'bioconda::COMEBin=1.0.3 bioconda::n50'
 
-    publishDir "${params.output}/${name}/assemble/binning/comebin/", mode: 'copy', pattern: "bins_dir/comebin_res/comebin_res_bins"
+    publishDir "${params.output}/${name}/assemble/binning/", mode: 'copy', pattern: "comebin"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
     //tuple val(name), path(assembly), path(ont_bam).optional(), path(illumina_bam).optional(), path(extra_bam).optional()
     tuple val(name), path(assembly), path(bam_files)
     output:
-    tuple val(name), path("bins_dir/comebin_res/comebin_res_bins")
+    tuple val(name), path("comebin")
     
     script:
     """
@@ -90,6 +128,10 @@ process comebin {
     echo ${task.cpus}
     run_comebin.sh -t ${task.cpus} -a ${assembly} -o bins_dir/ -l \$loss_temp -p \$temp_bam_dir/
     rm -r \$temp_bam_dir
+
+    comebin_bin_dir="./comebin/"
+    mkdir -p "\$comebin_bin_dir"
+    mv bins_dir/comebin_res/comebin_res_bins/* ./comebin/
     """
 }
 
