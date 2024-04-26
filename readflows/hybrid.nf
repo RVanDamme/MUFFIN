@@ -204,6 +204,7 @@ workflow hybrid_workflow{
 
         else{
             classify_ch = bin_out_ch
+            //possibilité de casse !!!
         }
 
 
