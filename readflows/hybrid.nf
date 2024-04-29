@@ -27,8 +27,7 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {get_wrong_bin} from '../modules/bins_tools' params(output : params.output)
     include {bin_merger} from '../modules/bins_tools' params(output : params.output)
     include {bam_merger} from '../modules/samtools_merger' params(output : params.output)
-    include {bam_merger_extra_ill} from '../modules/samtools_merger' params(output : params.output)
-    include {bam_merger_extra_ont} from '../modules/samtools_merger' params(output : params.output)
+    include {bam_merger_extra} from '../modules/samtools_merger' params(output : params.output)
     include {cat_all_bins} from '../modules/cat_all_bins' 
     include {minimap2_bin} from '../modules/minimap2'
     include {metaquast} from '../modules/quast' params(output : params.output)
@@ -107,6 +106,9 @@ workflow hybrid_workflow{
 
         // Mapping with Minimap2 for ONT reads
         ont_bam_ch = minimap2(assembly_ch.join(ont_input_ch))
+        // Mapping with BWA for Illumina reads
+        illumina_bam_ch = bwa(assembly_ch.join(illumina_input_ch))
+
 
         // Mapping additional ONT reads if specified
         if (params.extra_ont) {
@@ -114,13 +116,9 @@ workflow hybrid_workflow{
                         def path = file("${row[0]}")
                         return path
                     }
-            // extra_ont_ch=chopper(extra_ont_ch)
-            ont_extra_bam_ch = extra_minimap2(assembly_ch.join(extra_ont_ch))
-            ont_bam_ch = bam_merger_extra_ont(ont_bam_ch.join(ont_extra_bam_ch))
-        }
 
-        // Mapping with BWA for Illumina reads
-        illumina_bam_ch = bwa(assembly_ch.join(illumina_input_ch))
+            extra_bam_ch = extra_minimap2(assembly_ch.join(extra_ont_ch))
+        }
 
         // Mapping additional Illumina reads if specified
         if (params.extra_ill) {
@@ -128,9 +126,17 @@ workflow hybrid_workflow{
                         def path = file("${row[0]}")
                         return path
                     }
-            // extra_ill_ch=fastp(extra_ill_ch)
-            illumina_extra_bam_ch = extra_bwa(assembly_ch.join(params.extra_ill))
-            illumina_bam_ch = bam_merger_extra_ill(illumina_bam_ch.join(illumina_extra_bam_ch))
+
+            illumina_extra_bam_ch = extra_bwa(assembly_ch.join(extra_ill_ch))
+
+            if (params.extra_ont){
+                extra_bam_ch = bam_merger_extra(extra_bam_ch.join(illumina_extra_bam_ch))
+            }
+            else{
+                extra_bam_ch = illumina_extra_bam_ch
+            }
+            // Simplified merging logic by using conditional operator
+            //extra_bam_ch = params.extra_ont ? bam_merger_extra(extra_bam_ch.join(illumina_extra_bam_ch)) : illumina_extra_bam_ch
         }
 
 
@@ -150,33 +156,33 @@ workflow hybrid_workflow{
             println "No binning tool specified, using the default tool: metabat2"
         }
 
-        // Prepare bam files
-        bam_merger_ch = ont_bam_ch.join(illumina_bam_ch)
-        merged_bam_out = bam_merger(bam_merger_ch)
 
         switch (params.bintool) {
             case 'metabat2':
-                // if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible
-                //     metabat2_tmp_ch = merged_bam_out.join(extra_bam)
-                //     bam_merger(metabat2_tmp_ch)
-                //     metabat2_extra(assembly_ch, bam_merger.out)
-                //     bin_out_ch = metabat2_extra.out
-                // }
-                // else {
-                //     metabat2(assembly_ch.join(merged_bam_out))
-                //     bin_out_ch = metabat2.out
-                // }
-                metabat2(assembly_ch.join(merged_bam_out))
-                bin_out_ch = metabat2.out
+                if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible
+                    metabat2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
+                    metabat2_extra(metabat2_ch, extra_bam_ch)
+                    bin_out_ch = metabat2_extra.out
+                }
+                else {
+                    metabat2(assembly_ch.join(ont_bam_ch).join(illumina_bam_ch))
+                    bin_out_ch = metabat2.out
+                }
                 break
 
             case 'semibin2':
+                // Prepare bam files
+                bam_merger_ch = ont_bam_ch.join(illumina_bam_ch)
+                merged_bam_out = bam_merger(bam_merger_ch)
                 semibin2_ch = assembly_ch.join(merged_bam_out)
                 semibin2(semibin2_ch)
                 bin_out_ch = semibin2.out
                 break
 
             case 'comebin':
+                // Prepare bam files
+                bam_merger_ch = ont_bam_ch.join(illumina_bam_ch)
+                merged_bam_out = bam_merger(bam_merger_ch)
                 comebin_ch = assembly_ch.join(merged_bam_out)
                 comebin(comebin_ch)
                 bin_out_ch = comebin.out
@@ -184,18 +190,15 @@ workflow hybrid_workflow{
 
             default:
                 println "L'outil spécifié (${params.bintool}) n'est pas reconnu. Utilisation de l'outil par défaut: metabat2"
-                // if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible
-                //     metabat2_tmp_ch = merged_bam_out.join(extra_bam)
-                //     bam_merger(metabat2_tmp_ch)
-                //     metabat2_extra(assembly_ch, bam_merger.out)
-                //     bin_out_ch = metabat2_extra.out
-                // }
-                // else {
-                //     metabat2(assembly_ch, merged_bam_out)
-                //     bin_out_ch = metabat2.out
-                // }
-                metabat2(assembly_ch.join(merged_bam_out))
-                bin_out_ch = metabat2.out
+                if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible
+                    metabat2_ch = assembly_ch.join(ont_bam_ch).join(illumina_bam_ch)
+                    metabat2_extra(metabat2_ch, extra_bam_ch)
+                    bin_out_ch = metabat2_extra.out
+                }
+                else {
+                    metabat2(assembly_ch.join(ont_bam_ch).join(illumina_bam_ch))
+                    bin_out_ch = metabat2.out
+                }
         }
     }
     
