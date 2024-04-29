@@ -27,6 +27,8 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {get_wrong_bin} from '../modules/bins_tools' params(output : params.output)
     include {bin_merger} from '../modules/bins_tools' params(output : params.output)
     include {bam_merger} from '../modules/samtools_merger' params(output : params.output)
+    include {bam_merger_extra_ill} from '../modules/samtools_merger' params(output : params.output)
+    include {bam_merger_extra_ont} from '../modules/samtools_merger' params(output : params.output)
     include {cat_all_bins} from '../modules/cat_all_bins' 
     include {minimap2_bin} from '../modules/minimap2'
     include {metaquast} from '../modules/quast' params(output : params.output)
@@ -66,7 +68,7 @@ workflow hybrid_workflow{
 
         //ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}", checkIfExists: true).map { file -> tuple(file.baseName, file) }
         ont_input_ch = Channel.fromPath("${params.ont}/*.fastq{,.gz}", checkIfExists: true).map {file -> tuple(file.simpleName, file) }.view()
-
+        
         illumina_input_ch = Channel.fromFilePairs("${params.illumina}/*_R{1,2}.fastq{,.gz}", checkIfExists: true)
 
         if (!params.skip_ont_qc) {
@@ -102,13 +104,19 @@ workflow hybrid_workflow{
         //*********
         // Mapping
         //*********
-        
+
         // Mapping with Minimap2 for ONT reads
         ont_bam_ch = minimap2(assembly_ch.join(ont_input_ch))
 
         // Mapping additional ONT reads if specified
         if (params.extra_ont) {
-            ont_extra_bam_ch = minimap2(assembly_ch.join(extra_ont_ch))
+             extra_ont_ch=Channel.fromPath(params.extra_ont).splitCsv().map { row ->
+                        def path = file("${row[0]}")
+                        return path
+                    }
+            // extra_ont_ch=chopper(extra_ont_ch)
+            ont_extra_bam_ch = extra_minimap2(assembly_ch.join(extra_ont_ch))
+            ont_bam_ch = bam_merger_extra_ont(ont_bam_ch.join(ont_extra_bam_ch))
         }
 
         // Mapping with BWA for Illumina reads
@@ -116,7 +124,13 @@ workflow hybrid_workflow{
 
         // Mapping additional Illumina reads if specified
         if (params.extra_ill) {
-            illumina_extra_bam_ch = bwa(assembly_ch.join(params.extra_ill))
+            extra_ill_ch=Channel.fromPath(params.extra_ill).splitCsv().map { row ->
+                        def path = file("${row[0]}")
+                        return path
+                    }
+            // extra_ill_ch=fastp(extra_ill_ch)
+            illumina_extra_bam_ch = extra_bwa(assembly_ch.join(params.extra_ill))
+            illumina_bam_ch = bam_merger_extra_ill(illumina_bam_ch.join(illumina_extra_bam_ch))
         }
 
 
@@ -142,16 +156,18 @@ workflow hybrid_workflow{
 
         switch (params.bintool) {
             case 'metabat2':
-                if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible
-                    metabat2_tmp_ch = merged_bam_out.join(extra_bam)
-                    bam_merger(metabat2_tmp_ch)
-                    metabat2_extra(assembly_ch, bam_merger.out)
-                    bin_out_ch = metabat2_extra.out
-                }
-                else {
-                    metabat2(assembly_ch.join(merged_bam_out))
-                    bin_out_ch = metabat2.out
-                }
+                // if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible
+                //     metabat2_tmp_ch = merged_bam_out.join(extra_bam)
+                //     bam_merger(metabat2_tmp_ch)
+                //     metabat2_extra(assembly_ch, bam_merger.out)
+                //     bin_out_ch = metabat2_extra.out
+                // }
+                // else {
+                //     metabat2(assembly_ch.join(merged_bam_out))
+                //     bin_out_ch = metabat2.out
+                // }
+                metabat2(assembly_ch.join(merged_bam_out))
+                bin_out_ch = metabat2.out
                 break
 
             case 'semibin2':
@@ -168,16 +184,18 @@ workflow hybrid_workflow{
 
             default:
                 println "L'outil spécifié (${params.bintool}) n'est pas reconnu. Utilisation de l'outil par défaut: metabat2"
-                if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible
-                    metabat2_tmp_ch = merged_bam_out.join(extra_bam)
-                    bam_merger(metabat2_tmp_ch)
-                    metabat2_extra(assembly_ch, bam_merger.out)
-                    bin_out_ch = metabat2_extra.out
-                }
-                else {
-                    metabat2(assembly_ch, merged_bam_out)
-                    bin_out_ch = metabat2.out
-                }
+                // if (params.extra_ont || params.extra_ill ) { // check if differential coverage binning possible
+                //     metabat2_tmp_ch = merged_bam_out.join(extra_bam)
+                //     bam_merger(metabat2_tmp_ch)
+                //     metabat2_extra(assembly_ch, bam_merger.out)
+                //     bin_out_ch = metabat2_extra.out
+                // }
+                // else {
+                //     metabat2(assembly_ch, merged_bam_out)
+                //     bin_out_ch = metabat2.out
+                // }
+                metabat2(assembly_ch.join(merged_bam_out))
+                bin_out_ch = metabat2.out
         }
     }
     
