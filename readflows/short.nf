@@ -146,7 +146,7 @@ workflow short_read_workflow{
                 }
                 else {
                     metabat2_single(assembly_ch.join(illumina_bam_ch))
-                    bin_out_ch = metabat2.out
+                    bin_out_ch = metabat2_single.out
                 }
                 break
 
@@ -171,7 +171,7 @@ workflow short_read_workflow{
                 }
                 else {
                     metabat2_single(assembly_ch.join(illumina_bam_ch))
-                    bin_out_ch = metabat2.out
+                    bin_out_ch = metabat2_single.out
                 }
         }
     }
