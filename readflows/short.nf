@@ -77,8 +77,8 @@ workflow short_read_workflow{
 
         //ASSEMBLY
         spades_ch = illumina_input_ch
-        spades(spades_ch)
-        spades.out.set { assembly_ch }
+        spades_short(spades_ch)
+        spades_short.out.set { assembly_ch }
 
 
 
