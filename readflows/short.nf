@@ -21,6 +21,7 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {extra_bwa} from '../modules/bwa'   
     include {metabat2} from '../modules/metabat2' params(output : params.output)
     include {metabat2_extra} from '../modules/metabat2' params(output : params.output)
+    include {metabat2_single} from '../modules/metabat2' params(output : params.output)
     include {semibin2} from '../modules/semibin2' params(output : params.output, bining_model : params.bining_model, environment : params.environment)
     include {comebin} from '../modules/comebin' params(output : params.output)
     include {separateBins} from '../modules/bins_tools' params(output : params.output)
