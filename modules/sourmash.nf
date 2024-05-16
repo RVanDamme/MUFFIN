@@ -66,11 +66,11 @@ process sourmash_ill {
     ill_forward=\$(basename ${illumina_reads[0]} | sed -r "s/\\.\\w+//2")
     ill_reverse=\$(basename ${illumina_reads[1]} | sed -r "s/\\.\\w+//2") 
 
-    sourmash sketch dna -p k=31,scaled=10000 -o \$ill_forward.sig.zip ${illumina[0]}
+    sourmash sketch dna -p k=31,scaled=10000 -o \$ill_forward.sig.zip ${illumina_reads[0]}
     sourmash gather \$ill_forward.sig.zip ${full_db} -k 31 -o \$ill_forward.gather.k31.csv
     sourmash tax metagenome --gather-csv \$ill_forward.gather.k31.csv --taxonomy ${lineages} --output-format kreport > \$ill_forward.kreport
 
-    sourmash sketch dna -p k=31,scaled=10000 -o \$ill_reverse.sig.zip ${illumina[1]}
+    sourmash sketch dna -p k=31,scaled=10000 -o \$ill_reverse.sig.zip ${illumina_reads[1]}
     sourmash gather \$ill_reverse.sig.zip ${full_db} -k 31 -o \$ill_reverse.gather.k31.csv
     sourmash tax metagenome --gather-csv \$ill_reverse.gather.k31.csv --taxonomy ${lineages} --output-format kreport > \$ill_reverse.kreport
 
