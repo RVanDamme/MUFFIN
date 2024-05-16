@@ -40,11 +40,15 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
 }
 if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot"){
     include {sourmash_download_db} from '../modules/sourmashgetdatabase'
+    include {sourmash_download_db_full} from '../modules/sourmashgetdatabase'
+    include {sourmash_download_db_lineage} from '../modules/sourmashgetdatabase'
     include {checkm_download_db} from '../modules/checkmgetdatabases'
 }
 if (params.modular=="full" | params.modular=="classify" | params.modular=="assem-class" | params.modular=="class-annot") {
     include {checkm2} from '../modules/checkm2' params(output: params.output, checkm2_low: params.checkm2_low, checkm2db: params.checkm2db)
     include {sourmash_bins} from '../modules/sourmash' params(output: params.output, bintool : params.bintool)
+    include {sourmash_ont} from '../modules/sourmash' params(output: params.output)
+    include {sourmash_ill} from '../modules/sourmash' params(output: params.output)
     include {sourmash_checkm_parser} from '../modules/checkm_sourmash_parser' params(output: params.output)
     include {get_fasta_path} from '../modules/bins_tools' params(output : params.output)
 }
@@ -247,6 +251,17 @@ workflow short_read_workflow{
                 // illumina_input_ch = illumina_reads_retrieval(bwa_bin_ch.join(illumina_input_ch))
 
                 unmapped_illumina_retrieve(bwa_bin_ch.join(illumina_input_ch))
+                if (params.sourmash_db_full) { database_sourmash_full = file(params.sourmash_db_full) }
+                else {
+                    sourmash_download_db_full() 
+                    database_sourmash_full = sourmash_download_db_full.out
+                }
+                if (params.sourmash_db_lineage) { database_sourmash_lineage = file(params.sourmash_db_lineage) }
+                else {
+                    sourmash_download_db_lineage() 
+                    database_sourmash_lineage = sourmash_download_db_lineage.out
+                }
+                sourmash_ill(unmapped_illumina_retrieve.out, database_sourmash_lineage, database_sourmash_full)
             }
         }
         else {
