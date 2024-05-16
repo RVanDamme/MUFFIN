@@ -35,11 +35,12 @@ process unmapped_illumina_retrieve {
     label 'seqtk'
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
-    publishDir "${params.output}/${name}/assembled/reassembly/unmapped_reads/illumina/", mode: 'copy', pattern: "*unmapped_*.fastq"
+    publishDir "${params.output}/${name}/assembled/reassembly/unmapped_reads/illumina/", mode: 'copy', pattern: "*.fastq"
     input:
     tuple val(name), path(bam), path(reads)
     output:
-    path("unmapped_*.fastq")
+    path("unmapped_ILL_R1.fastq")
+    path("unmapped_ILL_R2.fastq")
     shell:
     """
     ## illumina unmapped reads retrieval

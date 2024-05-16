@@ -261,7 +261,7 @@ workflow short_read_workflow{
                     sourmash_download_db_lineage() 
                     database_sourmash_lineage = sourmash_download_db_lineage.out
                 }
-                sourmash_ill(unmapped_illumina_retrieve.out, database_sourmash_lineage, database_sourmash_full)
+                sourmash_ill(unmapped_illumina_retrieve.out[0], unmapped_illumina_retrieve.out[1], database_sourmash_lineage, database_sourmash_full)
             }
         }
         else {

@@ -56,21 +56,22 @@ process sourmash_ill {
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
-    tuple val(name), path(illumina_reads)
+    tuple val(name), path(illumina_reads_f)
+    tuple val(name), path(illumina_reads_r)
     path(lineages)
     path(full_db)
     output:
     path('*.kreport')
     shell:
     """
-    ill_forward=\$(basename ${illumina_reads[0]} | sed -r "s/\\.\\w+//2")
-    ill_reverse=\$(basename ${illumina_reads[1]} | sed -r "s/\\.\\w+//2") 
+    ill_forward=\$(basename ${illumina_reads_f} | sed -r "s/\\.\\w+//2")
+    ill_reverse=\$(basename ${illumina_reads_r} | sed -r "s/\\.\\w+//2") 
 
-    sourmash sketch dna -p k=31,scaled=10000 -o \$ill_forward.sig.zip ${illumina_reads[0]}
+    sourmash sketch dna -p k=31,scaled=10000 -o \$ill_forward.sig.zip ${illumina_reads_f}
     sourmash gather \$ill_forward.sig.zip ${full_db} -k 31 -o \$ill_forward.gather.k31.csv
     sourmash tax metagenome --gather-csv \$ill_forward.gather.k31.csv --taxonomy ${lineages} --output-format kreport > \$ill_forward.kreport
 
-    sourmash sketch dna -p k=31,scaled=10000 -o \$ill_reverse.sig.zip ${illumina_reads[1]}
+    sourmash sketch dna -p k=31,scaled=10000 -o \$ill_reverse.sig.zip ${illumina_reads_r}
     sourmash gather \$ill_reverse.sig.zip ${full_db} -k 31 -o \$ill_reverse.gather.k31.csv
     sourmash tax metagenome --gather-csv \$ill_reverse.gather.k31.csv --taxonomy ${lineages} --output-format kreport > \$ill_reverse.kreport
 
