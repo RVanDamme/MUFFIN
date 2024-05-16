@@ -63,8 +63,8 @@ process sourmash_ill {
     path('*.kreport')
     shell:
     """
-    ill_forward=\$(basename ${illumina[0]} | sed -r "s/\\.\\w+//2")
-    ill_reverse=\$(basename ${illumina[1]} | sed -r "s/\\.\\w+//2") 
+    ill_forward=\$(basename ${illumina_reads[0]} | sed -r "s/\\.\\w+//2")
+    ill_reverse=\$(basename ${illumina_reads[1]} | sed -r "s/\\.\\w+//2") 
 
     sourmash sketch dna -p k=31,scaled=10000 -o \$ill_forward.sig.zip ${illumina[0]}
     sourmash gather \$ill_forward.sig.zip ${full_db} -k 31 -o \$ill_forward.gather.k31.csv
