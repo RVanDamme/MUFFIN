@@ -6,7 +6,7 @@ process sourmash_download_db {
   maxRetries = 5
   label 'ubuntu' 
   output:
-  path("gtdb-rs214-k31.lca.json.gz")
+  path("genbank-k31.lca.json.gz")
   script:
   """
   #wget https://ndownloader.figshare.com/files/18809423?private_link=ed98a281ef089c033352 -O gtdb.lca.json
