@@ -6,12 +6,12 @@ process sourmash_download_db {
   maxRetries = 5
   label 'ubuntu' 
   output:
-  path("genbank-k31.lca.json.gz")
+  path("gtdb-rs214-k31.lca.json.gz")
   script:
   """
   #wget https://ndownloader.figshare.com/files/18809423?private_link=ed98a281ef089c033352 -O gtdb.lca.json
-  wget --no-check-certificate https://osf.io/4f8n3/download -O genbank-k31.lca.json.gz 
-  #wget --no-check-certificate https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.lca.json.gz -O gtdb-rs214-k31.lca.json.gz
+  #wget --no-check-certificate https://osf.io/4f8n3/download -O genbank-k31.lca.json.gz 
+  wget --no-check-certificate https://farm.cse.ucdavis.edu/~ctbrown/sourmash-db/gtdb-rs214/gtdb-rs214-k31.lca.json.gz -O gtdb-rs214-k31.lca.json.gz
   
   """
 }
