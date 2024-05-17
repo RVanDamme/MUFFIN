@@ -35,7 +35,7 @@ process unmapped_illumina_retrieve {
     label 'seqtk'
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
-    publishDir "${params.output}/${name}/assembled/reassembly/unmapped_reads/illumina/", mode: 'copy', pattern: "*.fastq"
+    publishDir "${params.output}/${name}/assemble/reassembly/unmapped_reads/illumina/", mode: 'copy', pattern: "*.fastq"
     input:
     tuple val(name), path(bam), path(reads)
     output:
@@ -62,7 +62,7 @@ process unmapped_ont_retrieve {
     label 'seqtk'
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
-    publishDir "${params.output}/${name}/assembled/reassembly/unmapped_reads/ont/", mode: 'copy', pattern: "*unmapped_*.fastq"
+    publishDir "${params.output}/${name}/assemble/reassembly/unmapped_reads/ont/", mode: 'copy', pattern: "*unmapped_*.fastq"
     input:
     tuple val(name), path(bam), path(reads)
     output:
@@ -100,7 +100,7 @@ process unmapped_ont_retrieve {
 
 process ont_reads_retrieval {
     label 'seqtk'
-    publishDir "${params.output}/${name}/assembled/reassembly/mapped_reads/ont/", mode: 'copy', pattern: "*.fastq"
+    publishDir "${params.output}/${name}/assemble/reassembly/mapped_reads/ont/", mode: 'copy', pattern: "*.fastq"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
@@ -126,7 +126,7 @@ process ont_reads_retrieval {
 
 process illumina_reads_retrieval {
     label 'seqtk'
-    publishDir "${params.output}/${name}/assembled/reassembly/mapped_reads/illumina/", mode: 'copy', pattern: "*.fastq"
+    publishDir "${params.output}/${name}/assemble/reassembly/mapped_reads/illumina/", mode: 'copy', pattern: "*.fastq"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
