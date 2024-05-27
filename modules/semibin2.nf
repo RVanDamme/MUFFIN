@@ -91,10 +91,10 @@ process semibin2 {
         model_option="--environment ${params.environment}"
         echo "Running SemiBin2 with the pre-trained model: ${params.environment}"
     elif [ "${params.bining_model}" == "self-supervised" ]; then
-        model_option="--self-supervised"
+        model_option="--training-mode=self"
         echo "Running SemiBin2 with the self-supervised model. This process may take some time and requires disk space."
     elif [ "${params.bining_model}" == "semi-supervised" ]; then
-        model_option="--semi-supervised"
+        model_option="--training-mode=semi"
         echo "Warning: Running SemiBin2 with the semi-supervised model is not recommended due to the long execution time and high memory requirement (~40GB). Consider using the self-supervised model instead."
     else
         echo "Defaulting to the pre-trained global model for SemiBin2."

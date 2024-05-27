@@ -19,8 +19,6 @@
 process chopper {
     label 'chopper'
 
-    conda 'bioconda::chopper=0.7.0'
-
     errorStrategy = { task.exitStatus in [14, -1] ? 'retry' : 'terminate' }
     maxRetries = 5
     publishDir "${params.output}/${name}/assemble/quality_control/nanopore/", mode: 'copy', pattern: "*_cleaned.fastq" 
@@ -30,7 +28,7 @@ process chopper {
     tuple val(name), path("${name}_cleaned.fastq")
     shell:
     """
-    chopper -q 10 -l ${params.short_qc} -t ${task.cpus} --headcrop 100 -i ${ont} > ${name}_cleaned.fastq
+    chopper -q ${params.ont_min_qc} -l ${params.short_qc} -t ${task.cpus} --headcrop 100 -i ${ont} > ${name}_cleaned.fastq
     """
 }
 

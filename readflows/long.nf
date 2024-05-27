@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 
 //include { modules_to_include } from '../modules/modules_inclusion.nf'
 if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem-class" | params.modular=="assem-annot") {
-    include {chopper} from '../modules/ont_qc' params(short_qc : params.short_qc, output: params.output)
+    include {chopper} from '../modules/ont_qc' params(short_qc : params.short_qc, output: params.output, ont_min_qc: params.ont_min_qc)
     include {fastp} from '../modules/fastp' params(output: params.output)
     include {spades} from '../modules/spades' params(output: params.output)
     include {spades_short} from '../modules/spades' params(output: params.output)
