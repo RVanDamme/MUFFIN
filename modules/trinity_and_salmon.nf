@@ -1,6 +1,9 @@
 process de_novo_transcript_and_quant {
     maxForks 1
     label 'trinity'
+
+    conda 'bioconda::trinity=2.9.1 '
+
     publishDir "${params.output}/${name}/annotate/de_novo_transcript/", mode: 'copy', pattern: "*_transcript.fasta"
     publishDir "${params.output}/${name}/annotate/quant_of_transcript/", mode: 'copy', pattern: "*_transcript_quant.sf"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
@@ -11,7 +14,7 @@ process de_novo_transcript_and_quant {
     tuple val(name), path("*_transcript.fasta"), path("*_transcript_quant.sf")
     shell:
     """
-    mem=\$(echo "!{task.memory}" | sed 's/ GB/g/g' | sed 's/g/G/g')
+    mem=\$(echo "!{task.memory}" | sed 's/ GB/g/g' | sed 's/g/G/g' | sed 's/ B/G/g')
     echo \$mem
     Trinity --seqType fq --max_memory \$mem --CPU !{task.cpus} --left !{rna[0]} --right !{rna[1]}
     cp trinity_out_dir/Trinity.fasta !{name}_transcript.fasta

@@ -1,5 +1,8 @@
 process minimap2 {
     label 'minimap2'
+
+    conda 'bioconda::minimap2=2.17 bioconda::samtools=1.9'
+
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
@@ -19,6 +22,9 @@ process minimap2 {
 
 process minimap_polish {
     label 'minimap2'
+
+    conda = 'bioconda::minimap2=2.17 bioconda::samtools=1.9'
+
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
@@ -35,6 +41,10 @@ process minimap_polish {
 
 process extra_minimap2 {
     label 'minimap2'
+
+    conda 'bioconda::minimap2=2.17 bioconda::samtools=1.9'
+
+
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"
@@ -55,6 +65,9 @@ process extra_minimap2 {
 
 process minimap2_bin {
     label 'minimap2'
+
+    conda 'bioconda::minimap2=2.17 bioconda::samtools=1.9'
+    
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     //publishDir "${params.output}/${name}_bam/", mode: 'copy', pattern: "ont.bam"

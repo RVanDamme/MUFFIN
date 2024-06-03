@@ -1,47 +1,49 @@
-process discard_short {
-    label 'ubuntu'
-    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+// process chopper {
+//     label 'chopper'
+
+//     conda 'bioconda::chopper=0.7.0'
+
+//     errorStrategy = { task.exitStatus in [14, -1] ? 'retry' : 'terminate' }
+//     maxRetries = 5
+//     publishDir "${params.output}/${name}/assemble/quality_control/nanopore/", mode: 'copy', pattern: "*_cleaned.fastq" 
+//     input:
+//     tuple val(name), path(part)
+//     output:
+//     tuple val(name), path("${name}_cleaned.fastq")
+//     shell:
+//     """
+//     cat !{part} | chopper -q 10 -l ${params.short_qc} -t ${task.cpus} --headcrop 100 > ${name}_cleaned.fastq
+//     """
+// }
+
+process chopper {
+    label 'chopper'
+
+    errorStrategy = { task.exitStatus in [14, -1] ? 'retry' : 'terminate' }
     maxRetries = 5
+    publishDir "${params.output}/${name}/assemble/quality_control/nanopore/", mode: 'copy', pattern: "*_cleaned.fastq" 
     input:
-    tuple val(name) , path(part)
+    tuple val(name), path(ont)
     output:
-    tuple val(name), path("filtered_${part}")
+    tuple val(name), path("${name}_cleaned.fastq")
     shell:
     """
-        cat !{part} | paste - - - - | awk -F"\\t" 'length(\$2)  >= ${params.short_qc}' | sed 's/\\t/\\n/g' > "filtered_${part}"
-
+    chopper -q ${params.ont_min_qc} -l ${params.short_qc} -t ${task.cpus} --headcrop 100 -i ${ont} > ${name}_cleaned.fastq
     """
 }
 
+// process merge {
+//     label 'ubuntu'
+//     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+//     maxRetries = 5
+//     publishDir "${params.output}/${name}/assemble/quality_control/nanopore/", mode: 'copy', pattern: "*_all.fastq" 
+//     input:
+//     tuple val(name) , path(filtered)
+//     output:
+//     tuple val(name), path("${name}_all.fastq")
+//     script:
+//     """
+//     cat *.fastq > ${name}_all.fastq
+//     """
 
-
-process filtlong {
-    label 'filtlong'
-    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
-    maxRetries = 5
-    input:
-    tuple val(name) , path(filtered)
-    output:
-    tuple val(name) , path("clean_${filtered}")
-    script:
-    """
-    filtlong --min_length ${params.short_qc} --keep_percent 90 --target_bases 500000000 ${filtered} > clean_${filtered}
-    """
-}
-
-
-process merge {
-    label 'ubuntu'
-    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
-    maxRetries = 5
-    publishDir "${params.output}/${name}/assemble/quality_control/nanopore/", mode: 'copy', pattern: "*_all.fastq" 
-    input:
-    tuple val(name) , path(filtered)
-    output:
-    tuple val(name), path("${name}_all.fastq")
-    script:
-    """
-    cat *.fastq > ${name}_all.fastq
-    """
-
-}
+// }

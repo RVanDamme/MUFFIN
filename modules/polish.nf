@@ -1,5 +1,8 @@
 process racon {
     label 'racon'
+
+    conda 'bioconda::racon=1.4.13 '
+
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
@@ -11,9 +14,12 @@ process racon {
         racon -t ${task.cpus} ${read} ${mapping} ${assembly} > ${name}_consensus.fasta
         """
     }
-
+//medaka_consensus -i ${read} -d ${consensus} -o polished -t ${task.cpus} -m ${params.model}
 process medaka {
     label 'medaka'
+    //python3.6 main::python=3.6 bioconda::ont-fast5-api
+    //conda 'bioconda::medaka=1.11.3'
+
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
@@ -22,6 +28,7 @@ process medaka {
         tuple val(name), path("${name}_polished.fasta") 
     script:
         """
+        medaka --version
         medaka_consensus -i ${read} -d ${consensus} -o polished -t ${task.cpus} -m ${params.model}
         mv polished/consensus.fasta ${name}_polished.fasta
         """
@@ -29,17 +36,23 @@ process medaka {
 
 process pilon {
     label 'pilon'
+
+    conda  'bioconda::pilon=1.23 bioconda::bwa=0.7.17 bioconda::samtools=1.9'
+    
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
-    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "polished_assembly.fasta" 
+    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "*polished_bin_assembly.fasta" 
     input:
-        tuple val(name), path(assembly), path(ill_read)
+        tuple val(name), path(assembly)
+        tuple val(name), path(ill_read)
         val(iteration)
     output:
-        tuple val(name) , path("polished_assembly.fasta")
+        tuple val(name) , path("*polished_bin_assembly.fasta")
     shell:
     """
-    mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g')
+    bin_id=\$(basename ${assembly} | sed -r "s/\\.\\w+//2")
+
+    mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g' | sed 's/ B//g')
     partial_mem=\$((\$mem*40/100))
     assemb="${assembly}"
     for ite in {1..${iteration}}
@@ -50,12 +63,133 @@ process pilon {
         pilon -Xmx\$partial_mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
         assemb=\$ite"_polished_assembly.fasta"
     done
-    mv ${iteration}"_polished_assembly.fasta" polished_assembly.fasta
+    mv ${iteration}"_polished_assembly.fasta" \$bin_id"_polished_bin_assembly.fasta"
     """
 
 }
 
+process pilon2 {
+    label 'pilon'
 
+    conda  'bioconda::pilon=1.23 bioconda::bwa=0.7.17 bioconda::samtools=1.9'
+    
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
+    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "pilon_res/*.fasta" 
+    
+    input:
+        tuple val(name), path(assembly_files)
+        tuple val(name), path(ill_read)
+        val(iteration)
+    
+    output:
+        tuple val(name), path("pilon_res/*.fasta")
+
+    script:
+    """
+    mkdir -p ./pilon_res
+    for assembly in ${assembly_files}
+    do
+        bin_id=\$(basename \$assembly | sed -r "s/\\.\\w+//2")
+        mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g' | sed 's/ B//g')
+        partial_mem=\$((\$mem*40/100))
+        assemb="\$assembly"
+        for ite in {1..${iteration}}
+        do
+            bwa index \$assemb
+            bwa mem \$assemb ${ill_read[0]} ${ill_read[1]} | samtools view -bS - | samtools sort -@ ${task.cpus} - > \$ite.bam
+            samtools index -@ ${task.cpus} \$ite.bam
+            pilon -Xmx\$partial_mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
+            assemb=\$ite"_polished_assembly.fasta"
+        done
+        mv ${iteration}"_polished_assembly.fasta" "./pilon_res/"\$bin_id"_polished_bin_assembly.fasta"
+    done
+    """
+}
+
+// process pilon_tk {
+//     label 'pilon'
+
+//     conda  'bioconda::pilon=1.23 bioconda::bwa=0.7.17 bioconda::samtools=1.9'
+    
+//     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+//     maxRetries = 5
+//     publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "*polished_bin_assembly.fasta" 
+//     input:
+//         tuple val(name), path(assembly), path(ill_read)
+//         val(iteration)
+//     output:
+//         tuple val(name) , path("polished_bin_assembly.fasta")
+//     shell:
+//     """
+//     bin_id=\$(basename ${assembly} | sed -r "s/\\.\\w+//2")
+
+//     bwa index -p illumina -a bwtsw ${assembly}
+//     bwa mem illumina ${ill_read[0]} ${ill_read[1]} -t ${task.cpus} > illumina.sam
+//     samtools view -bS illumina.sam > illumina.bam
+//     samtools sort -@ ${task.cpus} -o illumina_sorted.bam illumina.bam
+
+//     ## illumina mapped reads retrieval
+//     samtools index -@ ${task.cpus} illumina_sorted.bam
+//     samtools view -bh illumina_sorted.bam \$list > illumina_contigs.bam  
+//     samtools view -F4 illumina_contigs.bam > illumina_mapped_contigs.sam
+//     cut -f1 illumina_mapped_contigs.sam | sort | uniq > \$bin"_illumina_mapped.list"
+//     seqtk subseq ${ill_reads[0]} \$bin"_illumina_mapped.list" > \$bin"_illumina_R1.fastq"
+//     seqtk subseq ${ill_reads[1]} \$bin"_illumina_mapped.list" > \$bin"_illumina_R2.fastq"
+
+//     #do pilon
+//     mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g' | sed 's/ B//g')
+//     partial_mem=\$((\$mem*40/100))
+//     assemb="${assembly}"
+//     for ite in {1..${iteration}}
+//     do
+//         bwa index \$assemb
+//         bwa mem \$assemb \$bin"_illumina_R1.fastq" \$bin"_illumina_R2.fastq" | samtools view -bS - | samtools sort -@ ${task.cpus} - > \$ite.bam
+//         samtools index -@ ${task.cpus} \$ite.bam
+//         pilon -Xmx\$partial_mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
+//         assemb=\$ite"_polished_assembly.fasta"
+//     done
+//     mv ${iteration}"_polished_assembly.fasta" \$bin_id"_polished_bin_assembly.fasta"
+
+//     #clean phase
+//     rm illumina.*
+//     rm illumina_contigs.bam
+//     rm illumina_mapped_contigs.sam
+//     rm *.bam.bai
+//     """
+
+// }
+
+//use minimap instead of bwa
+process pilong {
+    label 'pilon'
+
+    conda 'bioconda::pilon=1.23 bioconda::bwa=0.7.17 bioconda::samtools=1.9'
+
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
+    publishDir "${params.output}/${name}/assemble/assembly/pilon_polished/", mode: 'copy', pattern: "polished_assembly.fasta" 
+    input:
+        tuple val(name), path(assembly), path(ont_read)
+        val(iteration)
+    output:
+        tuple val(name) , path("polished_assembly.fasta")
+    shell:
+    """
+    mem=\$(echo ${task.memory} | sed 's/ GB//g'| sed 's/g//g' | sed 's/ B//g')
+    partial_mem=\$((\$mem*40/100))
+    assemb="${assembly}"
+    for ite in {1..${iteration}}
+    do
+        minimap2 -ax map-ont \$assemb ${ont_read} | samtools view -bS - | samtools sort -@ ${task.cpus} - > \$ite.bam
+        samtools index -@ ${task.cpus} \$ite.bam
+        pilon -Xmx\$partial_mem"g" --threads ${task.cpus} --genome \$assemb --bam \$ite.bam --output \$ite"_polished_assembly"
+        assemb=\$ite"_polished_assembly.fasta"
+    done
+    mv ${iteration}"_polished_assembly.fasta" polished_assembly.fasta
+    """
+
+}
 
 //*********************************
 // if polish with long on pilon add

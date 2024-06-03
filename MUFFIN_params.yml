@@ -1,4 +1,5 @@
 assembler   : "metaspades"
+bintool     : "metabat2"
 ouptut      : "path/to/resultdir"
 illumina    : "fastq_ill/"
 ont         : "fastq_ont/"
