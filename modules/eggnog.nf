@@ -37,7 +37,7 @@ process eggnog_bin {
   shell:
     """
     bin_id=\$(basename !{bin} | sed -r "s/\\.\\w+//2")
-    emapper.py --data_dir ${db} -d bact -o \$bin_id  -m diamond -i ${bin} --cpu ${task.cpus} --go_evidence non-electronic  --target_orthologs all --translate
+    emapper.py --data_dir ${db} -d bact -o \$bin_id  -m diamond --itype metagenome -i ${bin} --cpu ${task.cpus} --go_evidence non-electronic  --target_orthologs all --translate --dbmem
     tac \$bin_id.emapper.annotations | sed "1,3d" | tac |sed "1,3d" > \$bin_id.annotations.tsv
     cp \$bin_id.emapper.seed_orthologs \$bin_id.seed_orthologs.tsv
     """
