@@ -235,8 +235,8 @@ workflow short_read_workflow{
 
         if (!params.skip_bin_sorting){
             bin_filter(checkm2.out.join(classify_ch))
-            classify_ch = bin_filter.out
             get_wrong_bin(checkm2.out.join(classify_ch))
+            classify_ch = bin_filter.out
 
             // separateBins(checkm2.out.join(classify_ch))
             // classify_ch = separateBins.out[0]
