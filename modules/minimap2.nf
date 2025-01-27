@@ -13,7 +13,7 @@ process minimap2 {
     tuple val(name) , path("ont_sorted.bam")
     script:
     """
-    minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
+    minimap2 -ax map-ont --split-prefix temp_index ${assembly} ${ont} > ont.sam
     samtools view -bS ont.sam > ont.bam
     samtools sort -@ ${task.cpus} -o ont_sorted.bam ont.bam
     rm ont.*
@@ -35,7 +35,7 @@ process minimap_polish {
     tuple val(name) , path("ont.paf")
     script:
     """
-    minimap2 -x map-ont ${assembly} ${ont} > ont.paf
+    minimap2 -x map-ont --split-prefix temp_index ${assembly} ${ont} > ont.paf
     """
 }
 
@@ -55,7 +55,7 @@ process extra_minimap2 {
     tuple val(name) , path("*_sorted.bam")
     script:
     """
-    minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
+    minimap2 -ax map-ont --split-prefix temp_index ${assembly} ${ont} > ont.sam
     samtools view -bS ont.sam > ont.bam
     samtools sort -@ ${task.cpus} -o ${ont}_sorted.bam ont.bam
     rm ont.*
@@ -78,7 +78,7 @@ process minimap2_bin {
     tuple val(name) , path("ont_sorted.bam")
     script:
     """
-    minimap2 -ax map-ont ${assembly} ${ont} > ont.sam
+    minimap2 -ax map-ont --split-prefix temp_index ${assembly} ${ont} > ont.sam
     samtools view -bS ont.sam > ont.bam
     samtools sort -o ont_sorted.bam ont.bam
     rm ont.*
