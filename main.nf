@@ -75,9 +75,9 @@ workflow {
             break
         default:
             error """Invalid analysis mode: ${params.mode}. Please use -mode with a valid mode: 
-            "-mode short" for Illumina reads 
-            "-mode long" for Nanopore reads 
-            "-mode hybrid" for both Illumina and Nanopore"""
+            "--mode short" for Illumina reads 
+            "--mode long" for Nanopore reads 
+            "--mode hybrid" for both Illumina and Nanopore"""
     }
 
 }

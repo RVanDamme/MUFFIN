@@ -17,6 +17,7 @@ def helpMSG() {
     --bin_classify              Path to the directory containing the bin files to classify. (Default: none)
     --bin_annotate              Path to the directory containing the bin files to annotate. (Default: none)
     --assembler                 Assembler to use in the assembly step. (Default: $params.assembler)
+    --mode                      The mode in which the pipeline should run depending on the input (short, long, hybrid). (Default: $params.mode)
 
     Optional Input:
     --checkm2db                 Path to the CheckM database.
