@@ -240,6 +240,7 @@ workflow hybrid_workflow{
             sourmash_download_db() 
             database_sourmash = sourmash_download_db.out
         }   
+	checkm_download_db_val = false
         if (!params.checkm2db){
             println "Checkm2 database configuration"
             // Check that folder and file exist
@@ -247,8 +248,10 @@ workflow hybrid_workflow{
             // If the path does not exist or if the file is not found.
             if( !path_exists | params.checkm2db_force_update) {
                 checkm_download_db()
+		checkm_download_db_val = checkm_download_db.out
             } else {
                 println "The specified folder and file already exist : continue."
+		checkm_download_db_val = true
             }
         }
 
@@ -258,7 +261,7 @@ workflow hybrid_workflow{
         //*************************
 
         //checkm of the final assemblies
-        checkm2(classify_ch, checkm_download_db.out)
+        checkm2(classify_ch, checkm_download_db_val)
 
         if (!params.skip_bin_sorting){
             bin_filter(checkm2.out.join(classify_ch))
