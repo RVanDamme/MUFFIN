@@ -12,6 +12,6 @@ process checkm_download_db {
     val(true)
   script:
   """
-  checkm2 database --download ${params.db_path}
+  checkm2 database --download --path ${params.db_path}
   """
 }
