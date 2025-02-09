@@ -1,8 +1,6 @@
 process spades {
     label 'spades'
 
-    //conda 'bioconda::spades=3.15.4'
-
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     publishDir "${params.output}/${name}/assemble/assembly/spades/", mode: 'copy', pattern: "assembly.fasta" 
@@ -23,9 +21,7 @@ process spades {
 }
 process spades_short {
     label 'spades'
-
-    conda 'bioconda::spades=3.15.4'
-    
+  
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     publishDir "${params.output}/${name}/assemble/assembly/spades/", mode: 'copy', pattern: "assembly.fasta" 

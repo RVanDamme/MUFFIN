@@ -17,6 +17,7 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {metabat2} from './modules/metabat2' params(output : params.output)
     include {semibin2} from './modules/semibin2' params(output : params.output)
     include {comebin} from './modules/comebin' params(output : params.output)
+    include {n50} from '../modules/comebin' params(output : params.output)
     include {bam_merger} from './modules/samtools_merger' params(output : params.output)
     //include {contig_list} from './modules/list_ids'
     include {cat_all_bins} from './modules/cat_all_bins'

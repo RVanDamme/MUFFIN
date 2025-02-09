@@ -20,11 +20,9 @@
 // }
 
 
-//posibilité de spécifier le dossier en utilisant ${bintool}/
+//possible to specify the dir using ${bintool}/
 process eggnog_bin { 
   label 'eggnog' 
-
-  conda 'bioconda::diamond anaconda::biopython bioconda::eggnog-mapper=2.0.1 '
 
   publishDir "${params.output}/${name}/annotate/bin_annotation/", mode: 'copy', pattern: "*.tsv"
   errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
@@ -37,7 +35,7 @@ process eggnog_bin {
   shell:
     """
     bin_id=\$(basename !{bin} | sed -r "s/\\.\\w+//2")
-    emapper.py --data_dir ${db} -d bact -o \$bin_id  -m diamond --itype metagenome -i ${bin} --cpu ${task.cpus} --go_evidence non-electronic  --target_orthologs all --translate --dbmem
+    emapper.py --data_dir ${db}  -o \$bin_id  -m diamond --itype metagenome -i ${bin} --cpu ${task.cpus} --go_evidence non-electronic  --target_orthologs all --translate --dbmem
     tac \$bin_id.emapper.annotations | sed "1,3d" | tac |sed "1,3d" > \$bin_id.annotations.tsv
     cp \$bin_id.emapper.seed_orthologs \$bin_id.seed_orthologs.tsv
     """
@@ -45,8 +43,6 @@ process eggnog_bin {
 
 process eggnog_rna { 
   label 'eggnog' 
-
-  conda 'bioconda::diamond anaconda::biopython bioconda::eggnog-mapper=2.0.1 '
 
   publishDir "${params.output}/${name}/annotate/rna_annotation/", mode: 'copy', pattern: "*.tsv"
   errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
@@ -58,7 +54,7 @@ process eggnog_rna {
     path("*.seed_orthologs.tsv")
   shell:
     """
-    emapper.py --data_dir ${db} -d bact -o ${name}_transcript  -m diamond -i ${transcript} --cpu ${task.cpus} --go_evidence non-electronic  --target_orthologs all --translate
+    emapper.py --data_dir ${db}  -o ${name}_transcript  -m diamond --itype CDS -i ${transcript} --cpu ${task.cpus} --go_evidence non-electronic  --target_orthologs all --translate --dbmem
     tac ${name}_transcript.emapper.annotations | sed "1,3d" | tac |sed "1,3d" > ${name}_transcript.annotations.tsv
     cp ${name}_transcript.emapper.seed_orthologs ${name}_transcript.seed_orthologs.tsv
     """

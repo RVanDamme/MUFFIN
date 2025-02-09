@@ -1,9 +1,6 @@
 process flye {
     label 'flye'
 
-    conda 'bioconda::flye=2.8'
-
-
     publishDir "${params.output}/${name}/assemble/assembly/flye_unpolished", mode: 'copy', pattern: "assembly.fasta"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5

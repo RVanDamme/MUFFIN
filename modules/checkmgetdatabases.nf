@@ -4,8 +4,6 @@ process checkm_download_db {
   //else { storeDir 'nextflow-autodownload-databases/checkm2' }
   label 'checkm2' 
 
-  conda 'bioconda::checkm2=1.0.1'
-
   errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
   maxRetries = 5
   output:

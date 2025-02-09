@@ -1,8 +1,6 @@
 process bam_merger {
     label 'samtools'
 
-    conda "bioconda::samtools=1.17"
-
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
 
@@ -20,8 +18,6 @@ process bam_merger {
 
 process bam_merger_extra {
     label 'samtools'
-
-    conda "bioconda::samtools=1.17"
 
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5

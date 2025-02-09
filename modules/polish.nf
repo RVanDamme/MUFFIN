@@ -1,8 +1,6 @@
 process racon {
     label 'racon'
 
-    conda 'bioconda::racon=1.4.13 '
-
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
@@ -17,8 +15,6 @@ process racon {
 //medaka_consensus -i ${read} -d ${consensus} -o polished -t ${task.cpus} -m ${params.model}
 process medaka {
     label 'medaka'
-    //python3.6 main::python=3.6 bioconda::ont-fast5-api
-    //conda 'bioconda::medaka=1.11.3'
 
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
@@ -36,8 +32,6 @@ process medaka {
 
 process pilon {
     label 'pilon'
-
-    conda  'bioconda::pilon=1.23 bioconda::bwa=0.7.17 bioconda::samtools=1.9'
     
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
@@ -70,8 +64,6 @@ process pilon {
 
 process pilon2 {
     label 'pilon'
-
-    conda  'bioconda::pilon=1.23 bioconda::bwa=0.7.17 bioconda::samtools=1.9'
     
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
@@ -163,8 +155,6 @@ process pilon2 {
 //use minimap instead of bwa
 process pilong {
     label 'pilon'
-
-    conda 'bioconda::pilon=1.23 bioconda::bwa=0.7.17 bioconda::samtools=1.9'
 
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5

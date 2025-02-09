@@ -24,6 +24,7 @@ if (params.modular=="full" | params.modular=="assemble" | params.modular=="assem
     include {metabat2_single} from '../modules/metabat2' params(output : params.output)
     include {semibin2} from '../modules/semibin2' params(output : params.output, bining_model : params.bining_model, environment : params.environment)
     include {comebin} from '../modules/comebin' params(output : params.output)
+    include {n50} from '../modules/comebin' params(output : params.output)
     include {separateBins} from '../modules/bins_tools' params(output : params.output)
     include {bin_filter} from '../modules/bins_tools' params(output : params.output)
     include {get_wrong_bin} from '../modules/bins_tools' params(output : params.output)
@@ -161,7 +162,8 @@ workflow short_read_workflow{
                 break
 
             case 'comebin':
-                comebin_ch = assembly_ch.join(illumina_bam_ch)
+                n50(assembly_ch)
+                comebin_ch = assembly_ch.join(illumina_bam_ch).join(n50.out)
                 comebin(comebin_ch)
                 bin_out_ch = comebin.out
                 break

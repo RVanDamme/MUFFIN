@@ -1,8 +1,6 @@
 process checkm2 {
     maxForks 1
     label 'checkm2'
-
-    conda 'bioconda::checkm2=1.0.1'
     
     publishDir "${params.output}/${name}/classify/checkm2/", mode: 'copy', pattern: "checkm2_dir"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
@@ -14,7 +12,7 @@ process checkm2 {
     tuple val(name), path("checkm2_dir")
     
     script:
-    // Détermine si params.checkm2db est fourni et ajoute --database_path à la commande si nécessaire
+    // find if params.checkm2db is provided and add --database_path to the command if needed
     def dbPathCmd = params.checkm2db ? "--database_path ${params.checkm2db}" : ""
     def lowmemCmd = params.checkm2_low ? "--lowmem" : ""
     

@@ -93,20 +93,17 @@
 //     """
 // }
 
-process comebin {
+process n50 {
     maxForks 1
-    label 'comebin'
-
-    conda 'bioconda::COMEBin=1.0.3 bioconda::n50'
-
-    publishDir "${params.output}/${name}/assemble/binning/", mode: 'copy', pattern: "comebin"
+    label 'n50'
+    
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
     //tuple val(name), path(assembly), path(ont_bam).optional(), path(illumina_bam).optional(), path(extra_bam).optional()
-    tuple val(name), path(assembly), path(bam_files)
+    tuple val(name), path(assembly)
     output:
-    tuple val(name), path("comebin")
+    tuple val(name), env(N50)
     
     script:
     """
@@ -114,7 +111,28 @@ process comebin {
     N50=\$(n50 ${assembly})
     echo "N50 calculé: \$N50"
 
-    # Definir la temperature dans la fonction de perte en fonction du N50
+    """
+}
+
+process comebin {
+    maxForks 1
+    label 'comebin'
+
+    publishDir "${params.output}/${name}/assemble/binning/", mode: 'copy', pattern: "comebin"
+    errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
+    maxRetries = 5
+    input:
+    //tuple val(name), path(assembly), path(ont_bam).optional(), path(illumina_bam).optional(), path(extra_bam).optional()
+    tuple val(name), path(assembly), path(bam_files), env(N50)
+    output:
+    tuple val(name), path("comebin")
+    
+    script:
+    """
+    #!/bin/bash
+    echo "N50 is: \$N50"
+
+    # Define the temp in the function from the N50 calculated previously
     loss_temp=\$(awk -v n50=\$N50 'BEGIN{print (n50 > 10000) ? 0.07 : 0.15}')
     echo "loss temp"
     echo \$loss_temp
