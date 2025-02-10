@@ -2,8 +2,6 @@ process metaquast {
     maxForks 1
     label 'QUAST'
 
-    conda 'bioconda::QUAST=5.2.0'
-
     publishDir "${params.output}/${name}/assemble/metaquast", mode: 'copy', pattern: "*metaquast"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5

@@ -1,8 +1,6 @@
 process sourmash_genome_size { //deprecated since flye 2.8 update
     label 'sourmash' 
 
-    conda 'bioconda::sourmash=2.0.1 '
-
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
     input:
@@ -29,8 +27,6 @@ process sourmash_genome_size { //deprecated since flye 2.8 update
 process sourmash_bins {
     label 'sourmash' 
 
-    conda 'bioconda::sourmash=2.0.1 '
-
     publishDir "${params.output}/${name}/classify/sourmash/", mode: 'copy', pattern: "*.txt"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
@@ -50,8 +46,6 @@ process sourmash_bins {
 
 process sourmash_ill {
     label 'sourmash' 
-
-    conda 'bioconda::sourmash=2.0.1 '
 
     publishDir "${params.output}/${name}/classify/not_mapped_sourmash/ill/", mode: 'copy', pattern: "*.kreport"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
@@ -81,8 +75,6 @@ process sourmash_ill {
 
 process sourmash_ont {
     label 'sourmash' 
-
-    conda 'bioconda::sourmash=2.0.1 '
 
     publishDir "${params.output}/${name}/classify/not_mapped_sourmash/ont/", mode: 'copy', pattern: "*.kreport"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }

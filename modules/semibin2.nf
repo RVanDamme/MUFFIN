@@ -74,8 +74,6 @@ process semibin2 {
     maxForks 1
     label 'semibin2'
 
-    conda 'bioconda::semibin=2.0.2'
-
     publishDir "${params.output}/${name}/assemble/binning/", mode: 'copy', pattern: "semibin2"
     errorStrategy = { task.exitStatus==14 ? 'retry' : 'terminate' }
     maxRetries = 5
