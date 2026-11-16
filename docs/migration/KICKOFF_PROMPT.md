@@ -19,7 +19,7 @@ Before anything else:
 
 Then:
 4. Ask me the open decisions for Stage 1 (N1, N2, N10, the template features)
-   and N3, which blocks Stage 2, in one message, each with your recommendation.
+   in one message, each with your recommendation.
 5. Print the Stage 1 plan: the task list (1.1, 1.2, ...), every file you will
    create, move or modify, how you resolve collisions between the template and
    existing files, the commands, and the check for each acceptance line.

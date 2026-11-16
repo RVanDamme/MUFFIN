@@ -59,14 +59,14 @@ Read from `modules/nf-core/<tool>/main.nf`. Re-read them after installing; this 
 | `TRINITY` (2.15.2) | `[meta, reads]` | `transcript_fasta` (`.fa.gz`) | labels `process_high` + `process_high_memory` |
 | `SALMON_QUANT` (2.11.0) | `[meta, reads]`, `[meta2, index, gtf, transcript_fasta]` | `results` (dir) | no lib-type input → `-l A` goes in `ext.args`. Script always emits `--geneMap ${gtf}`; with `gtf = []` that leaves a bare `--geneMap` *(verify — likely needs a patch or a gene map)*. Uses `meta.single_end`. |
 
-Not in nf-core/modules (confirmed): `metaquast`, `sourmash tax metagenome`, `sourmash tax genome`, an eggNOG DB downloader, `pankegg_make_db`.
+Not in nf-core/modules (confirmed): `metaquast`, `sourmash tax metagenome`, `sourmash tax genome`, `sourmash lca classify`, an eggNOG DB downloader, `pankegg_make_db`. `gtdbtk/classifywf` exists.
 
 ### Consequences for the wiring
 
 1. **Every assembly and every bin is gzipped** in the nf-core modules. Legacy MUFFIN used plain `.fa`. Bin-name matching in `BIN_QC` must strip `.fa.gz`/`.fa`/`.fna(.gz)`; CheckM2's extension option must match *(verify the exact flag and that the `Name` column drops the full extension)*; PILON needs `GUNZIP` first.
 2. **`meta` needs `single_end`** for every short-read and RNA channel (`false` for pairs), because `FASTP` and `SALMON_QUANT` read it.
 3. Report §7 `READ_MAPPING` emits `merged_bam`. With COMEBin taking a BAM directory and SemiBin accepting a BAM list, `SAMTOOLS_MERGE` is probably unnecessary (decision N4).
-4. Report §6 row 24 offers `sourmash/taxannotate` for bin taxonomy. The closest `tax` equivalent of `lca classify` is `sourmash tax genome`, which has no nf-core module and whose output PANKEGG cannot read (§4, decision N3).
+4. Report §6 row 24 offers `sourmash/taxannotate` for bin taxonomy. The closest `tax` equivalent of `lca classify` is `sourmash tax genome`, which has no nf-core module and whose output PANKEGG cannot read yet (§4a, N12).
 5. Medaka 2.x: `r941_min_high_g303` *(verify with `medaka tools list_models`)*. Medaka 2 can pick the model from the read headers, so `--medaka_model` defaulting to "auto" (no `-m`) is the robust choice *(verify)*.
 
 ## 4. PANKEGG (decided 2026-11-16: use the standalone tool, DB generation only)
@@ -84,7 +84,34 @@ Read from the PANKEGG source at tag `2.0.0` (`0ef3aee`; `master` was `3c6e652` o
 - No network access at run time; KEGG tables ship inside the package (`data/`).
 - No RNA mode. The legacy RNA report has no equivalent (decision N11).
 
-**Conflict with D6.** D6 replaces `lca classify` with `gather` + `tax`, but PANKEGG's sourmash mode reads only the `lca classify` format. `sourmash tax genome` output will not parse. This is now part of decision N3.
+**Consequence.** PANKEGG 2.0.0 cannot read `sourmash tax genome` output, which is the pipeline's default taxonomy method. The user will add that support to PANKEGG (N12); see §4a.
+
+## 4a. Bin taxonomy: three methods (decided 2026-11-16, replaces D6)
+
+Selected with `--bin_taxonomy`. One method per run. All three feed `PANKEGG_MAKEDB`.
+
+| `--bin_taxonomy` | Role | Processes | Databases (params) | Cost |
+|---|---|---|---|---|
+| `sourmash` (**default**) | Fast, light, current sourmash method | `SOURMASH_SKETCH` → `SOURMASH_GATHER` → local `SOURMASH_TAXGENOME` (per bin) | `--sourmash_db` (GTDB k=31 zip), `--sourmash_lineages` (csv) | Minutes per bin, a few GB RAM, DB around 10 GB |
+| `sourmash_lca` | Legacy MUFFIN behaviour, kept for continuity with old results | `SOURMASH_SKETCH` → local `SOURMASH_LCACLASSIFY` (per bin) | `--sourmash_lca_db` (`*.lca.json[.gz]`) | Light, but the LCA JSON format is deprecated upstream and newer GTDB releases may not be published in it. Print a deprecation warning at start-up |
+| `gtdbtk` | Highest accuracy and the community standard (marker-gene placement + ANI) | `nf-core/gtdbtk/classifywf` (2.7.2), once per sample on all bins | `--gtdbtk_db` (directory or tarball → `UNTAR`) | Reference data on the order of 100 GB on disk, tens of GB of RAM (`process_high_memory`), typically hours per sample. State the exact figures for the pinned release in `docs/usage.md` and the schema help text *(verify against the GTDB-Tk docs for the release used)* |
+
+Notes for the wiring:
+- `GTDBTK_CLASSIFYWF` inputs: `[meta, bins]` (staged as `bins/*`), `[db_name, db]`, `val use_pplacer_scratch_dir`; output `summary` = `${prefix}/classify/*.summary.tsv`. Check which genome extension it expects for gzipped bins (`--extension` in `ext.args`) *(verify)*.
+- `sourmash lca classify` still has to exist in the pinned sourmash 4.9.4 *(verify with `sourmash lca classify --help` in the container; if it is gone, stop and report)*.
+- `SOURMASH_TAXGENOME` runs `sourmash tax genome --gather-csv … --taxonomy … --output-format csv_summary` and emits the per-bin classification CSV. Expected columns in sourmash 4.9: `query_name, status, rank, fraction, lineage, query_md5, query_filename, f_weighted_at_rank, bp_match_at_rank, query_ani_at_rank` *(verify in the container and save one real file as a fixture)*. **This file is the contract for the PANKEGG update**; any change of output format must be agreed with the user first.
+- Validation: the DB params required by the chosen method must be set, the others ignored; fail early with a clear message.
+- `UNBINNED_READ_CLASSIFICATION` (sourmash `tax metagenome` on unmapped reads) is independent of `--bin_taxonomy` and still needs `--sourmash_db` / `--sourmash_lineages` unless skipped.
+
+### PANKEGG_MAKEDB and the three methods
+
+| `--bin_taxonomy` | Classification files passed | `pankegg_make_db` invocation | Works with PANKEGG 2.0.0? |
+|---|---|---|---|
+| `sourmash` | `tax genome` CSVs, one per bin | flag or auto-detection **to be defined by the PANKEGG update** | **No.** Needs the new PANKEGG release (N12) |
+| `sourmash_lca` | `lca classify` CSVs, one per bin | default mode | Yes |
+| `gtdbtk` | `*.summary.tsv` | `--gtdbtk` | Yes |
+
+The module takes the method as a `val` input and maps it to the right arguments in the script block (no `params` inside the module). Until N12 is resolved: build and test the module for `sourmash_lca` and `gtdbtk`; for `sourmash`, implement the wiring, mark the real test as pending, and make the pipeline skip `PANKEGG_MAKEDB` with a visible warning rather than fail. Do not add a format-conversion process to fake the old format.
 
 ## 5. Execution environment
 
@@ -98,7 +125,7 @@ Read from the PANKEGG source at tag `2.0.0` (`0ef3aee`; `master` was `3c6e652` o
 |---|---|---|---|
 | N1 | Stage 1 | Minimum Nextflow in `manifest.nextflowVersion` | `!>=26.04.0`, develop and test on 26.10.6 |
 | N2 | Stage 1 | Licence: keep GPL-3.0 or move to MIT like nf-core | Keep GPL-3.0; skip the `license` template feature and keep the existing `LICENSE` |
-| N3 | Stage 2/3 | Bin taxonomy method, given that PANKEGG reads only `sourmash lca classify` CSVs or GTDB-Tk summaries | **OPEN.** (a) GTDB-Tk via `nf-core/gtdbtk/classifywf` + `pankegg_make_db --gtdbtk`: current standard, no PANKEGG change, but a ~100 GB database and high memory. (b) `gather` + local `SOURMASH_TAXGENOME`, and add `tax genome` support to PANKEGG upstream first. (c) keep deprecated `lca classify` with an LCA database. Recommended: (a) as default with (b) as the light option once PANKEGG supports it |
+| N3 | — | Bin taxonomy method | **DECIDED 2026-11-16:** three selectable methods via `--bin_taxonomy`: `sourmash` (gather + tax genome, default), `sourmash_lca` (legacy), `gtdbtk` (highest accuracy, heavy). See §4a |
 | N4 | Stage 4 | Feed COMEBin/SemiBin all BAMs instead of one merged BAM | Yes: keeps per-sample coverage, removes `SAMTOOLS_MERGE`. Behaviour change → CHANGELOG |
 | N5 | — | One agent or the three-agent split of report §10 | **DECIDED 2026-11-16:** Claude does every stage **and the review**. Report §10 and all file-ownership rules are void |
 | N6 | — | PANKEGG source | **DECIDED 2026-11-16:** standalone PANKEGG (`pankegg_make_db` only), see §4. Legacy `bin/` scripts are not ported |
@@ -107,5 +134,6 @@ Read from the PANKEGG source at tag `2.0.0` (`0ef3aee`; `master` was `3c6e652` o
 | N9 | Stage 0 | Baseline run of legacy MUFFIN (report Stage 0) — where, and is it required? | Run locally if the legacy pipeline can be made to run; otherwise record "no baseline" and compare against expected ranges on the test data |
 | N10 | Stage 1 | Keep a `TEMPLATE` branch so `nf-core pipelines sync` works later | Yes, push the scratch repo's `TEMPLATE` branch once |
 | N11 | Stage 4 | PANKEGG has no RNA mode: how are transcriptome annotations and quantification reported? | Publish Trinity / salmon / eggNOG outputs and summarise in MultiQC; no RNA in the PANKEGG DB. Behaviour change → CHANGELOG |
+| N12 | Stage 3/4 | PANKEGG release that reads `sourmash tax genome` CSVs: tag to pin, and the flag (or auto-detection) that selects it | **OPEN — waiting for the user's PANKEGG update.** Until then the default method runs but skips `PANKEGG_MAKEDB` with a warning |
 
-Report decisions D1–D8 stand as written (D6 subject to N3), with D8 read as "`publishDir` via `conf/modules.config`".
+Report decisions D1–D8 stand as written, except D6, which is replaced by §4a, with D8 read as "`publishDir` via `conf/modules.config`".

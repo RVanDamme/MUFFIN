@@ -66,6 +66,7 @@ nf-test test --profile +<engine>
 - No processes that only glob, rename, `cat` or filter rows; use operators or `CAT_CAT`.
 - Scripts in `bin/` are on `PATH`; never `python ${projectDir}/bin/…`. Nothing writes to `params.outdir` from a script.
 - The legacy pankegg scripts in `bin/` are not ported. The report DB comes from the standalone PANKEGG tool (`pankegg_make_db`, addendum §4).
+- Bin taxonomy has three methods behind `--bin_taxonomy`: `sourmash` (gather + tax genome, default), `sourmash_lca` (legacy), `gtdbtk` (addendum §4a). `PANKEGG_MAKEDB` must handle all three.
 
 **Behaviour**
 - Implement the *intended* behaviour (report §3), not the legacy bugs. Every deviation from legacy behaviour gets a `CHANGELOG.md` line under `### Changed` or `### Fixed`, including the ones already decided.
