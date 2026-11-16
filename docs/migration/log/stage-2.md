@@ -17,3 +17,8 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2; n
 - `nf-core modules install` for bwa/index, bwa/mem, samtools/index, samtools/fastq, metabat2/jgisummarizebamcontigdepths, metabat2/metabat2, semibin/singleeasybin, comebin/runcomebin, seqkit/stats, cat/cat → each "Installing '<module>'".
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  20 files had 20 warnings  ? 60 files had no errors 
 - Previous entry commit: 76ca604
+
+## 2.4 (2026-11-16)
+- `nf-core modules install` for checkm2/predict, checkm2/databasedownload, sourmash/sketch, sourmash/gather, gtdbtk/classifywf, eggnogmapper, trinity, salmon/index, salmon/quant, untar → each "Installing '<module>'". `modules.json` lists 30 modules (29 + multiqc).
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  30 files had 30 warnings  ? 75 files had no errors 
+- Previous entry commit: 9354425

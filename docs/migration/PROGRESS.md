@@ -5,10 +5,10 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 ## Now
 
 - **Stage:** 2 — nf-core modules + ext.args (in progress, started 2026-11-16)
-- **Current task:** next after 2.3
-- **Next action:** install modules of 2.4
+- **Current task:** next after 2.4
+- **Next action:** read real signatures (2.5)
 - **In flight / half-decided:** nothing. HPC2N memory request behaviour (`--mem` vs per-core memory) to be checked on the first real run (`docs/hpc2n.md`).
-- **Last checkpoint:** task 2.3 (2026-11-16)
+- **Last checkpoint:** task 2.4 (2026-11-16)
 
 ## Stage status
 
@@ -32,7 +32,7 @@ _Format: `- [ ] 2.1 <task> — <commit hash when done>`._
 - [x] 2.1 `nf-core modules update multiqc` (fixes the versions-topic lint failure) and adapt the call if its inputs changed
 - [x] 2.2 Install read QC / assembly / polishing modules: chopper, fastp, spades, flye, minimap2/align, racon, medaka, pilon, gunzip
 - [x] 2.3 Install mapping / binning modules: bwa/index, bwa/mem, samtools/index, samtools/fastq, metabat2/jgisummarizebamcontigdepths, metabat2/metabat2, semibin/singleeasybin, comebin/runcomebin, seqkit/stats, cat/cat
-- [ ] 2.4 Install QC / taxonomy / annotation / RNA modules: checkm2/predict, checkm2/databasedownload, sourmash/sketch, sourmash/gather, gtdbtk/classifywf, eggnogmapper, trinity, salmon/index, salmon/quant, untar
+- [x] 2.4 Install QC / taxonomy / annotation / RNA modules: checkm2/predict, checkm2/databasedownload, sourmash/sketch, sourmash/gather, gtdbtk/classifywf, eggnogmapper, trinity, salmon/index, salmon/quant, untar
 - [ ] 2.5 Real signatures of every installed module vs addendum §3 (table in the stage report)
 - [ ] 2.6 `conf/modules.config`: scoped `withName` selectors and `ext.args`
 - [ ] 2.7 ⚠️ Tool-option checks (source-checked, no containers here) — report and wait if something is missing
