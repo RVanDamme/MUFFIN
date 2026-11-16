@@ -39,3 +39,11 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2, J
 - Not verified yet: schema behaviour on real samplesheets (checked in 1.8 with a run without containers).
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  1 file had 1 warning  ? 27 files had no errors 
 - Previous entry commit: 539b978
+
+## 1.5 (2026-11-16)
+- 31 pipeline parameters added to `nextflow.config` (report §5.3 + addendum §4a: `bin_taxonomy`, `sourmash_lca_db`, `gtdbtk_db`). Defaults follow legacy (`hybrid_assembler=metaspades`, `binner=metabat2`, `semibin_mode=pretrained`, `semibin_environment=global`, `pilon_rounds=2`, `bin_min_score=50`). `medaka_model` defaults to unset = medaka auto-selection (still *verify*, Stage 2).
+- `nf-core pipelines schema build --no-prompts` → "Pipeline schema looks valid (found 53 params)"; groups, descriptions, enums and the GTDB-Tk cost text filled by editing the JSON. `input` no longer required (alternative `--input_bins`; checked in `validateInputParameters`).
+- `nf-core pipelines schema lint` → "[✓] Default parameters match schema validation", "[✓] Pipeline schema looks valid (found 53 params)".
+- GTDB-Tk figures in the help text are orders of magnitude, not yet checked against the pinned release (Stage 2 item).
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  1 file had 1 warning  ? 27 files had no errors 
+- Previous entry commit: 9a9adce

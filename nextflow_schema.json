@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "required": ["outdir"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -19,8 +19,30 @@
                     "schema": "assets/schema_input.json",
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
-                    "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
+                    "description": "Samplesheet (CSV) with the reads of each sample.",
+                    "help_text": "Columns: `sample,short_reads_1,short_reads_2,long_reads,rna_reads_1,rna_reads_2`. Each sample needs a short-read pair, long (ONT) reads, or both; the pipeline derives the mode (short, long or hybrid) per sample. The RNA columns are optional. Required unless `--input_bins` is used.",
+                    "fa_icon": "fas fa-file-csv"
+                },
+                "coverage_input": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "schema": "assets/schema_coverage.json",
+                    "mimetype": "text/csv",
+                    "pattern": "^\\S+\\.csv$",
+                    "description": "Samplesheet (CSV) of extra read sets used only for differential-coverage binning.",
+                    "help_text": "Columns: `sample,short_reads_1,short_reads_2,long_reads`. Every row is mapped to every assembly and added to the binner's coverage input.",
+                    "fa_icon": "fas fa-file-csv"
+                },
+                "input_bins": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "schema": "assets/schema_bins.json",
+                    "mimetype": "text/csv",
+                    "pattern": "^\\S+\\.csv$",
+                    "description": "Samplesheet (CSV) of existing bins to classify and annotate.",
+                    "help_text": "Columns: `sample,bins_dir`. Skips read QC, assembly and binning for these samples; the pipeline starts at bin quality control.",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
@@ -33,6 +55,213 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                }
+            }
+        },
+        "workflow_control_options": {
+            "title": "Workflow control options",
+            "type": "object",
+            "fa_icon": "fas fa-random",
+            "description": "Choose which parts of the pipeline run.",
+            "default": "",
+            "properties": {
+                "skip_assembly": {
+                    "type": "boolean",
+                    "description": "Skip read QC, assembly and binning.",
+                    "help_text": "Implied for samples given with `--input_bins`."
+                },
+                "skip_classification": {
+                    "type": "boolean",
+                    "description": "Skip taxonomic classification of bins and unbinned reads."
+                },
+                "skip_annotation": {
+                    "type": "boolean",
+                    "description": "Skip functional annotation (eggNOG-mapper) and the PANKEGG database."
+                }
+            }
+        },
+        "read_qc_options": {
+            "title": "Read quality control options",
+            "type": "object",
+            "fa_icon": "fas fa-filter",
+            "description": "Read filtering with fastp (short reads) and chopper (long reads).",
+            "default": "",
+            "properties": {
+                "skip_shortread_qc": {
+                    "type": "boolean",
+                    "description": "Skip fastp on short reads."
+                },
+                "skip_longread_qc": {
+                    "type": "boolean",
+                    "description": "Skip chopper on long reads."
+                },
+                "longread_min_length": {
+                    "type": "integer",
+                    "default": 2000,
+                    "minimum": 0,
+                    "description": "Minimum long-read length kept by chopper (`-l`)."
+                },
+                "longread_min_quality": {
+                    "type": "integer",
+                    "default": 10,
+                    "minimum": 0,
+                    "description": "Minimum mean long-read quality kept by chopper (`-q`)."
+                }
+            }
+        },
+        "assembly_options": {
+            "title": "Assembly and polishing options",
+            "type": "object",
+            "fa_icon": "fas fa-puzzle-piece",
+            "description": "Short-read samples are assembled with metaSPAdes and long-read samples with metaFlye; these options cover hybrid samples and polishing.",
+            "default": "",
+            "properties": {
+                "hybrid_assembler": {
+                    "type": "string",
+                    "default": "metaspades",
+                    "enum": ["metaspades", "metaflye"],
+                    "description": "Assembler for hybrid samples.",
+                    "help_text": "`metaspades`: hybrid metaSPAdes on short and long reads. `metaflye`: metaFlye on long reads, polished with racon and medaka, then bins polished with short reads (Pilon)."
+                },
+                "medaka_model": {
+                    "type": "string",
+                    "description": "Medaka model for long-read polishing.",
+                    "help_text": "Leave unset to let medaka choose the model from the read headers. Set it when the basecaller information is missing from the reads."
+                },
+                "pilon_rounds": {
+                    "type": "integer",
+                    "default": 2,
+                    "minimum": 0,
+                    "maximum": 2,
+                    "description": "Number of Pilon polishing rounds on bins (hybrid samples assembled with metaFlye)."
+                },
+                "skip_pilon": {
+                    "type": "boolean",
+                    "description": "Skip Pilon polishing of bins."
+                },
+                "run_quast": {
+                    "type": "boolean",
+                    "description": "Run metaQUAST on the assemblies."
+                }
+            }
+        },
+        "binning_options": {
+            "title": "Binning and bin quality options",
+            "type": "object",
+            "fa_icon": "fas fa-boxes",
+            "description": "Binning, CheckM2 quality control and bin filtering.",
+            "default": "",
+            "properties": {
+                "binner": {
+                    "type": "string",
+                    "default": "metabat2",
+                    "enum": ["metabat2", "semibin2", "comebin"],
+                    "description": "Binning tool (one per run)."
+                },
+                "semibin_mode": {
+                    "type": "string",
+                    "default": "pretrained",
+                    "enum": ["pretrained", "self", "semi"],
+                    "description": "SemiBin2 model: a pretrained environment model, or self-/semi-supervised training on the sample."
+                },
+                "semibin_environment": {
+                    "type": "string",
+                    "default": "global",
+                    "description": "SemiBin2 pretrained environment (used with `--semibin_mode pretrained`), for example `global`, `human_gut`, `soil`, `ocean`."
+                },
+                "checkm2_db": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "description": "Path to the CheckM2 DIAMOND database (`.dmnd`).",
+                    "help_text": "Required for bin quality control unless `--download_checkm2_db` is set."
+                },
+                "download_checkm2_db": {
+                    "type": "boolean",
+                    "description": "Download the CheckM2 database (about 3 GB)."
+                },
+                "checkm2_lowmem": {
+                    "type": "boolean",
+                    "description": "Run CheckM2 in low-memory mode (`--lowmem`)."
+                },
+                "bin_min_score": {
+                    "type": "number",
+                    "default": 50.0,
+                    "description": "Bins are kept when `Completeness - 5 x Contamination` is above this value."
+                },
+                "skip_bin_filter": {
+                    "type": "boolean",
+                    "description": "Keep all bins regardless of their CheckM2 score."
+                }
+            }
+        },
+        "taxonomy_options": {
+            "title": "Taxonomic classification options",
+            "type": "object",
+            "fa_icon": "fas fa-sitemap",
+            "description": "Classification of bins and of reads that do not map to any good bin.",
+            "default": "",
+            "properties": {
+                "bin_taxonomy": {
+                    "type": "string",
+                    "default": "sourmash",
+                    "enum": ["sourmash", "sourmash_lca", "gtdbtk"],
+                    "description": "Method used to classify bins.",
+                    "help_text": "`sourmash` (default): `sourmash gather` + `sourmash tax genome`; minutes per bin, a few GB of RAM, database around 10 GB. Needs `--sourmash_db` and `--sourmash_lineages`.\n\n`sourmash_lca`: `sourmash lca classify`, the MUFFIN v1 method, kept for continuity with old results; the LCA database format is deprecated upstream. Needs `--sourmash_lca_db`.\n\n`gtdbtk`: GTDB-Tk `classify_wf`, the most accurate method and the community standard. **Heavy:** the reference data takes on the order of 100 GB of disk, the run needs tens of GB of RAM and typically hours per sample. Needs `--gtdbtk_db`."
+                },
+                "sourmash_db": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "description": "sourmash GTDB database (k=31 `.zip`).",
+                    "help_text": "Used by `--bin_taxonomy sourmash` and by the classification of unbinned reads."
+                },
+                "sourmash_lineages": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "description": "GTDB lineages CSV matching `--sourmash_db`."
+                },
+                "download_sourmash_db": {
+                    "type": "boolean",
+                    "description": "Download the sourmash GTDB database and lineages (about 10 GB)."
+                },
+                "sourmash_lca_db": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "description": "sourmash LCA database (`.lca.json` or `.lca.json.gz`), only for `--bin_taxonomy sourmash_lca`."
+                },
+                "gtdbtk_db": {
+                    "type": "string",
+                    "format": "path",
+                    "exists": true,
+                    "description": "GTDB-Tk reference data (directory or `.tar.gz`), only for `--bin_taxonomy gtdbtk`.",
+                    "help_text": "On the order of 100 GB on disk; classification needs tens of GB of RAM."
+                },
+                "skip_unbinned_read_classification": {
+                    "type": "boolean",
+                    "description": "Skip the classification of reads that do not map to the good bins."
+                }
+            }
+        },
+        "annotation_options": {
+            "title": "Functional annotation options",
+            "type": "object",
+            "fa_icon": "fas fa-tags",
+            "description": "eggNOG-mapper annotation of bins and transcripts.",
+            "default": "",
+            "properties": {
+                "eggnog_data_dir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "exists": true,
+                    "description": "Directory with the eggNOG-mapper databases.",
+                    "help_text": "Required for annotation unless `--download_eggnog_db` is set."
+                },
+                "download_eggnog_db": {
+                    "type": "boolean",
+                    "description": "Download the eggNOG-mapper databases (about 50 GB)."
                 }
             }
         },
@@ -176,6 +405,24 @@
     "allOf": [
         {
             "$ref": "#/$defs/input_output_options"
+        },
+        {
+            "$ref": "#/$defs/workflow_control_options"
+        },
+        {
+            "$ref": "#/$defs/read_qc_options"
+        },
+        {
+            "$ref": "#/$defs/assembly_options"
+        },
+        {
+            "$ref": "#/$defs/binning_options"
+        },
+        {
+            "$ref": "#/$defs/taxonomy_options"
+        },
+        {
+            "$ref": "#/$defs/annotation_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"
