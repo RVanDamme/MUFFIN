@@ -1,0 +1,56 @@
+repository_type: pipeline
+
+nf_core_version: 4.2.2
+
+lint:
+  files_unchanged:
+    - docs/CONTRIBUTING.md
+    - LICENSE
+    - .prettierignore
+    - CODE_OF_CONDUCT.md
+    - assets/nf-core-muffin_logo_light.png
+    - docs/images/nf-core-muffin_logo_light.png
+    - docs/images/nf-core-muffin_logo_dark.png
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - assets/email_template.txt
+    - docs/README.md
+  nextflow_config:
+    - manifest.name
+    - manifest.homePage
+  multiqc_config:
+    - report_comment
+  files_exist:
+    - LICENSE
+    - assets/email_template.html
+    - assets/sendmail_template.txt
+    - assets/email_template.txt
+    - conf/igenomes.config
+    - conf/igenomes_ignored.config
+    - CODE_OF_CONDUCT.md
+    - assets/nf-core-muffin_logo_light.png
+    - docs/images/nf-core-muffin_logo_light.png
+    - docs/images/nf-core-muffin_logo_dark.png
+    - .github/ISSUE_TEMPLATE/config.yml
+    - .github/workflows/awstest.yml
+    - .github/workflows/awsfulltest.yml
+
+template:
+  org: RVanDamme
+  name: muffin
+  description: Metagenomics workflow for hybrid assembly, differential coverage binning,
+    metatranscriptomics and pathway analysis
+  author: Renaud Van Damme
+  version: 2.0.0dev
+  force: true
+  outdir: .
+  skip_features:
+    - igenomes
+    - fastqc
+    - is_nfcore
+    - email
+    - seqera_platform
+    - gpu
+    - codespaces
+    - license
+  is_nfcore: false

@@ -5,10 +5,10 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 ## Now
 
 - **Stage:** 1 — Scaffold (in progress, started 2026-11-16)
-- **Current task:** next after 1.1
-- **Next action:** generate the template in a scratch dir and copy it in (1.2)
+- **Current task:** next after 1.2
+- **Next action:** template cleanup: nextflowVersion, contributors, lint config (1.3)
 - **In flight / half-decided:** nothing
-- **Last checkpoint:** task 1.1 (2026-11-16)
+- **Last checkpoint:** task 1.2 (2026-11-16)
 
 ## Stage status
 
@@ -31,7 +31,7 @@ _Format: `- [ ] 1.1 <task> — <commit hash when done>`._
 
 - [x] 1.0 Record decisions and checklist; install `seqeralabs/nextflow-plugin` skills (`npx skills add`)
 - [x] 1.1 `git mv` legacy code into `legacy/`, keeping the same directory names; files still needed stay in place
-- [ ] 1.2 Generate template (scratch dir, `2.0.0dev`), copy into repo, resolve collisions, push `TEMPLATE` branch, create `README_v2.md`
+- [x] 1.2 Generate template (scratch dir, `2.0.0dev`), copy into repo, resolve collisions, push `TEMPLATE` branch, create `README_v2.md`
 - [ ] 1.3 Remove template leftovers; `manifest.nextflowVersion`; exclude `legacy/` from lint/prettier
 - [ ] 1.4 Samplesheet schemas (`schema_input`, `schema_coverage`, `schema_bins`) and `meta` derivation in `PIPELINE_INITIALISATION`
 - [ ] 1.5 Parameters (report §5.3 + addendum §4a) and `nextflow_schema.json`

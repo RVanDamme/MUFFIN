@@ -14,3 +14,12 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2, J
 - `.agents/` (installed skills, contain example .nf files with 1 lint error) and `legacy/` are excluded from lint; not our code.
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Linting Nextflow code.. Nextflow linting complete!  No files found to process 
 - Previous entry commit: be238b2
+
+## 1.2 (2026-11-16)
+- `nf-core pipelines create --template-yaml template.yml` in /tmp/scratch (yaml saved as `docs/migration/template.yml`); files copied with tar, without `.git` and without the template `README.md`.
+- Collisions: `README.md` kept (v1 docs), new `README_v2.md` holds v2 status; `LICENSE`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` kept (license feature skipped; template has only `docs/CONTRIBUTING.md`); `.gitignore` = template + `results*/`; `docs/` no collision.
+- `.prettierignore` extended with legacy/, .agents/, .claude/, docs/migration/ and the kept root files.
+- `git push origin TEMPLATE` from the scratch repo → `* [new branch] TEMPLATE -> TEMPLATE` (98f9ae6).
+- Note: nf-core create offered an ORCID found online for the author; not used (template leaves `orcid: ''`).
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  2 files had 2 warnings  ? 27 files had no errors 
+- Previous entry commit: 291707c
