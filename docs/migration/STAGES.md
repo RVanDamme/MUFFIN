@@ -2,7 +2,9 @@
 
 Standing rules live in `/CLAUDE.md`. Facts and corrections live in `REPORT_ADDENDUM.md`. This file says what each stage delivers. `<engine>` is the container engine available on the machine (`docker`, `apptainer` or `singularity`).
 
-A stage is **DONE** only when every acceptance line was run and its output shown. If no container engine is available, finish the static part, mark the stage **DONE (static) — runs pending**, and list the exact commands the user must run.
+Every stage follows the task / checkpoint / review protocol in `CLAUDE.md` ("Traceability and resuming"): tasks listed in `PROGRESS.md` first, commit + push + log entry after each task, `stage-reviewer` pass and saved report at the end, then tag `stage-<N>-done`. The numbered items below are the minimum task split; split further where one item is more than one sitting.
+
+A stage is **DONE** only when every acceptance line was run and its output shown, and the review has no open blocking finding. If no container engine is available, finish the static part, mark the stage **DONE (static) — runs pending**, and list the exact commands the user must run.
 
 ⚠️ = stop and wait for the user's answer.
 
@@ -17,9 +19,9 @@ Run legacy MUFFIN on the OSF subset (`https://osf.io/9xmh4/download`) with Nextf
 
 ## Stage 1 — Scaffold
 
-⚠️ Confirm before generating: decisions N1, N2, N5, N10 and the template features. Proposed `skip_features`: `igenomes`, `fastqc`, `is_nfcore`, `email`, `seqera_platform`, `gpu`, `codespaces`, plus `license` if GPL-3.0 is kept.
+⚠️ Confirm before generating: decisions N1, N2, N10 and the template features. Proposed `skip_features`: `igenomes`, `fastqc`, `is_nfcore`, `email`, `seqera_platform`, `gpu`, `codespaces`, plus `license` if GPL-3.0 is kept.
 
-1. `git mv` all legacy code (`main.nf`, `nextflow.config`, `modules/`, `readflows/`, `configs/`, `obsolete_process/`, `MUFFIN_params.yml`) into `legacy/`. Keep `bin/`, `.figure/`, `LICENSE`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `README.md`, `CLAUDE.md`, `.claude/`, `docs/migration/` in place. Commit.
+1. `git mv` all legacy code (`main.nf`, `nextflow.config`, `modules/`, `readflows/`, `configs/`, `obsolete_process/`, `MUFFIN_params.yml`, and everything in `bin/` — the pankegg scripts are replaced by the standalone tool) into `legacy/`. Keep `.figure/`, `LICENSE`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `README.md`, `CLAUDE.md`, `.claude/`, `docs/migration/` in place. Commit.
 2. Generate the template into a **scratch directory outside the repo** with `nf-core pipelines create --template-yaml <file>` (name `muffin`, organisation `RVanDamme`, version `3.0.0dev`). Copy its files, not its `.git`, into the repo. Resolve collisions explicitly (`README.md`, `.gitignore`, `docs/`, `LICENSE`) and list each resolution in the plan. If N10 is yes, tell the user how to push the scratch repo's `TEMPLATE` branch.
 3. Remove template leftovers that do not apply (`params.fasta` / `getGenomeAttribute` if igenomes is skipped). Set `manifest.nextflowVersion` per N1.
 4. Samplesheet schemas per report §5.2: `assets/schema_input.json` (`sample, short_reads_1, short_reads_2, long_reads, rna_reads_1, rna_reads_2`; at least one of short pair / long; pairs complete), `assets/schema_coverage.json`, `assets/schema_bins.json`. In `PIPELINE_INITIALISATION` derive `meta.mode`, `meta.has_rna`, `meta.single_end`.
@@ -34,7 +36,9 @@ Run legacy MUFFIN on the OSF subset (`https://osf.io/9xmh4/download`) with Nextf
 
 ## Stage 2 — nf-core modules and `ext.args`
 
-1. `nf-core modules install` for: chopper, fastp, spades, flye, minimap2/align, racon, medaka, pilon, gunzip, bwa/index, bwa/mem, samtools/index, samtools/fastq, metabat2/jgisummarizebamcontigdepths, metabat2/metabat2, semibin/singleeasybin, comebin/runcomebin, seqkit/stats, cat/cat, checkm2/predict, checkm2/databasedownload, sourmash/sketch, sourmash/gather, eggnogmapper, trinity, salmon/index, salmon/quant, untar, multiqc. Add samtools/merge only if N4 is "no"; add sourmash/taxannotate or gtdbtk/classifywf only if N3 says so.
+⚠️ N3 (bin taxonomy) must be answered before this stage.
+
+1. `nf-core modules install` for: chopper, fastp, spades, flye, minimap2/align, racon, medaka, pilon, gunzip, bwa/index, bwa/mem, samtools/index, samtools/fastq, metabat2/jgisummarizebamcontigdepths, metabat2/metabat2, semibin/singleeasybin, comebin/runcomebin, seqkit/stats, cat/cat, checkm2/predict, checkm2/databasedownload, sourmash/sketch, sourmash/gather, eggnogmapper, trinity, salmon/index, salmon/quant, untar, multiqc. Add samtools/merge only if N4 is "no"; add gtdbtk/classifywf (and its DB handling) or other taxonomy modules according to N3.
 2. For each module, put in the stage report: real `input:` / `output:` copied from the installed `main.nf` → report §6 row → `ext.args` set. Flag every difference from `REPORT_ADDENDUM.md` §3.
 3. Write `conf/modules.config`: `withName` selectors scoped by subworkflow where a module is reused; flags from report §6 as corrected by the addendum (SemiBin options in `ext.args2`; no `--compression none`; eggNOG search mode is an input; salmon `-l A`; sourmash `-p k=31,scaled=10000`, ONT 5000; `gather -k 31`; chopper `-q/-l/--headcrop 100`; flye `--meta`; spades `--meta`).
 4. ⚠️ Verify in the pinned containers, report, and wait if something is missing: medaka model list and auto-selection; flye `--plasmids` (expected: drop); SemiBin2 `--environment` / `--training-mode`; COMEBin `-l`; CheckM2 extension flag with gzipped bins; `SALMON_QUANT` with `gtf = []`. Without a container engine, check upstream docs/source at the pinned version and mark each item "source-checked, not executed".
@@ -44,23 +48,24 @@ Run legacy MUFFIN on the OSF subset (`https://osf.io/9xmh4/download`) with Nextf
 
 ## Stage 3 — Local modules
 
-`METAQUAST`, `SOURMASH_TAXMETAGENOME`, `SOURMASH_TAXGENOME` (per N3), `PANKEGG`, and only if downloads are wanted `SOURMASH_DOWNLOADDB`, `EGGNOGMAPPER_DOWNLOADDB`. Each via `nf-core modules create`, with `meta.yml`, `environment.yml` (exact versions), pinned container, `stub:`, versions topic, and an nf-test with a real and a stub case.
+`METAQUAST`, `SOURMASH_TAXMETAGENOME`, `PANKEGG_MAKEDB`, a bin-taxonomy module only if N3 needs one, and only if downloads are wanted `SOURMASH_DOWNLOADDB`, `EGGNOGMAPPER_DOWNLOADDB`. Each via `nf-core modules create`, with `meta.yml`, `environment.yml` (exact versions), pinned container, `stub:`, versions topic, and an nf-test with a real and a stub case. One module per task.
 
 - Before writing each one, run the `search-existing-modules` check once more; nf-core/modules moves fast.
-- `PANKEGG`: standard library only, so use a pinned plain Python container. ⚠️ N6 before deciding how the KEGG REST call is handled. Header/footer stripping of eggNOG output happens inside the parser.
+- `PANKEGG_MAKEDB` (addendum §4): wraps `pankegg_make_db` from https://github.com/RVanDamme/PANKEGG pinned to a release tag (2.0.0 or newer; re-check tags). Inputs: all samples' eggNOG annotation files, classification files and CheckM2 reports, collected into **one** task; the script block writes the `Sample name,Annotation_dir,classification_dir,Checkm2_dir` CSV from the staged files and passes `--gtdbtk` through `ext.args` when N3 is GTDB-Tk. Output: the `.db`. Container: Wave build from an `environment.yml` that pip-installs the tagged release; ⚠️ show the environment and the resulting image reference before using it. Test with the PANKEGG example data (`https://osf.io/download/5v3zc/`) or a small fixture derived from it.
+- Do not wrap `pankegg_app`. Document in `docs/output.md` how to open the DB with it.
 
 **Accept**: `nf-test test modules/local/` passes (real + stub); `nf-core modules lint --local` passes.
 
 ## Stage 4 — Subworkflows and main workflow
 
-One subworkflow per directory under `subworkflows/local/<name>/` with `main.nf` and `meta.yml`, shapes as in report §7 as corrected by the addendum.
+One subworkflow per task, each in its own directory under `subworkflows/local/<name>/` with `main.nf` and `meta.yml`, shapes as in report §7 as corrected by the addendum.
 
 - Routing by `meta.mode` with `branch`: short → FASTP → SPADES `--meta`; long → CHOPPER → FLYE → LONGREAD_POLISH; hybrid → FASTP + CHOPPER → SPADES (hybrid) or FLYE → LONGREAD_POLISH according to `params.hybrid_assembler`.
 - `READ_MAPPING`: own reads always; every `--coverage_input` row mapped to **every** assembly with `combine`; BAMs grouped per assembly with `groupTuple` on `meta.id`.
 - `BINNING`: one binner per run (D7). MetaBAT2 gets all BAMs through the depth step. SemiBin2/COMEBin input per N4. COMEBin `-l` from N50 parsed out of `SEQKIT_STATS` into `meta.n50` with `map`.
 - `BIN_QC`: CheckM2 DB channel exists in both the `--checkm2_db` and the `--download_checkm2_db` case, in the `[dbmeta, db]` shape. Filtering is channel operators on the CheckM2 TSV (`Completeness - 5*Contamination > params.bin_min_score`), matching bins by name with `.fa`, `.fa.gz`, `.fna`, `.fna.gz` stripped.
 - `BIN_POLISH_PILON`: only `meta.mode == 'hybrid' && params.hybrid_assembler == 'metaflye'`; `GUNZIP` first; up to two aliased rounds gated by `params.pilon_rounds`.
-- `UNBINNED_READ_CLASSIFICATION`, `BIN_TAXONOMY`, `BIN_ANNOTATION`, `TRANSCRIPTOMICS`, `REPORTING` per report §6/§7. `--input_bins` starts at `BIN_QC`; `--skip_*` flags per §5.3.
+- `UNBINNED_READ_CLASSIFICATION`, `BIN_TAXONOMY` (per N3), `BIN_ANNOTATION`, `TRANSCRIPTOMICS` (reporting per N11), `REPORTING` per report §6/§7. `REPORTING` runs `PANKEGG_MAKEDB` once over all samples; bin names must agree between the eggNOG file prefix, the CheckM2 `Name` column and the classification files (addendum §4), so add an explicit check or test for it. `--input_bins` starts at `BIN_QC`; `--skip_*` flags per §5.3.
 - Versions through the `versions` topic into MultiQC using the template utilities.
 
 **Accept**
@@ -99,7 +104,7 @@ Compare against the baseline within the tolerances of report §9, or against doc
 ## Stage N report
 Status: DONE | DONE (static) — runs pending | BLOCKED (reason)
 Environment: nextflow <ver>, nf-core <ver>, nf-test <ver>, engine <name|none>
-Commits: <hash> <message> (one per line)
+Commits: <first>..<last> (range), tag stage-<N>-done; log: docs/migration/log/stage-<N>.md
 Files changed: <list>
 Verification (command → result, with the relevant output lines):
   - nextflow lint .            → <errors>/<warnings> (owned code: <n>)
@@ -109,6 +114,7 @@ Verification (command → result, with the relevant output lines):
 Not verified (and why): <list or "none">
 Behaviour changes (→ CHANGELOG): <list or "none">
 Deviations from report/addendum: <list with file:line evidence, or "none">
+Review (stage-reviewer): <independent | self>; blocking findings fixed: <list>; non-blocking left open: <list>
 Open questions: <list or "none">
 Next stage plan: <3–6 bullets>
 ```
