@@ -32,3 +32,10 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2; n
   - Everything else matches the addendum.
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  30 files had 30 warnings  ? 76 files had no errors 
 - Previous entry commit: 8827eb9
+
+## 2.6 (2026-11-16)
+- 17 `withName` selectors, scoped by subworkflow where a module is reused (FASTP, MINIMAP2_ALIGN, SOURMASH_SKETCH, EGGNOGMAPPER, SAMTOOLS_FASTQ). Flags per report §6 as corrected: chopper in `ext.args2`; SemiBin options in `ext.args2`, no `--compression none`; flye `--meta` without `--plasmids`; spades `--meta`; salmon `--libType A`; sourmash `dna -p k=31,scaled=10000` (ONT 5000); `gather -k 31`; medaka `-m` only when `--medaka_model` is set; GTDB-Tk `--extension gz`.
+- `nextflow lint conf/modules.config` → "1 file had no errors". Stub without engine: `nextflow run . -profile test -stub-run` → `[SUCCESS] completed=1 failed=0`.
+- Selector names for aliased processes (`SOURMASH_SKETCH_SHORT/_LONG`) are provisional until Stage 4 creates the aliases.
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  30 files had 30 warnings  ? 76 files had no errors 
+- Previous entry commit: 5abe440
