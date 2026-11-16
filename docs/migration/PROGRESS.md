@@ -5,9 +5,9 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 ## Now
 
 - **Stage:** 2 — nf-core modules + ext.args (in progress, started 2026-11-16)
-- **Current task:** next after 2.6
-- **Next action:** tool-option checks and lints (2.7, 2.8)
-- **In flight / half-decided:** nothing. HPC2N memory request behaviour (`--mem` vs per-core memory) to be checked on the first real run (`docs/hpc2n.md`).
+- **Current task:** 2.8 (waiting on the ⚠️ answers of 2.7)
+- **Next action:** get the user's answers on N20 (SemiBin `semi` mode) and N21 (`SALMON_QUANT` gene map); then stage-reviewer, stage report, README_v2, tag `stage-2-done`. Container confirmations of 2.7 can be run by the user on Kebnekaise.
+- **In flight / half-decided:** N20, N21 open; `conf/modules.config` currently maps `semibin_mode=semi` to `--semi-supervised`.
 - **Last checkpoint:** task 2.6 (2026-11-16)
 
 ## Stage status
@@ -35,7 +35,7 @@ _Format: `- [ ] 2.1 <task> — <commit hash when done>`._
 - [x] 2.4 Install QC / taxonomy / annotation / RNA modules: checkm2/predict, checkm2/databasedownload, sourmash/sketch, sourmash/gather, gtdbtk/classifywf, eggnogmapper, trinity, salmon/index, salmon/quant, untar
 - [x] 2.5 Real signatures of every installed module vs addendum §3 (table in the stage report)
 - [x] 2.6 `conf/modules.config`: scoped `withName` selectors and `ext.args`
-- [ ] 2.7 ⚠️ Tool-option checks (source-checked, no containers here) — report and wait if something is missing
+- [x] 2.7 ⚠️ Tool-option checks (source-checked, no containers here) — report and wait if something is missing
 - [ ] 2.8 Container configs, lints, stage-reviewer, report, README_v2, tag
 
 `samtools/merge` is not installed: N4 is taken as "yes" (recommended) for the module list; it is formally confirmed in Stage 4.
@@ -92,6 +92,9 @@ Addendum decisions (options in `REPORT_ADDENDUM.md` §6):
 | N17 | Legacy layout | **Files not needed any more move to `legacy/<same dirname>/`; files still needed stay where they are** | 2026-11-16 |
 | N18 | Skills | **`npx skills add seqeralabs/nextflow-plugin` run; skills committed under `.agents/skills/` (symlinked from `.claude/skills/`); keep them for the duration of the upgrade and remove `.agents/`, `.claude/skills/`, `skills-lock.json` before merging to the main branch** | 2026-11-16 |
 | N19 | Run environment | **HPC2N Kebnekaise with Apptainer (Slurm); `-profile hpc2n`, account from `SBATCH_ACCOUNT`** | 2026-11-16 |
+| N20 | SemiBin2 2.4.1 has no `--training-mode`; `--semi-supervised` is deprecated | OPEN (recommended: drop `semi`, keep `pretrained` and `self`) | |
+| N21 | `SALMON_QUANT` always emits `--geneMap` | OPEN (recommended: `nf-core modules patch salmon/quant` making `--geneMap` conditional) | |
+| N22 | `cat/cat` deprecated upstream (refuses to run) | **replaced by `find/concatenate`** | 2026-11-16 |
 | — | Push policy | **Push to `origin Upgrade` after every checkpoint commit; never force-push** | 2026-11-16 |
 
 ## Verification still owed

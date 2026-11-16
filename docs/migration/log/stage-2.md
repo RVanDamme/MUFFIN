@@ -39,3 +39,23 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2; n
 - Selector names for aliased processes (`SOURMASH_SKETCH_SHORT/_LONG`) are provisional until Stage 4 creates the aliases.
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  30 files had 30 warnings  ? 76 files had no errors 
 - Previous entry commit: 5abe440
+
+## 2.7 — tool-option checks (2026-11-16) — ALL "source-checked, not executed" (no container engine)
+Sources: the installed module scripts and upstream source at the pinned tag on raw.githubusercontent.com.
+| Item | Finding | Status |
+|---|---|---|
+| medaka 2.2.2 model | `medaka_consensus` without `-m` tries automatic selection from the reads and falls back to the default model with a warning (`scripts/medaka_consensus` l.116–126) | OK: `--medaka_model` unset = auto |
+| flye 2.9.5 `--plasmids` | still parsed, logs "--plasmids mode is no longer available" (`flye/main.py` l.747) | dropped |
+| SemiBin2 2.4.1 | `--environment` exists; there is NO `--training-mode`; flags are `--self-supervised` and `--semi-supervised` (the latter marked deprecated) (`SemiBin/main.py` l.399, 579–587) | ⚠️ decision: keep or drop `--semibin_mode semi` |
+| COMEBin `-l` | present in `run_comebin.sh` (checked at tag 1.0.4; module container is 1.1.0) | OK, confirm in container |
+| sourmash 4.9.4 `lca classify` | `cli/lca/__init__.py` still imports `classify` | OK, confirm in container |
+| sourmash 4.9.4 `tax genome` columns | `ClassificationResult` has `f_weighted_at_rank`, `bp_match_at_rank`, `query_ani_at_rank`; full csv_summary header not captured | confirm in container, save fixture (Stage 3) |
+| GTDB-Tk 2.7.2 gz bins | `-x/--extension`, default `fna`, "gz = gzipped" (`gtdbtk/cli.py` l.74) → `ext.args = '--extension gz'` | confirm in container |
+| CheckM2 1.1.0 gz bins | gz input is decompressed for prodigal; bin name = `os.path.splitext(basename)[0]`, so `x.fa.gz` gives `Name = x.fa` (`checkm2/prodigal.py` l.25, 58) | BIN_QC and the PANKEGG name check must strip `.fa`/`.fna` from `Name` (Stage 4); extension flag not needed when files are passed; confirm in container |
+| `SALMON_QUANT` with `gtf = []` | script always emits `--geneMap ${gtf}` → bare `--geneMap` | ⚠️ decision: `nf-core modules patch` vs supplying a gene map |
+| container configs | `nf-core pipelines containers create-configs` → "Generated container configs", no file changed after the installs | nothing to do |
+
+## 2.8a — lints (2026-11-16)
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → 0 errors; 30 warnings in 30 files, all `when:` deprecations inside `modules/nf-core/**` (0 in owned code); "76 files had no errors".
+- `nf-core modules lint --all` → `[✔] 1852 Tests Passed`, `[!] 32 Test Warnings`, `[✗] 1 Test Failed` (multiqc `main_nf_version_topic`, by design upstream).
+- Previous entry commit: 9507d15
