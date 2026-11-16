@@ -22,3 +22,13 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2; n
 - `nf-core modules install` for checkm2/predict, checkm2/databasedownload, sourmash/sketch, sourmash/gather, gtdbtk/classifywf, eggnogmapper, trinity, salmon/index, salmon/quant, untar → each "Installing '<module>'". `modules.json` lists 30 modules (29 + multiqc).
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  30 files had 30 warnings  ? 75 files had no errors 
 - Previous entry commit: 9354425
+
+## 2.5 (2026-11-16)
+- Read `input:`/`output:`/`script:` of all installed modules (table in the stage report). Differences from addendum §3:
+  - `cat/cat` is deprecated upstream and its script starts with `assert false` → removed, `find/concatenate` installed instead (`[meta, files_in]` → `file_out`). `CLAUDE.md` updated.
+  - `CHOPPER`: `ext.args`/`args3` belong to the pigz steps; chopper options are `ext.args2` (STAGES said ext.args).
+  - `BWA_INDEX` has an extra `val index_dir_name` input; `SALMON_INDEX` takes `[meta, transcript_fasta, genome_fasta]`; `METABAT2_METABAT2` has an extra `membership` output; `SOURMASH_SKETCH` has default args that must be overridden.
+  - `SALMON_QUANT` always writes `--geneMap ${gtf}` → with `gtf = []` the command is `salmon quant --geneMap --threads …` (broken). Needs a patch or a gene map: decision pending.
+  - Everything else matches the addendum.
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  30 files had 30 warnings  ? 76 files had no errors 
+- Previous entry commit: 8827eb9

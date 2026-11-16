@@ -63,7 +63,7 @@ nf-test test --profile +<engine>
 - Before any `join`, `combine`, `groupTuple`, `branch` or `transpose`, write the input shapes, the key and the output shape as a comment.
 - Bins travel as `[meta, List<Path>]`; `transpose()` only where a tool is per-bin, adding `meta.bin_id`.
 - No `join(remainder: true)` with null padding, no dummy placeholder files, no `collect()` that mixes samples.
-- No processes that only glob, rename, `cat` or filter rows; use operators or `CAT_CAT`.
+- No processes that only glob, rename, `cat` or filter rows; use operators or `FIND_CONCATENATE` (nf-core `cat/cat` is deprecated upstream and refuses to run).
 - Scripts in `bin/` are on `PATH`; never `python ${projectDir}/bin/…`. Nothing writes to `params.outdir` from a script.
 - The legacy pankegg scripts in `bin/` are not ported. The report DB comes from the standalone PANKEGG tool (`pankegg_make_db`, addendum §4).
 - Bin taxonomy has three methods behind `--bin_taxonomy`: `sourmash` (gather + tax genome, default), `sourmash_lca` (legacy), `gtdbtk` (addendum §4a). `PANKEGG_MAKEDB` must handle all three.

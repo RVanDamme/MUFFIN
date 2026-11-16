@@ -15,11 +15,6 @@
                         "git_sha": "2ea7b517421e97210c41585f2347ad113e643a12",
                         "installed_by": ["modules"]
                     },
-                    "cat/cat": {
-                        "branch": "master",
-                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
-                        "installed_by": ["modules"]
-                    },
                     "checkm2/databasedownload": {
                         "branch": "master",
                         "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
@@ -48,6 +43,11 @@
                     "fastp": {
                         "branch": "master",
                         "git_sha": "697192edd1bd7a330a5edbc4eb2f0f69ecfbb6ce",
+                        "installed_by": ["modules"]
+                    },
+                    "find/concatenate": {
+                        "branch": "master",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "flye": {
