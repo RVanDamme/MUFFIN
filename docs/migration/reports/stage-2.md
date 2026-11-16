@@ -1,6 +1,6 @@
 ## Stage 2 report
 
-Status: DRAFT — review in progress
+Status: DONE (static) — runs pending; awaiting user sign-off on N23 and short-mode `spades --meta` before the tag
 Environment: nextflow 26.10.6, nf-core 4.2.2, nf-test not installed, engine none (Claude Code cloud session)
 Commits: 25c3fbd..HEAD of this report (range), tag `stage-2-done` after the review; log: docs/migration/log/stage-2.md
 Files changed: `modules/nf-core/**` (30 modules via `nf-core modules install/update/remove`), `modules.json`, `conf/modules.config`, `nextflow_schema.json`, `CHANGELOG.md`, `README_v2.md`, `CLAUDE.md`, `docs/migration/*`.
@@ -22,6 +22,15 @@ Deviations from report/addendum:
   - No patch of `salmon/quant`; transcript-to-gene map built in Stage 4 — N21.
   - `samtools/merge` not installed (N4 assumed yes; formally decided in Stage 4).
   - CheckM2 `Name` keeps `.fa` for gzipped bins → name matching must strip it (Stage 4).
+
+Review (stage-reviewer): independent; it re-ran both lints with the same results. Blocking: the multiqc lint failure was only in the log → now N23 in `PROGRESS.md` and in the `STAGES.md` acceptance line, pending user sign-off. Non-blocking fixed: EGGNOGMAPPER does not decompress gz (addendum corrected, `GUNZIP` planned); GTDB-Tk `--extension gz` needs uniformly gzipped bins (Stage 4 carry-over); CHANGELOG lines for short-mode `--meta` and medaka auto model; `abund` removed from read sketches (not in legacy or spec); `MINIMAP2_ALIGN.*` selectors; checklist hashes; stale carried items; `STAGES.md` module list. Non-blocking left open: commit 5abe440 mixes the cat/cat swap and `conf/modules.config` (history is not rewritten); Stage 4 prefix/`merge_sigs`/`singleton`/`n50` notes moved to `STAGES.md`.
+
+Open questions: sign-off on N23; sign-off on `spades --meta` for short-only samples.
+
+Next stage plan:
+  - `nf-core modules create` for METAQUAST, SOURMASH_TAXMETAGENOME, SOURMASH_TAXGENOME, SOURMASH_LCACLASSIFY, PANKEGG_MAKEDB (one per task), each with stub, pinned container, meta.yml, environment.yml, nf-test.
+  - ⚠️ show the PANKEGG environment and image reference before using it.
+  - nf-tests can be written here but only run on Kebnekaise.
 
 ### Module signatures (installed `main.nf`)
 

@@ -6,8 +6,8 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 
 - **Stage:** 2 — nf-core modules + ext.args (in progress, started 2026-11-16)
 - **Current task:** next after 2.7
-- **Next action:** stage-reviewer, report, README_v2, tag (2.8)
-- **In flight / half-decided:** nothing.
+- **Next action:** user signs off N23 (multiqc lint exception) and short-mode `spades --meta`; then mark Stage 2 DONE and tag `stage-2-done`; then Stage 3.
+- **In flight / half-decided:** N23 and the `spades --meta` sign-off.
 - **Last checkpoint:** task 2.7 (2026-11-16)
 
 ## Stage status
@@ -29,14 +29,14 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 
 _Format: `- [ ] 2.1 <task> — <commit hash when done>`._
 
-- [x] 2.1 `nf-core modules update multiqc` (fixes the versions-topic lint failure) and adapt the call if its inputs changed
-- [x] 2.2 Install read QC / assembly / polishing modules: chopper, fastp, spades, flye, minimap2/align, racon, medaka, pilon, gunzip
-- [x] 2.3 Install mapping / binning modules: bwa/index, bwa/mem, samtools/index, samtools/fastq, metabat2/jgisummarizebamcontigdepths, metabat2/metabat2, semibin/singleeasybin, comebin/runcomebin, seqkit/stats, cat/cat
-- [x] 2.4 Install QC / taxonomy / annotation / RNA modules: checkm2/predict, checkm2/databasedownload, sourmash/sketch, sourmash/gather, gtdbtk/classifywf, eggnogmapper, trinity, salmon/index, salmon/quant, untar
-- [x] 2.5 Real signatures of every installed module vs addendum §3 (table in the stage report)
-- [x] 2.6 `conf/modules.config`: scoped `withName` selectors and `ext.args`
-- [x] 2.7 ⚠️ Tool-option checks (source-checked, no containers here) — report and wait if something is missing
-- [ ] 2.8 Container configs, lints, stage-reviewer, report, README_v2, tag
+- [x] 2.1 `nf-core modules update multiqc` (fixes the versions-topic lint failure) and adapt the call if its inputs changed — b27f659
+- [x] 2.2 Install read QC / assembly / polishing modules: chopper, fastp, spades, flye, minimap2/align, racon, medaka, pilon, gunzip — 76ca604
+- [x] 2.3 Install mapping / binning modules: bwa/index, bwa/mem, samtools/index, samtools/fastq, metabat2/jgisummarizebamcontigdepths, metabat2/metabat2, semibin/singleeasybin, comebin/runcomebin, seqkit/stats, cat/cat — 9354425
+- [x] 2.4 Install QC / taxonomy / annotation / RNA modules: checkm2/predict, checkm2/databasedownload, sourmash/sketch, sourmash/gather, gtdbtk/classifywf, eggnogmapper, trinity, salmon/index, salmon/quant, untar — 8827eb9
+- [x] 2.5 Real signatures of every installed module vs addendum §3 (table in the stage report) — 5abe440 (also contains `conf/modules.config`)
+- [x] 2.6 `conf/modules.config`: scoped `withName` selectors and `ext.args` — 9507d15 (log entry; config landed in 5abe440)
+- [x] 2.7 ⚠️ Tool-option checks (source-checked, no containers here) — report and wait if something is missing — d90e799, 8df9251
+- [x] 2.8 Container configs, lints, stage-reviewer, report, README_v2, tag
 
 `samtools/merge` is not installed: N4 is taken as "yes" (recommended) for the module list; it is formally confirmed in Stage 4.
 
@@ -67,7 +67,7 @@ Report decisions (defaults stand until changed here):
 | D6 | sourmash `lca classify` → `gather` + `tax` | **replaced by N3** (three methods) |
 | D7 | One binner per run | default |
 | D8 | Publishing as the template generates = `publishDir` | default |
-| — | Short mode uses `spades --meta` (legacy ran isolate SPAdes) | default — needs explicit sign-off (behaviour change) |
+| — | Short mode uses `spades --meta` (legacy ran isolate SPAdes) | default, now encoded in `conf/modules.config` and CHANGELOG — still needs explicit sign-off (behaviour change) |
 
 Addendum decisions (options in `REPORT_ADDENDUM.md` §6):
 
@@ -95,11 +95,12 @@ Addendum decisions (options in `REPORT_ADDENDUM.md` §6):
 | N20 | SemiBin2 modes | **Follow the current SemiBin2: `--semibin_mode pretrained|self`; deprecated `semi` dropped** | 2026-11-16 |
 | N21 | `SALMON_QUANT` gene map | **Build a transcript-to-gene map from the Trinity transcript IDs as an extra step in `TRANSCRIPTOMICS` (Stage 4) and pass it as the `gtf` input; no module patch** | 2026-11-16 |
 | N22 | `cat/cat` deprecated upstream (refuses to run) | **replaced by `find/concatenate`** | 2026-11-16 |
+| N23 | `nf-core modules lint --all`: multiqc fails `main_nf_version_topic` | accepted exception PROPOSED (upstream design: MultiQC must not emit to the `versions` topic; never patch) — awaiting user sign-off | |
 | — | Push policy | **Push to `origin Upgrade` after every checkpoint commit; never force-push** | 2026-11-16 |
 
 ## Verification still owed
 
-**Carried to Stage 2:** `nf-core modules lint --all` fails for `multiqc` ("does not emit software versions as topic") → `nf-core modules update multiqc`; `tests/nextflow.config` still points at the template's `test-datasets/muffin/` path; decide `bin_min_score` integer vs number; handle `--input` together with `--input_bins` (Stage 4).
+**Carried forward:** `tests/nextflow.config` still points at the template's `test-datasets/muffin/` path (Stage 6); `bin_min_score` integer vs number (Stage 4); `--input` together with `--input_bins` (Stage 4). **Stage 2, to confirm in containers** (log 2.7): COMEBin `-l` in 1.1.0; `sourmash lca classify` and the `tax genome` csv_summary header; GTDB-Tk `--extension gz`; CheckM2 `Name` for `.fa.gz` bins; medaka with RACON's gzipped draft.
 
 Items marked *(verify)* in `REPORT_ADDENDUM.md`: medaka model list / auto-selection; CheckM2 extension flag and `Name` column with gzipped bins; `SALMON_QUANT` with empty `gtf`; whether container configs must be regenerated after module installs; PANKEGG availability on Bioconda/PyPI; `sourmash lca classify` in sourmash 4.9.4; `tax genome` csv_summary columns; GTDB-Tk DB size / memory for the pinned release and its handling of gzipped bins; bin-name agreement between eggNOG prefix, CheckM2 `Name` and classification files.
 

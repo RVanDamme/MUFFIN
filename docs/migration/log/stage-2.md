@@ -66,3 +66,10 @@ Sources: the installed module scripts and upstream source at the pinned tag on r
 - CHANGELOG: `### Fixed` line for Flye `--plasmids`.
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  30 files had 30 warnings  ? 76 files had no errors 
 - Previous entry commit: d90e799
+
+## 2.8b — review and fixes (2026-11-16)
+- Decisions shown as pending in the 2.7 table were answered by the user the same day: N20 (SemiBin `pretrained|self`), N21 (gene map as an extra step).
+- `stage-reviewer` (independent) on 25c3fbd..14ff60c: 1 blocking, 5 non-blocking; it reproduced `nextflow lint` (0 errors, 30 warnings in `modules/nf-core/**`) and `nf-core modules lint --all` (1852 / 32 / 1).
+- CORRECTION to 2.5 ("everything else matches"): `EGGNOGMAPPER` does not decompress gz input (`fasta.extension == '.gz'` is never true, `modules/nf-core/eggnogmapper/main.nf:31`); addendum §3 corrected.
+- Fixes: N23 recorded; CHANGELOG lines (short-mode `--meta`, medaka auto model); `abund` removed from read sketches; `MINIMAP2_ALIGN.*` selectors; Stage 4 carry-overs in `STAGES.md`; checklist hashes. Signature table is in `docs/migration/reports/stage-2.md`.
+- Previous entry commit: 09cc038

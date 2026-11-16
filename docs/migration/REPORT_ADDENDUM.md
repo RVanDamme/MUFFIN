@@ -55,7 +55,7 @@ Read from `modules/nf-core/<tool>/main.nf`. Re-read them after installing; this 
 | `SOURMASH_SKETCH` (4.9.4) | `[meta, library]`, `merge_sigs` | `signatures` | extra `val` input |
 | `SOURMASH_GATHER` (4.9.4) | `[meta, signature]`, `database`, `save_unassigned`, `save_matches_sig`, `save_prefetch`, `save_prefetch_csv` | `result` (`.csv.gz`) | six inputs |
 | `SOURMASH_TAXANNOTATE` (4.9.4) | `[meta, gather_csv]`, `taxonomy` | `result` (`.with-lineages.csv.gz`) | only **appends lineages to gather rows**; it does not produce one classification per bin (decision N3) |
-| `EGGNOGMAPPER` (2.1.13) | `[meta, fasta]`, **`[search_mode, db]`**, `eggnog_data_dir` | `annotations`, `orthologs`, `hits` | `-m diamond` comes from the `search_mode` input, not `ext.args`; `--dbmem` is automatic above 40 GB; gz input handled |
+| `EGGNOGMAPPER` (2.1.13) | `[meta, fasta]`, **`[search_mode, db]`**, `eggnog_data_dir` | `annotations`, `orthologs`, `hits` | `-m diamond` comes from the `search_mode` input, not `ext.args`; `--dbmem` is automatic above 40 GB. **Correction 2026-11-16 (Stage 2 review):** gz input is NOT handled: the module tests `fasta.extension == '.gz'` (`modules/nf-core/eggnogmapper/main.nf:31`), which is never true, so run `GUNZIP` before `EGGNOGMAPPER` |
 | `TRINITY` (2.15.2) | `[meta, reads]` | `transcript_fasta` (`.fa.gz`) | labels `process_high` + `process_high_memory` |
 | `SALMON_QUANT` (2.11.0) | `[meta, reads]`, `[meta2, index, gtf, transcript_fasta]` | `results` (dir) | no lib-type input → `-l A` goes in `ext.args`. Script always emits `--geneMap ${gtf}`; with `gtf = []` that leaves a bare `--geneMap` *(verify — likely needs a patch or a gene map)*. Uses `meta.single_end`. |
 
