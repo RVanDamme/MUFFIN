@@ -7,3 +7,8 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2; n
 - `nf-core modules lint multiqc` → 64 passed / 1 warning / 1 failed: `main_nf_version_topic` still fails. This is by design upstream (comment in `modules/nf-core/multiqc/main.nf`: MultiQC must not push to the `versions` topic because its input depends on it). CORRECTION to the Stage 1 note: the update does not remove this failure; it is a known, accepted exception.
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  1 file had 1 warning  ? 28 files had no errors 
 - Previous entry commit: ff0184a
+
+## 2.2 (2026-11-16)
+- `nf-core modules install` for chopper, fastp, spades, flye, minimap2/align, racon, medaka, pilon, gunzip → each "Installing '<module>'"; all present under `modules/nf-core/` and in `modules.json`.
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  10 files had 10 warnings  ? 42 files had no errors 
+- Previous entry commit: b27f659
