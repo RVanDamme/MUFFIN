@@ -63,3 +63,11 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2, J
 - `CHANGELOG.md` rewritten for v2.0.0dev: breaking samplesheet interface (D2), renamed/removed parameters (report §5.3), taxonomy methods, minimum Nextflow. Behaviour fixes of later stages get their lines when implemented.
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  1 file had 1 warning  ? 27 files had no errors 
 - Previous entry commit: 276e96c
+
+## 1.8a — acceptance checks (2026-11-16)
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → 0 errors; 1 warning (`modules/nf-core/multiqc/main.nf:20` `when:` deprecated, not ours); "27 files had no errors".
+- `nextflow lint legacy` → "43 files had 150 errors", "15 files had 29 warnings" (unchanged legacy count).
+- `nf-core pipelines lint` → 198 passed / 29 ignored / 27 warnings / 0 failed. First run had 1 failure (`template_strings` in `.agents/skills/nf-pipeline-design/scripts/nflint/rules.py`, an installed skill file); that file is now listed under `lint.template_strings` in `.nf-core.yml`. Warnings: template TODOs, README badges (v1 `README.md` kept until Stage 7), `manifest.diagram`, unused template includes `paramsHelp`/`paramsSummaryMap`, no `meta.yml` for the local utils subworkflow, newer versions available for multiqc and utils subworkflows.
+- `nf-core modules lint --all` → 63 passed / 2 warnings / 1 failed: `multiqc` as pinned by the 4.2.2 template "does not emit software versions as topic". Not a Stage 1 criterion; fix in Stage 2 with `nf-core modules update multiqc`.
+- Acceptance run `nextflow run . -profile test,<engine> -stub --outdir results_stub`: NOT RUN (no container engine). Substitute without engine: see 1.6.
+- `nf-core pipelines lint` refreshed `ro-crate-metadata.json`.

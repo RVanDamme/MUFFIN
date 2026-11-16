@@ -18,6 +18,8 @@ lint:
   nextflow_config:
     - manifest.name
     - manifest.homePage
+  template_strings:
+    - .agents/skills/nf-pipeline-design/scripts/nflint/rules.py
   multiqc_config:
     - report_comment
   files_exist:

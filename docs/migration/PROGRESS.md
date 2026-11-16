@@ -37,7 +37,7 @@ _Format: `- [ ] 1.1 <task> — <commit hash when done>`._
 - [x] 1.5 Parameters (report §5.3 + addendum §4a) and `nextflow_schema.json`
 - [x] 1.6 `conf/test.config` + `assets/samplesheet_test.csv` (nf-core/test-datasets `mag` minigut, ~20 MB)
 - [x] 1.7 `CHANGELOG.md` at `v2.0.0dev`
-- [ ] 1.8 Acceptance checks, stage-reviewer pass, stage report, tag `stage-1-done`
+- [ ] 1.8 (checks run; review pending) Acceptance checks, stage-reviewer pass, stage report, tag `stage-1-done`
 
 ## Decisions
 
