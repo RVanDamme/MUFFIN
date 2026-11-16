@@ -6,8 +6,8 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 
 - **Stage:** 1 — Scaffold: DONE (static) — runs pending
 - **Current task:** none (Stage 1 static work complete)
-- **Next action:** user runs `nextflow run . -profile test,<engine> -stub --outdir results_stub` on a machine with Docker/Apptainer and confirms N1; then tag `stage-1-done` and start Stage 2 (first task: `nf-core modules update multiqc`).
-- **In flight / half-decided:** N1 applied as `!>=26.04.0` but the user's reply said "N11"; confirm.
+- **Next action:** user re-runs the stub with a real engine name (`-profile test,docker` or `test,apptainer`) and pastes the output; Stage 2 can start meanwhile (first task: `nf-core modules update multiqc`).
+- **In flight / half-decided:** tag `stage-1-done` was pushed by the user, but the container stub run did not execute (`<engine>` was typed literally → `bash: engine: No such file or directory`). The run is still owed; the tag stays.
 - **Last checkpoint:** task 1.7 (2026-11-16)
 
 ## Stage status
@@ -16,7 +16,7 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 |---|---|---|---|---|
 | Project setup | DONE 2026-11-16 | — | — | No pipeline code changed |
 | 0 Baseline | not started | | | optional, see N9 |
-| 1 Scaffold | DONE (static) — runs pending | (after stub run) | `log/stage-1.md` | cloud session: no container engine, no nf-test |
+| 1 Scaffold | DONE (static) — runs pending | `stage-1-done` | `log/stage-1.md` | cloud session: no container engine, no nf-test |
 | 2 nf-core modules + ext.args | not started | | | |
 | 3 Local modules | not started | | | PANKEGG tax-genome test waits on N12 |
 | 4 Subworkflows + workflow | not started | | | needs N4, N7, N11 |
@@ -59,7 +59,7 @@ Addendum decisions (options in `REPORT_ADDENDUM.md` §6):
 
 | # | Question | Answer | Date |
 |---|---|---|---|
-| N1 | Minimum Nextflow version | **`!>=26.04.0`** (recommended default applied; the user's reply named "N11" where N1 was asked — confirm) | 2026-11-16 |
+| N1 | Minimum Nextflow version | **`!>=26.04.0`** (confirmed by the user) | 2026-11-16 |
 | N2 | Licence GPL-3.0 vs MIT | **Keep GPL-3.0** (`license` template feature skipped) | 2026-11-16 |
 | N3 | Bin taxonomy method | **`--bin_taxonomy`: `sourmash` (gather + tax genome, default), `sourmash_lca` (legacy option), `gtdbtk` (higher accuracy, heavy resources, documented). `PANKEGG_MAKEDB` supports all three** (addendum §4a) | 2026-11-16 |
 | N4 | All BAMs to COMEBin/SemiBin, drop merge | OPEN (recommended yes) | |
@@ -76,7 +76,7 @@ Addendum decisions (options in `REPORT_ADDENDUM.md` §6):
 | N15 | Test data | **nf-core/test-datasets `mag` minigut (2 short pairs + 1 ONT file, ~20 MB); no RNA test data yet** | 2026-11-16 |
 | N16 | Human-readable status | **`README_v2.md` at the repo root, updated at every stage; replaces `README.md` in Stage 7** | 2026-11-16 |
 | N17 | Legacy layout | **Files not needed any more move to `legacy/<same dirname>/`; files still needed stay where they are** | 2026-11-16 |
-| N18 | Skills | **`npx skills add seqeralabs/nextflow-plugin` run; skills committed under `.agents/skills/` (symlinked from `.claude/skills/`)** | 2026-11-16 |
+| N18 | Skills | **`npx skills add seqeralabs/nextflow-plugin` run; skills committed under `.agents/skills/` (symlinked from `.claude/skills/`); keep them for the duration of the upgrade and remove `.agents/`, `.claude/skills/`, `skills-lock.json` before merging to the main branch** | 2026-11-16 |
 | — | Push policy | **Push to `origin Upgrade` after every checkpoint commit; never force-push** | 2026-11-16 |
 
 ## Verification still owed
@@ -94,3 +94,4 @@ One line per session: date — what was done — last commit.
 - 2026-11-16 — Project configured; report re-checked on Nextflow 26.10.6 / nf-core tools 4.2.2; corrections in `REPORT_ADDENDUM.md`. PANKEGG switched to the standalone tool; traceability protocol and reviewer added. Bin taxonomy set to three methods (N3).
 - 2026-11-16 — Stage 1 started (cloud session, no container engine). Decisions N1, N2, N10, N11, N13–N18 recorded.
 - 2026-11-16 — Stage 1 static work complete (be238b2..HEAD); reviewer pass done; container stub run and tag pending.
+- 2026-11-16 — User confirmed N1 and the skills decision; pushed tag `stage-1-done`; container stub run still owed (command was run with a literal `<engine>`).

@@ -87,7 +87,7 @@ Pipeline-level nf-test per mode (`tests/*.nf.test`) with snapshots of stable out
 
 ## Stage 7 — Docs and release preparation
 
-`README_v2.md` finalised and moved over `README.md` (old one to `legacy/README.md`), `docs/usage.md` (with the old → new parameter table of report §5.3), `docs/output.md`, `CITATIONS.md`, `CHANGELOG.md` for v2.0.0. ⚠️ Ask before deleting `legacy/`.
+`README_v2.md` finalised and moved over `README.md` (old one to `legacy/README.md`), `docs/usage.md` (with the old → new parameter table of report §5.3), `docs/output.md`, `CITATIONS.md`, `CHANGELOG.md` for v2.0.0. ⚠️ Ask before deleting `legacy/`. Before merging to the main branch, remove the installed skills (`.agents/`, `.claude/skills/`, `skills-lock.json`) and their entries in `.prettierignore` and `.nf-core.yml` (`lint.template_strings`).
 
 **Accept**: `nf-core pipelines lint` → 0 failures.
 
