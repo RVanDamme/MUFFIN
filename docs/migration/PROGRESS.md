@@ -5,10 +5,10 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 ## Now
 
 - **Stage:** 1 — Scaffold (in progress, started 2026-11-16)
-- **Current task:** 1.1
-- **Next action:** `git mv` legacy code into `legacy/` (same directory names), then generate the template (1.2).
+- **Current task:** next after 1.1
+- **Next action:** generate the template in a scratch dir and copy it in (1.2)
 - **In flight / half-decided:** nothing
-- **Last checkpoint:** project setup pushed to `origin/Upgrade` (2026-11-16)
+- **Last checkpoint:** task 1.1 (2026-11-16)
 
 ## Stage status
 
@@ -30,7 +30,7 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 _Format: `- [ ] 1.1 <task> — <commit hash when done>`._
 
 - [x] 1.0 Record decisions and checklist; install `seqeralabs/nextflow-plugin` skills (`npx skills add`)
-- [ ] 1.1 `git mv` legacy code into `legacy/`, keeping the same directory names; files still needed stay in place
+- [x] 1.1 `git mv` legacy code into `legacy/`, keeping the same directory names; files still needed stay in place
 - [ ] 1.2 Generate template (scratch dir, `2.0.0dev`), copy into repo, resolve collisions, push `TEMPLATE` branch, create `README_v2.md`
 - [ ] 1.3 Remove template leftovers; `manifest.nextflowVersion`; exclude `legacy/` from lint/prettier
 - [ ] 1.4 Samplesheet schemas (`schema_input`, `schema_coverage`, `schema_bins`) and `meta` derivation in `PIPELINE_INITIALISATION`

@@ -7,3 +7,10 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2, J
 - `npx --yes skills add seqeralabs/nextflow-plugin --yes` → "Done!", 28 skills under `.agents/skills/`, symlinks in `.claude/skills/`, `skills-lock.json`.
 - Not verified: skills are only loaded by a new session; this session worked from `CLAUDE.md`.
 - Previous entry commit: 154ede9
+
+## 1.1 (2026-11-16)
+- `git mv main.nf nextflow.config modules readflows configs obsolete_process MUFFIN_params.yml bin legacy/` (directory names preserved).
+- Kept in place: `.figure/`, `LICENSE`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `README.md`, `CLAUDE.md`, `.claude/`, `.agents/`, `docs/migration/`.
+- `.agents/` (installed skills, contain example .nf files with 1 lint error) and `legacy/` are excluded from lint; not our code.
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Linting Nextflow code.. Nextflow linting complete!  No files found to process 
+- Previous entry commit: be238b2
