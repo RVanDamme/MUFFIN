@@ -47,3 +47,14 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2, J
 - GTDB-Tk figures in the help text are orders of magnitude, not yet checked against the pinned release (Stage 2 item).
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  1 file had 1 warning  ? 27 files had no errors 
 - Previous entry commit: 9a9adce
+
+## 1.6 (2026-11-16)
+- `assets/samplesheet_test.csv`: minigut_hybrid (short pair 3.3+3.4 MB + ONT 10.3 MB), minigut_short (1.6+1.8 MB), minigut_long (same ONT file); `conf/test.config` and `conf/test_full.config` (placeholder, TODO Stage 6) point at it.
+- Executed WITHOUT a container engine (stub only, not the acceptance command): `nextflow run . -profile test -stub-run --outdir results_stub` → `[PROCESS] RVANDAMME_MUFFIN:MUFFIN:MULTIQC (muffin)`, `[SUCCESS] completed=1 failed=0 cached=0`.
+- Channel check (temporary `.view`, reverted): rows came out as `[[id:minigut_hybrid, mode:hybrid, has_rna:false, single_end:false], [R1, R2], ont, []]`, `[[id:minigut_short, mode:short, …], [R1, R2], [], []]`, `[[id:minigut_long, mode:long, …], [], ont, []]`.
+- Negative checks: samplesheet with R1 only and with no reads → "Validation of file failed … Object does not have some of the required properties [short_reads_2]" / "Value does not match against any of the schemas"; no `--input`/`--input_bins` → "Please provide a samplesheet with --input (reads) or --input_bins (existing bins)."
+- Fixes found by these runs: `bin_min_score` schema type integer/default 50 (was shown as non-default); samplesheet `errorMessage` as plain strings.
+- Observed, not fixed: with `-stub-run` on Nextflow 26.10.6 the template check warns "positional argument `true` has been detected" (no warning with `-preview`); comes from `subworkflows/nf-core/utils_nfcore_pipeline`, harmless.
+- Not verified: RNA columns and `--coverage_input`/`--input_bins` parsing with real files (no test data yet).
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  1 file had 1 warning  ? 27 files had no errors 
+- Previous entry commit: 11ea817

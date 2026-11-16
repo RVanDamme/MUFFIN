@@ -60,10 +60,7 @@
                 ]
             }
         ],
-        "errorMessage": {
-            "anyOf": "Each coverage sample needs a short-read pair, long reads, or both",
-            "dependentRequired": "Read pairs must be complete: give both _1 and _2 files"
-        }
+        "errorMessage": "Each coverage sample needs a complete short-read pair (short_reads_1 and short_reads_2), long reads (long_reads), or both"
     },
     "uniqueEntries": [
         "sample"

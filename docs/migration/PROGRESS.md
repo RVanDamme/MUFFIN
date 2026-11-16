@@ -5,10 +5,10 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 ## Now
 
 - **Stage:** 1 — Scaffold (in progress, started 2026-11-16)
-- **Current task:** next after 1.5
-- **Next action:** conf/test.config and test samplesheet (1.6)
+- **Current task:** next after 1.6
+- **Next action:** CHANGELOG at v2.0.0dev (1.7)
 - **In flight / half-decided:** nothing
-- **Last checkpoint:** task 1.5 (2026-11-16)
+- **Last checkpoint:** task 1.6 (2026-11-16)
 
 ## Stage status
 
@@ -35,7 +35,7 @@ _Format: `- [ ] 1.1 <task> — <commit hash when done>`._
 - [x] 1.3 Remove template leftovers; `manifest.nextflowVersion`; exclude `legacy/` from lint/prettier
 - [x] 1.4 Samplesheet schemas (`schema_input`, `schema_coverage`, `schema_bins`) and `meta` derivation in `PIPELINE_INITIALISATION`
 - [x] 1.5 Parameters (report §5.3 + addendum §4a) and `nextflow_schema.json`
-- [ ] 1.6 `conf/test.config` + `assets/samplesheet_test.csv` (nf-core/test-datasets `mag` minigut, ~20 MB)
+- [x] 1.6 `conf/test.config` + `assets/samplesheet_test.csv` (nf-core/test-datasets `mag` minigut, ~20 MB)
 - [ ] 1.7 `CHANGELOG.md` at `v2.0.0dev`
 - [ ] 1.8 Acceptance checks, stage-reviewer pass, stage report, tag `stage-1-done`
 

@@ -10,7 +10,9 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["outdir"],
+            "required": [
+                "outdir"
+            ],
             "properties": {
                 "input": {
                     "type": "string",
@@ -119,7 +121,10 @@
                 "hybrid_assembler": {
                     "type": "string",
                     "default": "metaspades",
-                    "enum": ["metaspades", "metaflye"],
+                    "enum": [
+                        "metaspades",
+                        "metaflye"
+                    ],
                     "description": "Assembler for hybrid samples.",
                     "help_text": "`metaspades`: hybrid metaSPAdes on short and long reads. `metaflye`: metaFlye on long reads, polished with racon and medaka, then bins polished with short reads (Pilon)."
                 },
@@ -155,13 +160,21 @@
                 "binner": {
                     "type": "string",
                     "default": "metabat2",
-                    "enum": ["metabat2", "semibin2", "comebin"],
+                    "enum": [
+                        "metabat2",
+                        "semibin2",
+                        "comebin"
+                    ],
                     "description": "Binning tool (one per run)."
                 },
                 "semibin_mode": {
                     "type": "string",
                     "default": "pretrained",
-                    "enum": ["pretrained", "self", "semi"],
+                    "enum": [
+                        "pretrained",
+                        "self",
+                        "semi"
+                    ],
                     "description": "SemiBin2 model: a pretrained environment model, or self-/semi-supervised training on the sample."
                 },
                 "semibin_environment": {
@@ -185,8 +198,8 @@
                     "description": "Run CheckM2 in low-memory mode (`--lowmem`)."
                 },
                 "bin_min_score": {
-                    "type": "number",
-                    "default": 50.0,
+                    "type": "integer",
+                    "default": 50,
                     "description": "Bins are kept when `Completeness - 5 x Contamination` is above this value."
                 },
                 "skip_bin_filter": {
@@ -205,7 +218,11 @@
                 "bin_taxonomy": {
                     "type": "string",
                     "default": "sourmash",
-                    "enum": ["sourmash", "sourmash_lca", "gtdbtk"],
+                    "enum": [
+                        "sourmash",
+                        "sourmash_lca",
+                        "gtdbtk"
+                    ],
                     "description": "Method used to classify bins.",
                     "help_text": "`sourmash` (default): `sourmash gather` + `sourmash tax genome`; minutes per bin, a few GB of RAM, database around 10 GB. Needs `--sourmash_db` and `--sourmash_lineages`.\n\n`sourmash_lca`: `sourmash lca classify`, the MUFFIN v1 method, kept for continuity with old results; the LCA database format is deprecated upstream. Needs `--sourmash_lca_db`.\n\n`gtdbtk`: GTDB-Tk `classify_wf`, the most accurate method and the community standard. **Heavy:** the reference data takes on the order of 100 GB of disk, the run needs tens of GB of RAM and typically hours per sample. Needs `--gtdbtk_db`."
                 },
@@ -332,7 +349,14 @@
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ],
                     "hidden": true
                 },
                 "max_multiqc_email_size": {
@@ -388,7 +412,10 @@
                     "hidden": true
                 },
                 "help": {
-                    "type": ["boolean", "string"],
+                    "type": [
+                        "boolean",
+                        "string"
+                    ],
                     "description": "Display the help message."
                 },
                 "help_full": {
