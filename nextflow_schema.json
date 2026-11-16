@@ -172,10 +172,10 @@
                     "default": "pretrained",
                     "enum": [
                         "pretrained",
-                        "self",
-                        "semi"
+                        "self"
                     ],
-                    "description": "SemiBin2 model: a pretrained environment model, or self-/semi-supervised training on the sample."
+                    "description": "SemiBin2 model: a pretrained environment model (`pretrained`) or self-supervised training on the sample (`self`).",
+                    "help_text": "The semi-supervised mode of MUFFIN v1 (`--bining_model semi`) is deprecated in SemiBin2 and is not offered."
                 },
                 "semibin_environment": {
                     "type": "string",

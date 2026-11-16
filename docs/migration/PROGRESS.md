@@ -5,10 +5,10 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 ## Now
 
 - **Stage:** 2 — nf-core modules + ext.args (in progress, started 2026-11-16)
-- **Current task:** 2.8 (waiting on the ⚠️ answers of 2.7)
-- **Next action:** get the user's answers on N20 (SemiBin `semi` mode) and N21 (`SALMON_QUANT` gene map); then stage-reviewer, stage report, README_v2, tag `stage-2-done`. Container confirmations of 2.7 can be run by the user on Kebnekaise.
-- **In flight / half-decided:** N20, N21 open; `conf/modules.config` currently maps `semibin_mode=semi` to `--semi-supervised`.
-- **Last checkpoint:** task 2.6 (2026-11-16)
+- **Current task:** next after 2.7
+- **Next action:** stage-reviewer, report, README_v2, tag (2.8)
+- **In flight / half-decided:** nothing.
+- **Last checkpoint:** task 2.7 (2026-11-16)
 
 ## Stage status
 
@@ -92,8 +92,8 @@ Addendum decisions (options in `REPORT_ADDENDUM.md` §6):
 | N17 | Legacy layout | **Files not needed any more move to `legacy/<same dirname>/`; files still needed stay where they are** | 2026-11-16 |
 | N18 | Skills | **`npx skills add seqeralabs/nextflow-plugin` run; skills committed under `.agents/skills/` (symlinked from `.claude/skills/`); keep them for the duration of the upgrade and remove `.agents/`, `.claude/skills/`, `skills-lock.json` before merging to the main branch** | 2026-11-16 |
 | N19 | Run environment | **HPC2N Kebnekaise with Apptainer (Slurm); `-profile hpc2n`, account from `SBATCH_ACCOUNT`** | 2026-11-16 |
-| N20 | SemiBin2 2.4.1 has no `--training-mode`; `--semi-supervised` is deprecated | OPEN (recommended: drop `semi`, keep `pretrained` and `self`) | |
-| N21 | `SALMON_QUANT` always emits `--geneMap` | OPEN (recommended: `nf-core modules patch salmon/quant` making `--geneMap` conditional) | |
+| N20 | SemiBin2 modes | **Follow the current SemiBin2: `--semibin_mode pretrained|self`; deprecated `semi` dropped** | 2026-11-16 |
+| N21 | `SALMON_QUANT` gene map | **Build a transcript-to-gene map from the Trinity transcript IDs as an extra step in `TRANSCRIPTOMICS` (Stage 4) and pass it as the `gtf` input; no module patch** | 2026-11-16 |
 | N22 | `cat/cat` deprecated upstream (refuses to run) | **replaced by `find/concatenate`** | 2026-11-16 |
 | — | Push policy | **Push to `origin Upgrade` after every checkpoint commit; never force-push** | 2026-11-16 |
 

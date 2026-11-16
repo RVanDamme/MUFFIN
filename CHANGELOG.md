@@ -18,7 +18,7 @@ MUFFIN v2 is a rebuild of the pipeline on the [nf-core](https://nf-co.re/) templ
 ### `Changed`
 
 - **Breaking:** reads are given with a samplesheet (`--input`: `sample,short_reads_1,short_reads_2,long_reads,rna_reads_1,rna_reads_2`) instead of `--illumina`, `--ont`, `--rna` and `--mode`. The mode (short, long, hybrid) is derived per sample, so one run can mix modes.
-- **Breaking:** parameters renamed: `--extra_ill`/`--extra_ont` → `--coverage_input`; `--bin_classify`/`--bin_annotate` → `--input_bins`; `--modular` → `--skip_assembly`, `--skip_classification`, `--skip_annotation`; `--assembler` → `--hybrid_assembler`; `--bintool` → `--binner`; `--bining_model`/`--environment` → `--semibin_mode`/`--semibin_environment`; `--skip_ill_qc`/`--skip_ont_qc` → `--skip_shortread_qc`/`--skip_longread_qc`; `--short_qc`/`--ont_min_qc` → `--longread_min_length`/`--longread_min_quality`; `--model` → `--medaka_model`; `--polish_iteration` → `--pilon_rounds`; `--checkm2db`/`--checkm2_low` → `--checkm2_db`/`--checkm2_lowmem`; `--sourmash_db_lineage` → `--sourmash_lineages` (`--sourmash_db_full` dropped, `--sourmash_db` is the GTDB zip); `--eggnog_db` → `--eggnog_data_dir`; `--skip_bin_sorting` → `--skip_bin_filter`; `--skip_bad_reads_recovery` → `--skip_unbinned_read_classification`; `--quast` → `--run_quast`; `--output` → `--outdir`.
+- **Breaking:** parameters renamed: `--extra_ill`/`--extra_ont` → `--coverage_input`; `--bin_classify`/`--bin_annotate` → `--input_bins`; `--modular` → `--skip_assembly`, `--skip_classification`, `--skip_annotation`; `--assembler` → `--hybrid_assembler`; `--bintool` → `--binner`; `--bining_model`/`--environment` → `--semibin_mode`/`--semibin_environment` (`pretrained` or `self`; the semi-supervised mode is deprecated in SemiBin2 and was dropped); `--skip_ill_qc`/`--skip_ont_qc` → `--skip_shortread_qc`/`--skip_longread_qc`; `--short_qc`/`--ont_min_qc` → `--longread_min_length`/`--longread_min_quality`; `--model` → `--medaka_model`; `--polish_iteration` → `--pilon_rounds`; `--checkm2db`/`--checkm2_low` → `--checkm2_db`/`--checkm2_lowmem`; `--sourmash_db_lineage` → `--sourmash_lineages` (`--sourmash_db_full` dropped, `--sourmash_db` is the GTDB zip); `--eggnog_db` → `--eggnog_data_dir`; `--skip_bin_sorting` → `--skip_bin_filter`; `--skip_bad_reads_recovery` → `--skip_unbinned_read_classification`; `--quast` → `--run_quast`; `--output` → `--outdir`.
 - Databases are user-supplied paths; downloads are opt-in (`--download_checkm2_db`, `--download_sourmash_db`, `--download_eggnog_db`).
 - Minimum Nextflow version is 26.04.0.
 
@@ -27,6 +27,8 @@ MUFFIN v2 is a rebuild of the pipeline on the [nf-core](https://nf-co.re/) templ
 - `--cpus`, `--memory`, `--cachedir`, `--runinfodir`, `--reassembly`, `--reference`, `--db_path`, `--db_file`, `--checkm2db_force_update`, `--profile` and the `<executor>,<engine>` profile pairs: resources come from process labels and `resourceLimits`, engines from the standard nf-core profiles (`-profile docker`, `apptainer`, `singularity`, …). `--help` is now generated from the parameter schema.
 
 ### `Fixed`
+
+- Flye is no longer called with `--plasmids`, which Flye >= 2.9 ignores.
 
 ### `Dependencies`
 

@@ -59,3 +59,10 @@ Sources: the installed module scripts and upstream source at the pinned tag on r
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → 0 errors; 30 warnings in 30 files, all `when:` deprecations inside `modules/nf-core/**` (0 in owned code); "76 files had no errors".
 - `nf-core modules lint --all` → `[✔] 1852 Tests Passed`, `[!] 32 Test Warnings`, `[✗] 1 Test Failed` (multiqc `main_nf_version_topic`, by design upstream).
 - Previous entry commit: 9507d15
+
+## 2.7 (2026-11-16)
+- N20: `--semibin_mode` enum is now `pretrained|self` (schema + `conf/modules.config` + CHANGELOG); N21: transcript-to-gene map built in TRANSCRIPTOMICS (Stage 4), no patch of `salmon/quant`.
+- `nf-core pipelines schema lint` → schema valid, defaults match; `nextflow lint conf/modules.config` → no errors.
+- CHANGELOG: `### Fixed` line for Flye `--plasmids`.
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  30 files had 30 warnings  ? 76 files had no errors 
+- Previous entry commit: d90e799
