@@ -58,3 +58,8 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2, J
 - Not verified: RNA columns and `--coverage_input`/`--input_bins` parsing with real files (no test data yet).
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  1 file had 1 warning  ? 27 files had no errors 
 - Previous entry commit: 11ea817
+
+## 1.7 (2026-11-16)
+- `CHANGELOG.md` rewritten for v2.0.0dev: breaking samplesheet interface (D2), renamed/removed parameters (report §5.3), taxonomy methods, minimum Nextflow. Behaviour fixes of later stages get their lines when implemented.
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  1 file had 1 warning  ? 27 files had no errors 
+- Previous entry commit: 276e96c
