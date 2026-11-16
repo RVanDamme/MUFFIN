@@ -4,11 +4,11 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 
 ## Now
 
-- **Stage:** 1 — Scaffold: DONE (static) — runs pending
+- **Stage:** 1 — Scaffold: DONE (2026-11-16). Stage 2 not started
 - **Current task:** none (Stage 1 static work complete)
-- **Next action:** user re-runs the stub with a real engine name (`-profile test,docker` or `test,apptainer`) and pastes the output; Stage 2 can start meanwhile (first task: `nf-core modules update multiqc`).
-- **In flight / half-decided:** tag `stage-1-done` was pushed by the user, but the container stub run did not execute (`<engine>` was typed literally → `bash: engine: No such file or directory`). The run is still owed; the tag stays.
-- **Last checkpoint:** task 1.7 (2026-11-16)
+- **Next action:** start Stage 2 on the user's word (first task: `nf-core modules update multiqc`).
+- **In flight / half-decided:** nothing. HPC2N memory request behaviour (`--mem` vs per-core memory) to be checked on the first real run (`docs/hpc2n.md`).
+- **Last checkpoint:** task 1.9 (2026-11-16)
 
 ## Stage status
 
@@ -16,7 +16,7 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 |---|---|---|---|---|
 | Project setup | DONE 2026-11-16 | — | — | No pipeline code changed |
 | 0 Baseline | not started | | | optional, see N9 |
-| 1 Scaffold | DONE (static) — runs pending | `stage-1-done` | `log/stage-1.md` | cloud session: no container engine, no nf-test |
+| 1 Scaffold | DONE 2026-11-16 | `stage-1-done` (a19dd17; later Stage 1 commits are docs + `hpc2n` profile) | `log/stage-1.md` | cloud session: no container engine, no nf-test |
 | 2 nf-core modules + ext.args | not started | | | |
 | 3 Local modules | not started | | | PANKEGG tax-genome test waits on N12 |
 | 4 Subworkflows + workflow | not started | | | needs N4, N7, N11 |
@@ -37,6 +37,7 @@ _Format: `- [ ] 1.1 <task> — <commit hash when done>`._
 - [x] 1.5 Parameters (report §5.3 + addendum §4a) and `nextflow_schema.json` — 11ea817
 - [x] 1.6 `conf/test.config` + `assets/samplesheet_test.csv` (nf-core/test-datasets `mag` minigut, ~20 MB) — 276e96c
 - [x] 1.7 `CHANGELOG.md` at `v2.0.0dev` — 5c81f12
+- [x] 1.9 `hpc2n` profile (`conf/hpc2n.config`, `docs/hpc2n.md`)
 - [x] 1.8 Acceptance checks, stage-reviewer pass, stage report, tag `stage-1-done` (tag withheld until the container stub run passes)
 
 ## Decisions
@@ -77,11 +78,10 @@ Addendum decisions (options in `REPORT_ADDENDUM.md` §6):
 | N16 | Human-readable status | **`README_v2.md` at the repo root, updated at every stage; replaces `README.md` in Stage 7** | 2026-11-16 |
 | N17 | Legacy layout | **Files not needed any more move to `legacy/<same dirname>/`; files still needed stay where they are** | 2026-11-16 |
 | N18 | Skills | **`npx skills add seqeralabs/nextflow-plugin` run; skills committed under `.agents/skills/` (symlinked from `.claude/skills/`); keep them for the duration of the upgrade and remove `.agents/`, `.claude/skills/`, `skills-lock.json` before merging to the main branch** | 2026-11-16 |
+| N19 | Run environment | **HPC2N Kebnekaise with Apptainer (Slurm); `-profile hpc2n`, account from `SBATCH_ACCOUNT`** | 2026-11-16 |
 | — | Push policy | **Push to `origin Upgrade` after every checkpoint commit; never force-push** | 2026-11-16 |
 
 ## Verification still owed
-
-**Stage 1:** `nextflow run . -profile test,<engine> -stub --outdir results_stub` with a container engine (acceptance line 3; only an engine-less stub was run). Paste the last lines into `docs/migration/log/stage-1.md`, then `git tag stage-1-done && git push origin stage-1-done`.
 
 **Carried to Stage 2:** `nf-core modules lint --all` fails for `multiqc` ("does not emit software versions as topic") → `nf-core modules update multiqc`; `tests/nextflow.config` still points at the template's `test-datasets/muffin/` path; decide `bin_min_score` integer vs number; handle `--input` together with `--input_bins` (Stage 4).
 
@@ -95,3 +95,4 @@ One line per session: date — what was done — last commit.
 - 2026-11-16 — Stage 1 started (cloud session, no container engine). Decisions N1, N2, N10, N11, N13–N18 recorded.
 - 2026-11-16 — Stage 1 static work complete (be238b2..HEAD); reviewer pass done; container stub run and tag pending.
 - 2026-11-16 — User confirmed N1 and the skills decision; pushed tag `stage-1-done`; container stub run still owed (command was run with a literal `<engine>`).
+- 2026-11-16 — Container stub run passed on Kebnekaise (user); Stage 1 DONE. `hpc2n` profile and `docs/hpc2n.md` added.

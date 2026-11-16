@@ -79,3 +79,15 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2, J
 - `nf-core pipelines lint` summary lines: `[✔] 198 Tests Passed`, `[?] 29 Tests Ignored`, `[!] 27 Test Warnings`, `[✗] 0 Tests Failed`.
 - `nf-core modules lint --all` summary lines: `[✔] 63 Tests Passed`, `[!] 2 Test Warnings`, `[✗] 1 Test Failed` (multiqc `main_nf_version_topic`).
 - Previous entry commit: aa9b830
+
+## 1.8c — container stub run (user, HPC2N Kebnekaise, 2026-11-16)
+- `nextflow run . -profile test,apptainer -stub --outdir results_stub` on Nextflow 26.04.6 (the minimum supported version), `containerEngine: apptainer`:
+  `[6f/14d263] process > RVANDAMME_MUFFIN:MUFFIN:MULTIQC (muffin) [100%] 1 of 1 ✔`, `Pulling Apptainer image https://community-cr-prod.seqera.io/…`, `-[RVanDamme/muffin] Pipeline completed successfully-`.
+- Same harmless "positional argument `true`" warning as in 1.6, so it is not specific to 26.10.
+- Warning "Apptainer cache directory has not been defined" → set `NXF_APPTAINER_CACHEDIR` (documented in `docs/hpc2n.md`).
+- Acceptance line 3 is met. Tag `stage-1-done` already exists on a19dd17 (pushed earlier by the user); left as is.
+
+## 1.9 — hpc2n profile (2026-11-16)
+- `conf/hpc2n.config` + profile `hpc2n` in `nextflow.config`: Slurm executor, Apptainer, `resourceLimits` 28 cpus / 180 GB / 168 h; account via `SBATCH_ACCOUNT`. `docs/hpc2n.md`: setup and `sbatch` head-job script.
+- `nextflow config -profile hpc2n .` → resolves (`executor.name = 'slurm'`, `apptainer.enabled = true`). Source-checked, not executed on Slurm: memory requests (`--mem`) on Kebnekaise, which ties memory to cores.
+- Previous entry commit: 3073f90

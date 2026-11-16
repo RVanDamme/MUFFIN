@@ -8,7 +8,7 @@ MUFFIN is a metagenomics workflow: hybrid assembly, differential-coverage binnin
 
 | Stage | What | Status |
 |---|---|---|
-| 1 | Pipeline skeleton, parameters, samplesheets, test profile | done (static checks); container stub run still to do |
+| 1 | Pipeline skeleton, parameters, samplesheets, test profile | done |
 | 2 | nf-core modules installed and configured | not started |
 | 3 | MUFFIN-specific modules (metaQUAST, sourmash tax, PANKEGG DB) | not started |
 | 4 | Subworkflows and main workflow | not started |
@@ -17,7 +17,7 @@ MUFFIN is a metagenomics workflow: hybrid assembly, differential-coverage binnin
 | 7 | Documentation, this file becomes `README.md` | not started |
 | 8 | Comparison with v1 results | not started |
 
-**What works today:** nothing analytical yet. The skeleton validates parameters and samplesheets and has only been exercised as a stub run without containers (MultiQC stubbed); no assembly, binning or annotation step is wired.
+**What works today:** nothing analytical yet. The skeleton validates parameters and samplesheets and has been exercised as a stub run with Apptainer on HPC2N Kebnekaise (MultiQC stubbed); no assembly, binning or annotation step is wired.
 
 Details for developers: `docs/migration/PROGRESS.md` (current task, decisions), `docs/migration/log/` (what was run), `CHANGELOG.md` (what changes for users).
 
@@ -29,6 +29,8 @@ nextflow run RVanDamme/MUFFIN -r Upgrade -profile <docker|apptainer|singularity>
 ```
 
 Requirements: Nextflow ≥ 26.04 and Docker, Apptainer or Singularity.
+
+On HPC2N Kebnekaise use `-profile hpc2n` (Slurm + Apptainer); setup and the `sbatch` launcher are in `docs/hpc2n.md`.
 
 ### Samplesheet (`--input`)
 
@@ -85,5 +87,5 @@ The pathway report database is built with the standalone [PANKEGG](https://githu
 ## Known limitations right now
 
 - No analysis steps yet (see the table above).
-- Not yet run with containers: the skeleton was built in an environment without Docker/Apptainer.
+- Only a stub run has been done with containers so far; no real analysis run.
 - The default taxonomy method cannot feed PANKEGG until PANKEGG reads `sourmash tax genome` output.

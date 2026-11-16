@@ -1,6 +1,6 @@
 ## Stage 1 report
 
-Status: DONE (static) — runs pending
+Status: DONE (container stub run by the user on HPC2N Kebnekaise, 2026-11-16; see log 1.8c)
 Environment: nextflow 26.10.6, nf-core 4.2.2, nf-test not installed, engine none (Claude Code cloud session)
 Commits: be238b2..HEAD of this report (range), tag `stage-1-done` withheld until the container stub run; log: docs/migration/log/stage-1.md
 Files changed: legacy/** (58 renames); template files (`main.nf`, `nextflow.config`, `nextflow_schema.json`, `workflows/`, `subworkflows/`, `modules/nf-core/multiqc`, `conf/`, `assets/`, `docs/*.md`, `tests/`, `.github/`, `.nf-core.yml`, `modules.json`, linter configs); `assets/schema_{input,coverage,bins}.json`, `assets/samplesheet{,_test}.csv`; `README_v2.md`, `CHANGELOG.md`; `.agents/`, `.claude/skills/`, `skills-lock.json`; `CLAUDE.md`, `docs/migration/*`.
