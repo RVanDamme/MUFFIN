@@ -9,7 +9,7 @@ MUFFIN is a metagenomics workflow: hybrid assembly, differential-coverage binnin
 | Stage | What | Status |
 |---|---|---|
 | 1 | Pipeline skeleton, parameters, samplesheets, test profile | done |
-| 2 | nf-core modules installed and configured | not started |
+| 2 | nf-core modules installed and configured | done (static checks); tool options still to confirm in containers |
 | 3 | MUFFIN-specific modules (metaQUAST, sourmash tax, PANKEGG DB) | not started |
 | 4 | Subworkflows and main workflow | not started |
 | 5 | Output layout | not started |
@@ -17,7 +17,7 @@ MUFFIN is a metagenomics workflow: hybrid assembly, differential-coverage binnin
 | 7 | Documentation, this file becomes `README.md` | not started |
 | 8 | Comparison with v1 results | not started |
 
-**What works today:** nothing analytical yet. The skeleton validates parameters and samplesheets and has been exercised as a stub run with Apptainer on HPC2N Kebnekaise (MultiQC stubbed); no assembly, binning or annotation step is wired.
+**What works today:** nothing analytical yet. The skeleton validates parameters and samplesheets and has been exercised as a stub run with Apptainer on HPC2N Kebnekaise (MultiQC stubbed); no assembly, binning or annotation step is wired yet. The 30 nf-core modules the pipeline will use are installed and their options are set in `conf/modules.config`, but they are not called until Stage 4.
 
 Details for developers: `docs/migration/PROGRESS.md` (current task, decisions), `docs/migration/log/` (what was run), `CHANGELOG.md` (what changes for users).
 
@@ -66,6 +66,7 @@ Two more optional samplesheets:
 | `--modular` | `--skip_assembly`, `--skip_classification`, `--skip_annotation` |
 | `--assembler` | `--hybrid_assembler` |
 | `--bintool` | `--binner` |
+| `--bining_model` | `--semibin_mode pretrained` or `self` (semi-supervised mode dropped, deprecated in SemiBin2) |
 | `--output` | `--outdir` |
 | `--cpus`, `--memory` | per-process resources, capped with `resourceLimits` in a config |
 
