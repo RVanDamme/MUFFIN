@@ -12,3 +12,8 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2; n
 - `nf-core modules install` for chopper, fastp, spades, flye, minimap2/align, racon, medaka, pilon, gunzip → each "Installing '<module>'"; all present under `modules/nf-core/` and in `modules.json`.
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  10 files had 10 warnings  ? 42 files had no errors 
 - Previous entry commit: b27f659
+
+## 2.3 (2026-11-16)
+- `nf-core modules install` for bwa/index, bwa/mem, samtools/index, samtools/fastq, metabat2/jgisummarizebamcontigdepths, metabat2/metabat2, semibin/singleeasybin, comebin/runcomebin, seqkit/stats, cat/cat → each "Installing '<module>'".
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  20 files had 20 warnings  ? 60 files had no errors 
+- Previous entry commit: 76ca604

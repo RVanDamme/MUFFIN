@@ -1,0 +1,82 @@
+nextflow_process {
+
+    name "Test Process BWA_INDEX"
+    tag "modules_nfcore"
+    tag "modules"
+    tag "bwa"
+    tag "bwa/index"
+    script "../main.nf"
+    process "BWA_INDEX"
+
+    test("BWA index") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [id: 'test'],
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta', checkIfExists: true)
+                ]
+                input[1] = []
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assertAll(
+                { assert snapshot(sanitizeOutput(process.out) + [index_dir: process.out.index.collect { file(it[1]).name }]).match() }
+            )
+        }
+
+    }
+
+    test("BWA index - index_dir_name") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [id: 'test'],
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta', checkIfExists: true)
+                ]
+                input[1] = 'sarscov2'
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assertAll(
+                { assert snapshot(sanitizeOutput(process.out) + [index_dir: process.out.index.collect { file(it[1]).name }]).match() }
+            )
+        }
+
+    }
+
+    test("BWA index - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [id: 'test'],
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta', checkIfExists: true)
+                ]
+                input[1] = []
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assertAll(
+                { assert snapshot(sanitizeOutput(process.out) + [index_dir: process.out.index.collect { file(it[1]).name }]).match() }
+            )
+        }
+
+    }
+
+}

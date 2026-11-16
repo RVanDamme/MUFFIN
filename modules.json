@@ -5,7 +5,27 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "bwa/index": {
+                        "branch": "master",
+                        "git_sha": "3b0d9821716a51645b641577551c03eddacd04fc",
+                        "installed_by": ["modules"]
+                    },
+                    "bwa/mem": {
+                        "branch": "master",
+                        "git_sha": "2ea7b517421e97210c41585f2347ad113e643a12",
+                        "installed_by": ["modules"]
+                    },
+                    "cat/cat": {
+                        "branch": "master",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
+                        "installed_by": ["modules"]
+                    },
                     "chopper": {
+                        "branch": "master",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
+                        "installed_by": ["modules"]
+                    },
+                    "comebin/runcomebin": {
                         "branch": "master",
                         "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
@@ -30,6 +50,16 @@
                         "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
+                    "metabat2/jgisummarizebamcontigdepths": {
+                        "branch": "master",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
+                        "installed_by": ["modules"]
+                    },
+                    "metabat2/metabat2": {
+                        "branch": "master",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
+                        "installed_by": ["modules"]
+                    },
                     "minimap2/align": {
                         "branch": "master",
                         "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
@@ -48,6 +78,26 @@
                     "racon": {
                         "branch": "master",
                         "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
+                        "installed_by": ["modules"]
+                    },
+                    "samtools/fastq": {
+                        "branch": "master",
+                        "git_sha": "80eb474060aa4aa6d7b4b00e0dc785174f156a28",
+                        "installed_by": ["modules"]
+                    },
+                    "samtools/index": {
+                        "branch": "master",
+                        "git_sha": "80eb474060aa4aa6d7b4b00e0dc785174f156a28",
+                        "installed_by": ["modules"]
+                    },
+                    "semibin/singleeasybin": {
+                        "branch": "master",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
+                        "installed_by": ["modules"]
+                    },
+                    "seqkit/stats": {
+                        "branch": "master",
+                        "git_sha": "b37c02fb23e80372e4857dc6695b699d62fea612",
                         "installed_by": ["modules"]
                     },
                     "spades": {
