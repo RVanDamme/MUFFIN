@@ -1,0 +1,71 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/RVanDamme/muffin/master/assets/schema_coverage.json",
+    "title": "RVanDamme/muffin pipeline - params.coverage_input schema",
+    "description": "Schema for the file provided with params.coverage_input: extra read sets mapped to every assembly for differential-coverage binning",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "sample": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Sample name must be provided and cannot contain spaces",
+                "meta": [
+                    "id"
+                ]
+            },
+            "short_reads_1": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
+                "errorMessage": "Short reads R1 file cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+            },
+            "short_reads_2": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
+                "errorMessage": "Short reads R2 file cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+            },
+            "long_reads": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
+                "errorMessage": "Long (ONT) reads file cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+            }
+        },
+        "required": [
+            "sample"
+        ],
+        "dependentRequired": {
+            "short_reads_1": [
+                "short_reads_2"
+            ],
+            "short_reads_2": [
+                "short_reads_1"
+            ]
+        },
+        "anyOf": [
+            {
+                "required": [
+                    "short_reads_1"
+                ]
+            },
+            {
+                "required": [
+                    "long_reads"
+                ]
+            }
+        ],
+        "errorMessage": {
+            "anyOf": "Each coverage sample needs a short-read pair, long reads, or both",
+            "dependentRequired": "Read pairs must be complete: give both _1 and _2 files"
+        }
+    },
+    "uniqueEntries": [
+        "sample"
+    ]
+}

@@ -64,6 +64,8 @@ workflow {
         args,
         params.outdir,
         params.input,
+        params.coverage_input,
+        params.input_bins,
         params.help,
         params.help_full,
         params.show_hidden

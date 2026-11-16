@@ -1,3 +1,4 @@
-sample,fastq_1,fastq_2
-SAMPLE_PAIRED_END,/path/to/fastq/files/AEG588A1_S1_L002_R1_001.fastq.gz,/path/to/fastq/files/AEG588A1_S1_L002_R2_001.fastq.gz
-SAMPLE_SINGLE_END,/path/to/fastq/files/AEG588A4_S4_L003_R1_001.fastq.gz,
+sample,short_reads_1,short_reads_2,long_reads,rna_reads_1,rna_reads_2
+hybrid_sample,/path/to/s1_R1.fastq.gz,/path/to/s1_R2.fastq.gz,/path/to/s1_ont.fastq.gz,/path/to/s1_rna_R1.fastq.gz,/path/to/s1_rna_R2.fastq.gz
+short_sample,/path/to/s2_R1.fastq.gz,/path/to/s2_R2.fastq.gz,,,
+long_sample,,,/path/to/s3_ont.fastq.gz,,

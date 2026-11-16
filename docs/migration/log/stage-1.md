@@ -31,3 +31,11 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2, J
 - Remaining warning: `when:` in `modules/nf-core/multiqc` (expected, not ours).
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  1 file had 1 warning  ? 27 files had no errors 
 - Previous entry commit: c7cef5c
+
+## 1.4 (2026-11-16)
+- `assets/schema_input.json`: `sample, short_reads_1, short_reads_2, long_reads, rna_reads_1, rna_reads_2`; at least one of short pair / long reads (`anyOf`); pairs complete (`dependentRequired`); unique sample names.
+- `assets/schema_coverage.json` (`sample, short_reads_1, short_reads_2, long_reads`), `assets/schema_bins.json` (`sample, bins_dir`); `assets/samplesheet.csv` example updated.
+- `PIPELINE_INITIALISATION` takes `coverage_input` and `input_bins`, derives `meta.mode` (short|long|hybrid), `meta.has_rna`, `meta.single_end=false`, emits `samplesheet`, `coverage`, `bins`; fails early if neither `--input` nor `--input_bins` is given. Template single-end/multi-run grouping removed (one row per sample).
+- Not verified yet: schema behaviour on real samplesheets (checked in 1.8 with a run without containers).
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  1 file had 1 warning  ? 27 files had no errors 
+- Previous entry commit: 539b978

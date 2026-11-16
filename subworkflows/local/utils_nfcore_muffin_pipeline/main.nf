@@ -31,6 +31,8 @@ workflow PIPELINE_INITIALISATION {
     nextflow_cli_args //   array: List of positional nextflow CLI args
     outdir            //  string: The output directory where the results will be saved
     input             //  string: Path to input samplesheet
+    coverage_input    //  string: Path to samplesheet of extra coverage read sets
+    input_bins        //  string: Path to samplesheet of existing bins
     help              // boolean: Display help message and exit
     help_full         // boolean: Show the full help message
     show_hidden       // boolean: Show hidden parameters in the help message
@@ -82,31 +84,50 @@ workflow PIPELINE_INITIALISATION {
     )
 
     //
-    // Create channel from input file provided through params.input
+    // Custom validation for pipeline parameters
+    //
+    validateInputParameters(input, input_bins)
+
+    //
+    // Create channels from the samplesheets
     //
 
-    channel
-        .fromList(samplesheetToList(input, "${projectDir}/assets/schema_input.json"))
-        .map {
-            meta, fastq_1, fastq_2 ->
-                if (!fastq_2) {
-                    return [ meta.id, meta + [ single_end:true ], [ fastq_1 ] ]
-                } else {
-                    return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
-                }
-        }
-        .groupTuple()
-        .map { samplesheet ->
-            validateInputSamplesheet(samplesheet)
-        }
-        .map {
-            meta, fastqs ->
-                return [ meta, fastqs.flatten() ]
-        }
-        .set { ch_samplesheet }
+    // --input rows: [ meta(id), short_1, short_2, long, rna_1, rna_2 ] (missing files are [])
+    // out: [ meta(id, mode, has_rna, single_end), [short_1, short_2] | [], long | [], [rna_1, rna_2] | [] ]
+    ch_samplesheet = input
+        ? channel
+            .fromList(samplesheetToList(input, "${projectDir}/assets/schema_input.json"))
+            .map { meta, short_1, short_2, long_reads, rna_1, rna_2 ->
+                def new_meta = meta + [
+                    mode      : readMode(short_1, long_reads),
+                    has_rna   : rna_1 ? true : false,
+                    single_end: false,
+                ]
+                [new_meta, short_1 ? [short_1, short_2] : [], long_reads ?: [], rna_1 ? [rna_1, rna_2] : []]
+            }
+        : channel.empty()
+
+    // --coverage_input rows: [ meta(id), short_1, short_2, long ]
+    // out: [ meta(id, mode, single_end), [short_1, short_2] | [], long | [] ]
+    ch_coverage = coverage_input
+        ? channel
+            .fromList(samplesheetToList(coverage_input, "${projectDir}/assets/schema_coverage.json"))
+            .map { meta, short_1, short_2, long_reads ->
+                def new_meta = meta + [mode: readMode(short_1, long_reads), single_end: false]
+                [new_meta, short_1 ? [short_1, short_2] : [], long_reads ?: []]
+            }
+        : channel.empty()
+
+    // --input_bins rows: [ meta(id), bins_dir ]
+    // out: [ meta(id), bins_dir ]
+    ch_bins = input_bins
+        ? channel.fromList(samplesheetToList(input_bins, "${projectDir}/assets/schema_bins.json"))
+        : channel.empty()
 
     emit:
-    samplesheet = ch_samplesheet
+    samplesheet = ch_samplesheet // channel: [ meta, short_reads, long_reads, rna_reads ]
+    coverage    = ch_coverage    // channel: [ meta, short_reads, long_reads ]
+    bins        = ch_bins        // channel: [ meta, bins_dir ]
     versions    = ch_versions
 }
 
@@ -144,19 +165,24 @@ workflow PIPELINE_COMPLETION {
 */
 
 //
-// Validate channels from input samplesheet
+// Derive the processing mode of a sample from the read types it has
 //
-def validateInputSamplesheet(input) {
-    def (metas, fastqs) = input[1..2]
-
-    // Check that multiple runs of the same sample are of the same datatype i.e. single-end / paired-end
-    def endedness_ok = metas.collect{ meta -> meta.single_end }.unique().size == 1
-    if (!endedness_ok) {
-        error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
+def readMode(short_1, long_reads) {
+    if (short_1 && long_reads) {
+        return 'hybrid'
     }
-
-    return [ metas[0], fastqs ]
+    return short_1 ? 'short' : 'long'
 }
+
+//
+// Check parameter combinations that the JSON schema cannot express
+//
+def validateInputParameters(input, input_bins) {
+    if (!input && !input_bins) {
+        error("Please provide a samplesheet with --input (reads) or --input_bins (existing bins).")
+    }
+}
+
 //
 // Generate methods description for MultiQC
 //

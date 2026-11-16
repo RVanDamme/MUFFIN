@@ -1,0 +1,34 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/RVanDamme/muffin/master/assets/schema_bins.json",
+    "title": "RVanDamme/muffin pipeline - params.input_bins schema",
+    "description": "Schema for the file provided with params.input_bins: existing bins to classify and annotate",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "sample": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Sample name must be provided and cannot contain spaces",
+                "meta": [
+                    "id"
+                ]
+            },
+            "bins_dir": {
+                "type": "string",
+                "format": "directory-path",
+                "exists": true,
+                "pattern": "^\\S+$",
+                "errorMessage": "bins_dir must be an existing directory containing bin FASTA files (.fa, .fna, optionally gzipped) and cannot contain spaces"
+            }
+        },
+        "required": [
+            "sample",
+            "bins_dir"
+        ]
+    },
+    "uniqueEntries": [
+        "sample"
+    ]
+}
