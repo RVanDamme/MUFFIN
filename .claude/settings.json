@@ -1,0 +1,32 @@
+{
+  "extraKnownMarketplaces": {
+    "nextflow-plugin": {
+      "source": { "source": "github", "repo": "seqeralabs/nextflow-plugin" }
+    }
+  },
+  "enabledPlugins": { "nextflow@nextflow-plugin": true },
+  "env": { "NXF_VER": "26.10.6", "NXF_ANSI_LOG": "false" },
+  "permissions": {
+    "allow": [
+      "Bash(nextflow lint:*)",
+      "Bash(nextflow -version)",
+      "Bash(nextflow inspect:*)",
+      "Bash(nextflow module search:*)",
+      "Bash(nextflow module view:*)",
+      "Bash(nf-core --version)",
+      "Bash(nf-core pipelines lint:*)",
+      "Bash(nf-core modules lint:*)",
+      "Bash(nf-core modules list:*)",
+      "Bash(nf-core modules info:*)",
+      "Bash(nf-core subworkflows lint:*)",
+      "Bash(nf-test version)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)"
+    ]
+  }
+}
