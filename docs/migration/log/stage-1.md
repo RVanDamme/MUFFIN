@@ -71,3 +71,11 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2, J
 - `nf-core modules lint --all` → 63 passed / 2 warnings / 1 failed: `multiqc` as pinned by the 4.2.2 template "does not emit software versions as topic". Not a Stage 1 criterion; fix in Stage 2 with `nf-core modules update multiqc`.
 - Acceptance run `nextflow run . -profile test,<engine> -stub --outdir results_stub`: NOT RUN (no container engine). Substitute without engine: see 1.6.
 - `nf-core pipelines lint` refreshed `ro-crate-metadata.json`.
+- Previous entry commit: 5c81f12
+
+## 1.8b — review and fixes (2026-11-16)
+- `stage-reviewer` subagent (independent, read-only) on 154ede9..aa9b830: 1 blocking (container stub run not executed and not recorded as owed), 6 non-blocking. It reproduced `nextflow lint` (0 errors, 1 warning in `modules/nf-core/multiqc`) and confirmed 58 pure renames into `legacy/`.
+- Fixed: owed run recorded in `PROGRESS.md` and stage marked "DONE (static) — runs pending", tag withheld; commit hashes added to the checklist; README_v2 wording ("stub run without containers"); CHANGELOG gaps (`--sourmash_db_full`, `--profile`, `--help`); disabled lint tests listed in the stage report.
+- `nf-core pipelines lint` summary lines: `[✔] 198 Tests Passed`, `[?] 29 Tests Ignored`, `[!] 27 Test Warnings`, `[✗] 0 Tests Failed`.
+- `nf-core modules lint --all` summary lines: `[✔] 63 Tests Passed`, `[!] 2 Test Warnings`, `[✗] 1 Test Failed` (multiqc `main_nf_version_topic`).
+- Previous entry commit: aa9b830

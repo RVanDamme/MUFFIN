@@ -8,7 +8,7 @@ MUFFIN is a metagenomics workflow: hybrid assembly, differential-coverage binnin
 
 | Stage | What | Status |
 |---|---|---|
-| 1 | Pipeline skeleton, parameters, samplesheets, test profile | in progress |
+| 1 | Pipeline skeleton, parameters, samplesheets, test profile | done (static checks); container stub run still to do |
 | 2 | nf-core modules installed and configured | not started |
 | 3 | MUFFIN-specific modules (metaQUAST, sourmash tax, PANKEGG DB) | not started |
 | 4 | Subworkflows and main workflow | not started |
@@ -17,7 +17,7 @@ MUFFIN is a metagenomics workflow: hybrid assembly, differential-coverage binnin
 | 7 | Documentation, this file becomes `README.md` | not started |
 | 8 | Comparison with v1 results | not started |
 
-**What works today:** nothing analytical yet. The skeleton validates parameters and samplesheets and produces a MultiQC report; no assembly, binning or annotation step is wired.
+**What works today:** nothing analytical yet. The skeleton validates parameters and samplesheets and has only been exercised as a stub run without containers (MultiQC stubbed); no assembly, binning or annotation step is wired.
 
 Details for developers: `docs/migration/PROGRESS.md` (current task, decisions), `docs/migration/log/` (what was run), `CHANGELOG.md` (what changes for users).
 

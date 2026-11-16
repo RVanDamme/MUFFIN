@@ -4,10 +4,10 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 
 ## Now
 
-- **Stage:** 1 — Scaffold (in progress, started 2026-11-16)
-- **Current task:** next after 1.7
-- **Next action:** acceptance checks: nf-core pipelines lint, review, report, tag (1.8)
-- **In flight / half-decided:** nothing
+- **Stage:** 1 — Scaffold: DONE (static) — runs pending
+- **Current task:** none (Stage 1 static work complete)
+- **Next action:** user runs `nextflow run . -profile test,<engine> -stub --outdir results_stub` on a machine with Docker/Apptainer and confirms N1; then tag `stage-1-done` and start Stage 2 (first task: `nf-core modules update multiqc`).
+- **In flight / half-decided:** N1 applied as `!>=26.04.0` but the user's reply said "N11"; confirm.
 - **Last checkpoint:** task 1.7 (2026-11-16)
 
 ## Stage status
@@ -16,7 +16,7 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 |---|---|---|---|---|
 | Project setup | DONE 2026-11-16 | — | — | No pipeline code changed |
 | 0 Baseline | not started | | | optional, see N9 |
-| 1 Scaffold | in progress | | `log/stage-1.md` | cloud session: no container engine, no nf-test |
+| 1 Scaffold | DONE (static) — runs pending | (after stub run) | `log/stage-1.md` | cloud session: no container engine, no nf-test |
 | 2 nf-core modules + ext.args | not started | | | |
 | 3 Local modules | not started | | | PANKEGG tax-genome test waits on N12 |
 | 4 Subworkflows + workflow | not started | | | needs N4, N7, N11 |
@@ -29,15 +29,15 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 
 _Format: `- [ ] 1.1 <task> — <commit hash when done>`._
 
-- [x] 1.0 Record decisions and checklist; install `seqeralabs/nextflow-plugin` skills (`npx skills add`)
-- [x] 1.1 `git mv` legacy code into `legacy/`, keeping the same directory names; files still needed stay in place
-- [x] 1.2 Generate template (scratch dir, `2.0.0dev`), copy into repo, resolve collisions, push `TEMPLATE` branch, create `README_v2.md`
-- [x] 1.3 Remove template leftovers; `manifest.nextflowVersion`; exclude `legacy/` from lint/prettier
-- [x] 1.4 Samplesheet schemas (`schema_input`, `schema_coverage`, `schema_bins`) and `meta` derivation in `PIPELINE_INITIALISATION`
-- [x] 1.5 Parameters (report §5.3 + addendum §4a) and `nextflow_schema.json`
-- [x] 1.6 `conf/test.config` + `assets/samplesheet_test.csv` (nf-core/test-datasets `mag` minigut, ~20 MB)
-- [x] 1.7 `CHANGELOG.md` at `v2.0.0dev`
-- [ ] 1.8 (checks run; review pending) Acceptance checks, stage-reviewer pass, stage report, tag `stage-1-done`
+- [x] 1.0 Record decisions and checklist; install `seqeralabs/nextflow-plugin` skills (`npx skills add`) — be238b2
+- [x] 1.1 `git mv` legacy code into `legacy/`, keeping the same directory names; files still needed stay in place — 291707c
+- [x] 1.2 Generate template (scratch dir, `2.0.0dev`), copy into repo, resolve collisions, push `TEMPLATE` branch, create `README_v2.md` — c7cef5c
+- [x] 1.3 Remove template leftovers; `manifest.nextflowVersion`; exclude `legacy/` from lint/prettier — 539b978
+- [x] 1.4 Samplesheet schemas (`schema_input`, `schema_coverage`, `schema_bins`) and `meta` derivation in `PIPELINE_INITIALISATION` — 9a9adce
+- [x] 1.5 Parameters (report §5.3 + addendum §4a) and `nextflow_schema.json` — 11ea817
+- [x] 1.6 `conf/test.config` + `assets/samplesheet_test.csv` (nf-core/test-datasets `mag` minigut, ~20 MB) — 276e96c
+- [x] 1.7 `CHANGELOG.md` at `v2.0.0dev` — 5c81f12
+- [x] 1.8 Acceptance checks, stage-reviewer pass, stage report, tag `stage-1-done` (tag withheld until the container stub run passes)
 
 ## Decisions
 
@@ -81,6 +81,10 @@ Addendum decisions (options in `REPORT_ADDENDUM.md` §6):
 
 ## Verification still owed
 
+**Stage 1:** `nextflow run . -profile test,<engine> -stub --outdir results_stub` with a container engine (acceptance line 3; only an engine-less stub was run). Paste the last lines into `docs/migration/log/stage-1.md`, then `git tag stage-1-done && git push origin stage-1-done`.
+
+**Carried to Stage 2:** `nf-core modules lint --all` fails for `multiqc` ("does not emit software versions as topic") → `nf-core modules update multiqc`; `tests/nextflow.config` still points at the template's `test-datasets/muffin/` path; decide `bin_min_score` integer vs number; handle `--input` together with `--input_bins` (Stage 4).
+
 Items marked *(verify)* in `REPORT_ADDENDUM.md`: medaka model list / auto-selection; CheckM2 extension flag and `Name` column with gzipped bins; `SALMON_QUANT` with empty `gtf`; whether container configs must be regenerated after module installs; PANKEGG availability on Bioconda/PyPI; `sourmash lca classify` in sourmash 4.9.4; `tax genome` csv_summary columns; GTDB-Tk DB size / memory for the pinned release and its handling of gzipped bins; bin-name agreement between eggNOG prefix, CheckM2 `Name` and classification files.
 
 ## Session log
@@ -89,3 +93,4 @@ One line per session: date — what was done — last commit.
 
 - 2026-11-16 — Project configured; report re-checked on Nextflow 26.10.6 / nf-core tools 4.2.2; corrections in `REPORT_ADDENDUM.md`. PANKEGG switched to the standalone tool; traceability protocol and reviewer added. Bin taxonomy set to three methods (N3).
 - 2026-11-16 — Stage 1 started (cloud session, no container engine). Decisions N1, N2, N10, N11, N13–N18 recorded.
+- 2026-11-16 — Stage 1 static work complete (be238b2..HEAD); reviewer pass done; container stub run and tag pending.
