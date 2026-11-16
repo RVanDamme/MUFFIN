@@ -84,7 +84,9 @@ workflow MUFFIN {
             ]
         }
     )
-    emit:multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
+    emit:
+    samplesheet    = ch_samplesheet              // channel: [ meta, short_reads, long_reads, rna_reads ] (placeholder until Stage 4 wires the analysis)
+    multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
 }
 

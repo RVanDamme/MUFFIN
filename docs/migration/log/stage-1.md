@@ -23,3 +23,11 @@ Environment: Claude Code cloud session; nextflow 26.10.6, nf-core/tools 4.2.2, J
 - Note: nf-core create offered an ORCID found online for the author; not used (template leaves `orcid: ''`).
 - `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  2 files had 2 warnings  ? 27 files had no errors 
 - Previous entry commit: 291707c
+
+## 1.3 (2026-11-16)
+- `manifest.nextflowVersion = '!>=26.04.0'`; CI minimum version in `.github/workflows/{nf-test,fix-linting}.yml` set to 26.04.0 to match.
+- Contributor entry filled (github, author/maintainer); removed `validation.defaultIgnoreParams = ["genomes"]` (igenomes skipped). No `params.fasta`/`getGenomeAttribute` was generated.
+- `workflows/muffin.nf` emits the samplesheet channel (removes the unused-parameter warning; placeholder until Stage 4).
+- Remaining warning: `when:` in `modules/nf-core/multiqc` (expected, not ours).
+- `nextflow lint . -exclude legacy -exclude .agents -exclude .claude` → Nextflow linting complete!  ??  1 file had 1 warning  ? 27 files had no errors 
+- Previous entry commit: c7cef5c
