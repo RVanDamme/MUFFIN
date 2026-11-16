@@ -4,9 +4,9 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 
 ## Now
 
-- **Stage:** 1 — Scaffold: DONE (2026-11-16). Stage 2 not started
-- **Current task:** none (Stage 1 static work complete)
-- **Next action:** start Stage 2 on the user's word (first task: `nf-core modules update multiqc`).
+- **Stage:** 2 — nf-core modules + ext.args (in progress, started 2026-11-16)
+- **Current task:** 2.1–2.4
+- **Next action:** `nf-core modules update multiqc`, then `nf-core modules install` for the 29 modules of tasks 2.2–2.4 (in flight: expect `modules.json` to list them all; re-run the install for any missing one).
 - **In flight / half-decided:** nothing. HPC2N memory request behaviour (`--mem` vs per-core memory) to be checked on the first real run (`docs/hpc2n.md`).
 - **Last checkpoint:** task 1.9 (2026-11-16)
 
@@ -17,7 +17,7 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 | Project setup | DONE 2026-11-16 | — | — | No pipeline code changed |
 | 0 Baseline | not started | | | optional, see N9 |
 | 1 Scaffold | DONE 2026-11-16 | `stage-1-done` (a19dd17; later Stage 1 commits are docs + `hpc2n` profile) | `log/stage-1.md` | cloud session: no container engine, no nf-test |
-| 2 nf-core modules + ext.args | not started | | | |
+| 2 nf-core modules + ext.args | in progress | | `log/stage-2.md` | cloud session: no container engine |
 | 3 Local modules | not started | | | PANKEGG tax-genome test waits on N12 |
 | 4 Subworkflows + workflow | not started | | | needs N4, N7, N11 |
 | 5 Publishing | not started | | | |
@@ -25,9 +25,22 @@ Single source of truth for where the rebuild stands. Updated at every checkpoint
 | 7 Docs | not started | | | |
 | 8 Comparison / Platform | not started | | | needs N8 |
 
-## Task checklist — current stage
+## Task checklist — current stage (Stage 2)
 
-_Format: `- [ ] 1.1 <task> — <commit hash when done>`._
+_Format: `- [ ] 2.1 <task> — <commit hash when done>`._
+
+- [ ] 2.1 `nf-core modules update multiqc` (fixes the versions-topic lint failure) and adapt the call if its inputs changed
+- [ ] 2.2 Install read QC / assembly / polishing modules: chopper, fastp, spades, flye, minimap2/align, racon, medaka, pilon, gunzip
+- [ ] 2.3 Install mapping / binning modules: bwa/index, bwa/mem, samtools/index, samtools/fastq, metabat2/jgisummarizebamcontigdepths, metabat2/metabat2, semibin/singleeasybin, comebin/runcomebin, seqkit/stats, cat/cat
+- [ ] 2.4 Install QC / taxonomy / annotation / RNA modules: checkm2/predict, checkm2/databasedownload, sourmash/sketch, sourmash/gather, gtdbtk/classifywf, eggnogmapper, trinity, salmon/index, salmon/quant, untar
+- [ ] 2.5 Real signatures of every installed module vs addendum §3 (table in the stage report)
+- [ ] 2.6 `conf/modules.config`: scoped `withName` selectors and `ext.args`
+- [ ] 2.7 ⚠️ Tool-option checks (source-checked, no containers here) — report and wait if something is missing
+- [ ] 2.8 Container configs, lints, stage-reviewer, report, README_v2, tag
+
+`samtools/merge` is not installed: N4 is taken as "yes" (recommended) for the module list; it is formally confirmed in Stage 4.
+
+### Stage 1 checklist (done)
 
 - [x] 1.0 Record decisions and checklist; install `seqeralabs/nextflow-plugin` skills (`npx skills add`) — be238b2
 - [x] 1.1 `git mv` legacy code into `legacy/`, keeping the same directory names; files still needed stay in place — 291707c
