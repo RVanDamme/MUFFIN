@@ -1,0 +1,173 @@
+{
+  "version": 2,
+  "skills": {
+    "audit-conversion-readiness": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/audit-conversion-readiness/SKILL.md",
+      "computedHash": "44aea866e7529c1946b7ce02692a6d2f815da7005af619aa52f26c658a516520"
+    },
+    "build-nextflow-pipeline": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/build-nextflow-pipeline/SKILL.md",
+      "computedHash": "7c5d76a10ef44c93acde878abd531db73e5c6607c73a463a4190ab84140e5dd5"
+    },
+    "ce-credentials-setup": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/ce-credentials-setup/SKILL.md",
+      "computedHash": "3884db5a35e5d297cfb345405596355a76147500a3e44b9a2915d691966aa818"
+    },
+    "create-container": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/create-container/SKILL.md",
+      "computedHash": "dfc093b2d5d88b084e0cb7ce9c1c5e21f7be7567f1eb15876a17d1a9fc3da41e"
+    },
+    "debug-local-run": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/debug-local-run/SKILL.md",
+      "computedHash": "ea585b144da1f53d47194a7b39c8d2697aa1f6c5805534bac0d25bb9658c2b17"
+    },
+    "debug-seqera-failed-run": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/debug-seqera-failed-run/SKILL.md",
+      "computedHash": "3cd935a119c3553234cede767e6d8dad27ea74dd96d2ace550f37f3bcc494e25"
+    },
+    "find-alternative-tools": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/find-alternative-tools/SKILL.md",
+      "computedHash": "c600d307ffb58566cbfd5e38756544a386d351e076df701119002ff469fc9b65"
+    },
+    "install-nextflow": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/install-nextflow/SKILL.md",
+      "computedHash": "bcf996fa8ab18064115ad2c6f0f3cfd460681630e45cd3adccc8ec7d91b30e03"
+    },
+    "launch-workflow": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/launch-workflow/SKILL.md",
+      "computedHash": "796515690aa8a8c8ef26a2309a1d7dfc6b73540f5107cd7fea5792cb2bf37433"
+    },
+    "maintain-nf-core-pipeline": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/maintain-nf-core-pipeline/SKILL.md",
+      "computedHash": "9c32bc6b5b2c885995e03c982dc99dc68bfe6547935531be0173f98afbac3b01"
+    },
+    "migrate-from-snakemake": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/migrate-from-snakemake/SKILL.md",
+      "computedHash": "75a44ef2f20ff714be5e8920bf12452c2cf4b1950e306d44b296c1978f0ac2c4"
+    },
+    "migrate-nextflow-code": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/migrate-nextflow-code/SKILL.md",
+      "computedHash": "f5471b4ab33198ae48513f32e55a85214ff9d42ead5f633442cea43cd1c2dbee"
+    },
+    "nextflow-config": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/nextflow-config/SKILL.md",
+      "computedHash": "1dd37b0b6f401817a069f901a1a880aed99f3f53c0211805eb5a253982a39def"
+    },
+    "nextflow-development": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/nextflow-development/SKILL.md",
+      "computedHash": "3a07b0cd9901fa8effb06bb95ebc653489dcb430122eaf7f4d99d5442f766b3f"
+    },
+    "nextflow-history": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/nextflow-history/SKILL.md",
+      "computedHash": "a79e2e23f9ddef7bdaeac7bd84aba27c4b98e23286c1be891e9f7db9d46c3c8c"
+    },
+    "nextflow-output-patterns": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/nextflow-output-patterns/SKILL.md",
+      "computedHash": "1bb0a10c4f9e49e6ff41b81b0d140aa9af7f7d253229dfc2b7ebf724d012c8b2"
+    },
+    "nextflow-schema": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/nextflow-schema/SKILL.md",
+      "computedHash": "6249840fb7abfe6641bfe7cffd560f61da8ab928d8ed5fb0b82123b496b6bb1d"
+    },
+    "nf-data-lineage": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/nf-data-lineage/SKILL.md",
+      "computedHash": "6e8ed74df8ed911f61812bce6ac7e99e114aa87cf6ebe7b99648a815c6eb39d2"
+    },
+    "nf-docker-scripts": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/nf-docker-scripts/SKILL.md",
+      "computedHash": "cb5435cf3cd3fee92d683429a683dbf927d978e6c32622748d854f9bf43b873a"
+    },
+    "nf-pipeline-design": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/nf-pipeline-design/SKILL.md",
+      "computedHash": "2a716bc94b904018a07eee7ca4e8f7d37726a3ef5392f7f299a1c28dea06f4b2"
+    },
+    "nf-plugin-development": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/nf-plugin-development/SKILL.md",
+      "computedHash": "f55043946063929910928236b9423d01ddc231d66d20a021a674fe46d3b303a6"
+    },
+    "nf-plugin-legacy-migration": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/nf-plugin-legacy-migration/SKILL.md",
+      "computedHash": "0d6fb2a057fa650247002cf7fd66491bcb58b869fb1b3486f297729667a31a3a"
+    },
+    "nf-test": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/nf-test/SKILL.md",
+      "computedHash": "179793e7f3eed607a72df8fc66ff07da7c3d062e8ca1319361791bc4d97ba25b"
+    },
+    "repair-workflow": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/repair-workflow/SKILL.md",
+      "computedHash": "4bdbd56eac2006a5357ac75a34bf7c13b38d9aa8f366638a959b46e5fdb59a69"
+    },
+    "run-module": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/run-module/SKILL.md",
+      "computedHash": "fbb78606074fb43e05c6c90db647b0d6552273504bb278adc5439aca17352c77"
+    },
+    "search-existing-modules": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/search-existing-modules/SKILL.md",
+      "computedHash": "b19e68380d5ee917a492e68c374ba288b5f1a4ac451099c2fbc8a73500688623"
+    },
+    "seqera-data-links": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/seqera-data-links/SKILL.md",
+      "computedHash": "8109ef29c3d522def263b46c81ccfd5edf9d9378f33e18b440658f31eca28cb3"
+    },
+    "seqerakit": {
+      "source": "seqeralabs/nextflow-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/seqerakit/SKILL.md",
+      "computedHash": "fd9ff4eb426f9328af0d07c28e780b9d9b0f0db6002658ca1b470ad65da2973c"
+    }
+  }
+}

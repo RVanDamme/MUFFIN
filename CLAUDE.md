@@ -70,7 +70,9 @@ nf-test test --profile +<engine>
 
 **Behaviour**
 - Implement the *intended* behaviour (report §3), not the legacy bugs. Every deviation from legacy behaviour gets a `CHANGELOG.md` line under `### Changed` or `### Fixed`, including the ones already decided.
-- Legacy code moves to `legacy/` in Stage 1 and stays until the user confirms the comparison is done.
+- The rebuild is version **2.0.0** (`2.0.0dev` during development), not 3.0.0, wherever older docs say otherwise.
+- `README_v2.md` is the human-readable status of the rebuild (what works, how to run it, what changed, what is pending). Update it at the end of every stage and whenever user-facing behaviour changes; it replaces `README.md` in Stage 7.
+- Legacy code moves to `legacy/` (same directory names; files still needed stay in place) in Stage 1 and stays until the user confirms the comparison is done.
 
 **Git**
 - Work on `Upgrade`. Small conventional commits (`feat(binning): …`, `fix(bin_qc): …`), one logical change each, with the task ID in the body (`Task: 4.3`). Never commit `work/`, `.nextflow*`, `results*/`, `.nf-test/`.

@@ -1,0 +1,57 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/nflint-example-pipeline/nextflow_schema.json",
+    "title": "nflint-example-pipeline parameters",
+    "description": "Fast FASTA composition pipeline used as a reference implementation of the design-nextflow-pipelines skill.",
+    "type": "object",
+    "$defs": {
+        "input_output_options": {
+            "title": "Input / output options",
+            "type": "object",
+            "fa_icon": "fas fa-folder-open",
+            "description": "Where the pipeline reads from and writes to.",
+            "required": ["input", "outdir"],
+            "properties": {
+                "input": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.(fa|fasta)(\\.gz)?$",
+                    "description": "Path to a FASTA file of one or more nucleotide sequences.",
+                    "help_text": "The pipeline splits this file into per-sequence records and computes composition metrics for each."
+                },
+                "outdir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "default": "results",
+                    "description": "Directory where published outputs are written."
+                }
+            }
+        },
+        "analysis_options": {
+            "title": "Analysis options",
+            "type": "object",
+            "fa_icon": "fas fa-chart-bar",
+            "description": "Analysis tuning knobs.",
+            "properties": {
+                "kmer_size": {
+                    "type": "integer",
+                    "default": 3,
+                    "minimum": 1,
+                    "maximum": 8,
+                    "description": "k for the k-mer profile.",
+                    "help_text": "Larger k produces sparser profiles; values above 8 are usually noise for short inputs."
+                },
+                "summary_title": {
+                    "type": "string",
+                    "default": "FASTA composition report",
+                    "description": "Title printed at the top of the rendered markdown report."
+                }
+            }
+        }
+    },
+    "allOf": [
+        {"$ref": "#/$defs/input_output_options"},
+        {"$ref": "#/$defs/analysis_options"}
+    ]
+}

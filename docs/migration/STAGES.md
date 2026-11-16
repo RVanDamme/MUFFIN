@@ -21,13 +21,14 @@ Run legacy MUFFIN on the OSF subset (`https://osf.io/9xmh4/download`) with Nextf
 
 ⚠️ Confirm before generating: decisions N1, N2, N10 and the template features. Proposed `skip_features`: `igenomes`, `fastqc`, `is_nfcore`, `email`, `seqera_platform`, `gpu`, `codespaces`, plus `license` if GPL-3.0 is kept.
 
-1. `git mv` all legacy code (`main.nf`, `nextflow.config`, `modules/`, `readflows/`, `configs/`, `obsolete_process/`, `MUFFIN_params.yml`, and everything in `bin/` — the pankegg scripts are replaced by the standalone tool) into `legacy/`. Keep `.figure/`, `LICENSE`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `README.md`, `CLAUDE.md`, `.claude/`, `docs/migration/` in place. Commit.
-2. Generate the template into a **scratch directory outside the repo** with `nf-core pipelines create --template-yaml <file>` (name `muffin`, organisation `RVanDamme`, version `3.0.0dev`). Copy its files, not its `.git`, into the repo. Resolve collisions explicitly (`README.md`, `.gitignore`, `docs/`, `LICENSE`) and list each resolution in the plan. If N10 is yes, tell the user how to push the scratch repo's `TEMPLATE` branch.
+1. `git mv` all legacy code (`main.nf`, `nextflow.config`, `modules/`, `readflows/`, `configs/`, `obsolete_process/`, `MUFFIN_params.yml`, and everything in `bin/` — the pankegg scripts are replaced by the standalone tool) into `legacy/`. Preserve directory names under `legacy/` (`legacy/modules/`, `legacy/bin/`, …); only files that are no longer needed move. Keep `.figure/`, `LICENSE`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `README.md`, `CLAUDE.md`, `.claude/`, `docs/migration/` in place. Commit.
+2. Generate the template into a **scratch directory outside the repo** with `nf-core pipelines create --template-yaml <file>` (name `muffin`, organisation `RVanDamme`, version `2.0.0dev`). Copy its files, not its `.git`, into the repo. Resolve collisions explicitly (`README.md`, `.gitignore`, `docs/`, `LICENSE`) and list each resolution in the plan. If N10 is yes, tell the user how to push the scratch repo's `TEMPLATE` branch.
 3. Remove template leftovers that do not apply (`params.fasta` / `getGenomeAttribute` if igenomes is skipped). Set `manifest.nextflowVersion` per N1.
 4. Samplesheet schemas per report §5.2: `assets/schema_input.json` (`sample, short_reads_1, short_reads_2, long_reads, rna_reads_1, rna_reads_2`; at least one of short pair / long; pairs complete), `assets/schema_coverage.json`, `assets/schema_bins.json`. In `PIPELINE_INITIALISATION` derive `meta.mode`, `meta.has_rna`, `meta.single_end`.
 5. All parameters of report §5.3 in `nextflow.config` with defaults, plus the taxonomy parameters of addendum §4a (`--bin_taxonomy sourmash|sourmash_lca|gtdbtk`, default `sourmash`; `--sourmash_lca_db`; `--gtdbtk_db`), with the GTDB-Tk resource cost in the schema help text; rebuild `nextflow_schema.json` (`nf-core pipelines schema build --no-prompts`, then fill descriptions/enums by editing the JSON).
 6. `conf/test.config` pointing at small hosted data. Propose the dataset (nf-core/test-datasets is reachable; the OSF subset is larger) and its size before wiring it.
-7. Start `CHANGELOG.md` at `v3.0.0dev` with the breaking CLI change (D2).
+8. Create `README_v2.md` at the repo root: human-readable status of the rebuild (what works, how to run, what changed, what is pending). Update it at the end of every stage; it replaces `README.md` in Stage 7.
+7. Start `CHANGELOG.md` at `v2.0.0dev` with the breaking CLI change (D2).
 
 **Accept**
 - `nextflow lint .` → 0 errors; 0 warnings outside `modules/nf-core/**` and `legacy/` (exclude `legacy/` from lint or state its count separately).
@@ -86,7 +87,7 @@ Pipeline-level nf-test per mode (`tests/*.nf.test`) with snapshots of stable out
 
 ## Stage 7 — Docs and release preparation
 
-`README.md`, `docs/usage.md` (with the old → new parameter table of report §5.3), `docs/output.md`, `CITATIONS.md`, `CHANGELOG.md` for v3.0.0. ⚠️ Ask before deleting `legacy/`.
+`README_v2.md` finalised and moved over `README.md` (old one to `legacy/README.md`), `docs/usage.md` (with the old → new parameter table of report §5.3), `docs/output.md`, `CITATIONS.md`, `CHANGELOG.md` for v2.0.0. ⚠️ Ask before deleting `legacy/`.
 
 **Accept**: `nf-core pipelines lint` → 0 failures.
 
